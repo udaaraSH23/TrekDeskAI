@@ -6,6 +6,59 @@ The TrekDesk AI backend uses a PostgreSQL database. The schema is designed to su
 
 Migrations are managed using `node-pg-migrate`.
 
+## Entity Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    TENANTS ||--o{ USERS : "employs"
+    TENANTS ||--o{ TREKS : "offers"
+    TENANTS ||--o{ AI_SETTINGS : "configures"
+    TENANTS ||--o{ CALL_LOGS : "records"
+    TENANTS ||--o{ DOCUMENT_CHUNKS : "owns knowledge"
+
+    TREKS ||--o{ DOCUMENT_CHUNKS : "scoped to"
+
+    USERS {
+        uuid id PK
+        varchar tenant_id FK
+        varchar email "Unique"
+        varchar role
+        varchar google_id "SSO Identifier"
+    }
+
+    TREKS {
+        uuid id PK
+        varchar tenant_id FK
+        varchar name
+        decimal base_price
+        boolean is_active
+    }
+
+    AI_SETTINGS {
+        uuid id PK
+        varchar tenant_id FK
+        text system_instruction "AI Persona Prompt"
+        varchar voice_name
+    }
+
+    DOCUMENT_CHUNKS {
+        uuid id PK
+        varchar tenant_id FK
+        uuid trek_id FK "Nullable Route specific scope"
+        text content "Raw Text Chunk"
+        vector embedding "pgvector dense format"
+    }
+
+    CALL_LOGS {
+        uuid id PK
+        varchar tenant_id FK
+        varchar session_id
+        text transcript
+        varchar sentiment
+        int duration_seconds
+    }
+```
+
 ## Tables
 
 ### `users`

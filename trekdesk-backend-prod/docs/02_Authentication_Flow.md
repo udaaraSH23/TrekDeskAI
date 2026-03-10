@@ -6,6 +6,30 @@ The backend uses **JSON Web Tokens (JWT)** for stateless API authentication and 
 
 ## Google Login Flow
 
+## Google Login Flow
+
+```mermaid
+sequenceDiagram
+    participant Client as Frontend Dashboard
+    participant Google as Google Identity Services
+    participant API as /api/v1/auth/google
+    participant AuthService as AuthService
+    participant DB as PostgreSQL (users)
+
+    Client->>Google: 1. Request OAuth Login
+    Google-->>Client: 2. Return short-lived `idToken`
+    Client->>API: 3. POST `idToken`
+    API->>AuthService: 4. verifyGoogleToken(idToken)
+    AuthService->>Google: 5. Cryptographic signature check
+    Google-->>AuthService: 6. Signature Valid + Email Payload
+    AuthService->>AuthService: 7. Check `GOOGLE_AUTH_WHITELIST`
+    AuthService->>DB: 8. Upsert (Create/Update) user profile
+    DB-->>AuthService: Return DB `UserRow`
+    AuthService->>AuthService: 9. Generate signed internal JWT
+    AuthService-->>API: Return AuthUser + local JWT Bearer token
+    API-->>Client: 200 OK (Token payload)
+```
+
 1.  **Client Kickoff:** The frontend dashboard opens the Google Sign-In prompt.
 2.  **ID Token Retrieval:** Upon successful login, Google gives the frontend an `idToken`.
 3.  **Backend Verification (`POST /api/v1/auth/google`):** The frontend sends this `idToken` to our backend.

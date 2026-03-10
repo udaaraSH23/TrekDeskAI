@@ -8,6 +8,13 @@ This pipeline consists of three phases: Ingestion, Retrieval, and Live Integrati
 
 ## 1. Document Ingestion (Storing Knowledge)
 
+```mermaid
+flowchart LR
+    Doc["Raw Text Payload"] --> Chunking["Chunk Document\n(1000 chars)"]
+    Chunking --> Embedding["Google text-embedding-004\n(Generate [0.01, -0.05...])"]
+    Embedding --> DB[("PostgreSQL\n(document_chunks)")]
+```
+
 To make documents searchable by the AI, we must convert them into vector embeddings.
 
 - **API Endpoint:** `POST /api/v1/knowledge/ingest`
@@ -17,6 +24,18 @@ To make documents searchable by the AI, we must convert them into vector embeddi
 - **Database Storage (`KnowledgeRepository.ts`):** The repository inserts the raw text chunk, its embedding vector, and any metadata (like an associated `trekId`) into the PostgreSQL `document_chunks` table.
 
 ## 2. Knowledge Retrieval (Finding Answers)
+
+```mermaid
+flowchart TD
+    Query["User Question"] --> Embedding["Google text-embedding-004\n(Generate Query Vector)"]
+    Embedding --> DB[("pgvector Database")]
+
+    subgraph Cosine Distance Search `<=>`
+        DB -- "Compare against\nall stored chunks" --> TopK["Select Top 3\nClosest Matches"]
+    end
+
+    TopK --> Results["Return raw text to AI"]
+```
 
 When a user asks a complex question, we search our vector space for the most mathematically similar text chunks.
 

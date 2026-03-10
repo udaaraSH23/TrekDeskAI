@@ -6,6 +6,16 @@ The core of TrekDesk AI is its ability to conduct natural, real-time voice conve
 
 ## The WebSocket Architecture (`src/sockets/voiceSession.ts`)
 
+```mermaid
+flowchart LR
+    Frontend(["Frontend Microphone"]) <-->|ws://.../voicesession\nRaw PCM 16kHz Audio| Backend["Node.js Backend (ws)"]
+    Backend <-->|wss://generativelanguage...\nBase64 Audio + Tools| Gemini(["Google Gemini API"])
+
+    subgraph Backend Server
+        Backend -- "Proxy Stream" --> Backend
+    end
+```
+
 Instead of standard REST HTTP calls where a user submits audio, waits for processing, and receives a response (which creates massive latency), we maintain a dual-WebSocket stream architecture:
 
 1.  **Frontend <-> Backend (Widget to Node.js):** The frontend web widget opens a WebSocket connection to our Node backend at `ws://<server>/voicesession`. It rapidly streams raw base64-encoded PCM audio chunks as the user speaks.
@@ -20,6 +30,26 @@ When Gemini generates spoken audio responses, it streams PCM chunks back to our 
 ## Tool Calling (Function Execution)
 
 The Gemini model is not just a chatbot; it acts as an agent capable of taking actions.
+
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant Backend
+    participant Gemini as Google Gemini
+    participant Data as Local Database
+
+    Frontend->>Backend: User asks: "How much is the trek tomorrow?"
+    Backend->>Gemini: Stream user audio
+    Note over Gemini: AI realizes it needs internal data
+    Gemini-->>Backend: Pause audio stream
+    Gemini-->>Backend: `toolCall: check_guide_calendar(tomorrow)`
+    Backend->>Data: Query local database availability
+    Data-->>Backend: Return {"available": true, "price": $400}
+    Backend-->>Gemini: `functionResponse: check_guide_calendar` RESULT
+    Note over Gemini: AI ingests facts, formulates speech
+    Gemini->>Backend: Generate audio: "It's $400 and available!"
+    Backend->>Frontend: Stream audio back to user
+```
 
 ### 1. Declaring Tools (`src/config/tools.ts`)
 

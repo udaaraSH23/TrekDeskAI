@@ -12,6 +12,19 @@ The application is structured into three distinct layers:
 2.  **Services (`src/services`):** The core Business Logic Layer (BLL). Services handle complex operations, orchestration, authentication verification, and data manipulation. They never touch the database directly; instead, they rely on abstract repository interfaces.
 3.  **Repositories (`src/repositories`):** The Data Access Layer (DAL). Repositories are strictly responsible for executing SQL queries against the underlying PostgreSQL database.
 
+```mermaid
+flowchart TD
+    Client(["Frontend Client (React)"]) --> Router
+
+    subgraph Express Application
+        Router["Express Router (REST API)"] --> Controller["Controllers (Validation & HTTP)"]
+        Controller --> Service["Services (Business Logic)"]
+        Service --> Repository["Repositories (Data Access)"]
+    end
+
+    Repository --> Database[("PostgreSQL Database")]
+```
+
 ## Dependency Injection (DI)
 
 To avoid tight coupling, we do not use static methods or hard-coded instantiations inside classes. Instead, we use Constructor-based Dependency Injection.
@@ -23,6 +36,20 @@ Each Service and Repository defines an interface in `src/interfaces/services` an
 ### The DI Container (`src/config/di.ts`)
 
 The `di.ts` file acts as a central manual wiring hub.
+
+```mermaid
+flowchart LR
+    subgraph di.ts [DI Container]
+        TR[TourRepository]
+        TS[TourService]
+        TC[TourController]
+
+        TR -- inverts via ITourRepository --> TS
+        TS -- inverts via ITourService --> TC
+    end
+
+    TC -. exported to .-> Routes
+```
 
 1. It instantiates all repositories.
 2. It instantiates services by injecting the required repository instances into their constructors.
