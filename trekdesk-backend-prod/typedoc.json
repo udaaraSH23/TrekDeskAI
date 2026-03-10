@@ -1,0 +1,15 @@
+{
+  "entryPoints": [
+    "src/interfaces/services/*.ts",
+    "src/interfaces/repositories/*.ts",
+    "src/services/*.ts",
+    "src/repositories/*.ts"
+  ],
+  "out": "docs/typedoc",
+  "name": "TrekDesk AI Backend Internals",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "theme": "default",
+  "plugin": []
+}

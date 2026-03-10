@@ -1,0 +1,13 @@
+/**
+ * TrekDesk AI - Core AI Type Definitions
+ *
+ * This file now re-exports the Zod-inferred TypeScript interfaces.
+ * The actual Zod schemas are located in src/models/ai.schema.ts
+ */
+
+export {
+  AISettings,
+  ToolCall,
+  ChatMessage,
+  ItineraryGenerationArgs,
+} from "../models/ai.schema";

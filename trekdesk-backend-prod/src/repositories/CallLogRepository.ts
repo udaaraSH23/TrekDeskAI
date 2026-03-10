@@ -1,0 +1,68 @@
+import { query } from "../config/database";
+import { ICallLogRepository } from "../interfaces/repositories/ICallLogRepository";
+import { CallLogStats } from "../models/logs.schema";
+
+/**
+ * Repository implementation for retrieving agent conversation transcripts and summaries.
+ * Interacts directly with the PostgreSQL database.
+ */
+export class CallLogRepository implements ICallLogRepository {
+  /**
+   * Retrieves all call logs for a specific tenant, ordered by the most recent conversation first.
+   *
+   * @param tenantId - The UUID of the tenant/tour operator.
+   * @returns A Promise resolving to an array of call log rows.
+   */
+  public async getLogsByTenant(tenantId: string) {
+    const result = await query(
+      "SELECT id, session_id, transcript, summary, sentiment_score, duration_seconds, created_at FROM call_logs WHERE tenant_id = $1 ORDER BY created_at DESC",
+      [tenantId],
+    );
+    return result.rows;
+  }
+
+  /**
+   * Retrieves a specific call log by its exact ID.
+   * Strictly scopes the query by tenantId to prevent unauthorized log access.
+   *
+   * @param logId - The UUID of the requested log.
+   * @param tenantId - The UUID of the tenant/tour operator.
+   * @returns A Promise resolving to the call log object, or null if not found.
+   */
+  public async getLogByIdAndTenant(logId: string, tenantId: string) {
+    const result = await query(
+      "SELECT * FROM call_logs WHERE id = $1 AND tenant_id = $2",
+      [logId, tenantId],
+    );
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Retrieves aggregated statistics for a tenant, calculating overall usage metrics
+   * and identifying high value "hot leads" via sentiment scoring.
+   *
+   * @param tenantId - The UUID of the tenant/tour operator.
+   * @returns A Promise resolving to a CallLogStats DTO containing aggregated data.
+   */
+  public async getStatsByTenant(tenantId: string): Promise<CallLogStats> {
+    const countRes = await query(
+      "SELECT COUNT(*) FROM call_logs WHERE tenant_id = $1",
+      [tenantId],
+    );
+
+    const leadRes = await query(
+      `SELECT id, session_id, sentiment_score, created_at, summary 
+       FROM call_logs 
+       WHERE tenant_id = $1 AND sentiment_score > 0.7
+       ORDER BY created_at DESC 
+       LIMIT 5`,
+      [tenantId],
+    );
+
+    return {
+      totalCalls: parseInt(countRes.rows[0].count, 10) || 0,
+      hotLeads: leadRes.rows,
+      leadsCount: leadRes.rowCount || 0,
+    };
+  }
+}
