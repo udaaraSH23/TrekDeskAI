@@ -1,1 +1,3 @@
+#!/bin/sh
+cd trekdesk-backend-prod
 npx lint-staged
