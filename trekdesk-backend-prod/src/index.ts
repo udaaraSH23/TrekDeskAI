@@ -1,6 +1,6 @@
 /**
- *    @file index.ts
- * @description    TrekDesk AI Backend Entry Point. Bootstrap for HTTP/WebSocket servers.
+ * @file index.ts
+ * @description TrekDesk AI Backend Entry Point. Bootstrap for HTTP/WebSocket servers.
  */
 
 /**
