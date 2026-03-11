@@ -1,3 +1,7 @@
+/**
+ * @file UserRepository.ts
+ * @description Data access logic for user identity and profile management.
+ */
 import { query } from "../config/database";
 import { IUserRepository } from "../interfaces/repositories/IUserRepository";
 import { UserRow, GoogleUserPayload } from "../models/auth.schema";

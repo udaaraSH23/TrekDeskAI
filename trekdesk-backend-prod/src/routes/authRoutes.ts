@@ -1,3 +1,7 @@
+/**
+ * @file authRoutes.ts
+ * @description Express routes for Google OAuth authentication and session verification.
+ */
 import { Router } from "express";
 import { authController } from "../config/di";
 import { authMiddleware } from "../middleware/authMiddleware";
@@ -9,7 +13,7 @@ const router = Router();
  * /api/v1/auth/google:
  *   post:
  *     summary: Authenticate via Google OAuth2
- *     description: Verify Google ID token and issue a backend JWT.
+ *     description: Verify Google ID token, upsert user securely, and issue a backend JWT for session management.
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -22,13 +26,37 @@ const router = Router();
  *             properties:
  *               idToken:
  *                 type: string
+ *                 example: "eyJhbGciOiJSUzI1NiIsImtpZCI..."
  *     responses:
  *       200:
- *         description: Successfully authenticated
+ *         description: Successfully authenticated. Returns user data and JWT.
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "success"
+ *               message: "Login successful"
+ *               data:
+ *                 user:
+ *                   id: "123e4567-e89b-12d3-a456-426614174000"
+ *                   email: "guide@kandytreks.com"
+ *                   fullName: "Jane Doe"
+ *                   pictureUrl: "https://lh3.googleusercontent.com/a/..."
+ *                   tenantId: "00000000-0000-0000-0000-000000000001"
+ *                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
  *       400:
- *         description: Invalid Token
+ *         description: Bad Request (Missing Token)
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "error"
+ *               message: "ID Token is required"
  *       401:
- *         description: Unauthorized Email
+ *         description: Unauthorized (Email not whitelisted or token invalid)
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "error"
+ *               message: "Unauthorized: Access restricted to whitelisted accounts"
  */
 router.post("/google", authController.googleLogin.bind(authController));
 
@@ -37,15 +65,30 @@ router.post("/google", authController.googleLogin.bind(authController));
  * /api/v1/auth/verify:
  *   get:
  *     summary: Verify Session JWT
- *     description: Validate the current Bearer token.
+ *     description: Validates the current Bearer token in the Authorization header to restore a frontend session on page reload.
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Token is valid
+ *         description: Token is valid. Returns minimal user profile.
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "success"
+ *               message: "Session verified"
+ *               data:
+ *                 user:
+ *                   id: "123e4567-e89b-12d3-a456-426614174000"
+ *                   email: "guide@kandytreks.com"
+ *                   tenantId: "00000000-0000-0000-0000-000000000001"
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized (Token expired or missing)
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "error"
+ *               message: "Invalid or expired routing token"
  */
 router.get(
   "/verify",

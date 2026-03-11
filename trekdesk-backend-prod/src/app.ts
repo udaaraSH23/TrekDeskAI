@@ -1,4 +1,8 @@
 /**
+ * @file app.ts
+ * @description Express application configuration, middleware, and route registration.
+ */
+/**
  * TrekDesk AI - Express Application Configuration
  *
  * This module configures the Express application, including middleware,
@@ -90,6 +94,7 @@ const authLimiter = rateLimit({
  * Public Routes
  * Accessible without authentication (e.g., Google OAuth login)
  */
+app.use("/api", apiLimiter); // Apply general rate limiting to all API routes
 app.use("/api/v1/auth", authLimiter, authRoutes);
 
 /**

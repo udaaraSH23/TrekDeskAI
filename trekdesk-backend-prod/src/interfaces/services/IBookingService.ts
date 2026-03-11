@@ -1,8 +1,17 @@
 /**
  * Interface representing the business logic layer for transactional booking operations.
- * Handles mock or real integrations for calendar availability and quote generation.
+ * Handles mock or real integrations for calendar availability and quote generation, as well as real bookings.
  */
+import { BookingRow, CreateBookingPayload } from "../../models/booking.schema";
+
 export interface IBookingService {
+  /**
+   * Finalizes and securely persists a verified tour booking request.
+   *
+   * @param payload - Safely parsed DTO containing the user's details and target trek.
+   * @returns A Promise resolving to the finished DB row containing the unique booking ID.
+   */
+  createBooking(payload: CreateBookingPayload): Promise<BookingRow>;
   /**
    * Checks the availability of tour guides/treks for a specific date.
    *

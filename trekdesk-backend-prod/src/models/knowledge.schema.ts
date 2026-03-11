@@ -1,3 +1,7 @@
+/**
+ * @file knowledge.schema.ts
+ * @description Zod schemas and TypeScript types for knowledge base ingestion and semantic search.
+ */
 import { z } from "zod";
 
 /**

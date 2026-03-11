@@ -1,3 +1,7 @@
+/**
+ * @file env.ts
+ * @description Runtime environment variable validation and configuration.
+ */
 import { z } from "zod";
 import * as dotenv from "dotenv";
 

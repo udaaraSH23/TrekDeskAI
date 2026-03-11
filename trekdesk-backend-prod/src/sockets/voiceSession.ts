@@ -1,4 +1,8 @@
 /**
+ * @file voiceSession.ts
+ * @description Real-time WebSocket session handler for the Gemini Multimodal Live API.
+ */
+/**
  * TrekDesk AI - Voice Session Handler
  *
  * This module manages individual real-time voice sessions between a client
@@ -9,7 +13,11 @@
 
 import { WebSocket } from "ws";
 import { GeminiService } from "../services/GeminiService";
-import { toolDispatcher, aiSettingsRepository } from "../config/di";
+import {
+  toolDispatcher,
+  aiSettingsRepository,
+  callLogService,
+} from "../config/di";
 import { AISettings } from "../types/ai";
 import { MVP_TENANT_ID } from "../config/constants";
 import { tools } from "../config/tools";
@@ -30,7 +38,16 @@ const geminiService = new GeminiService(tools);
 export const handleVoiceConnection = async (ws: WebSocket) => {
   console.log("[Server] Incoming Multimodal Voice Connection");
 
+  const startTime = Date.now();
+  const sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
+  let liveTranscript = "";
+
   try {
+    // 0. Inform the system a call has started
+    await callLogService.startCallSession({
+      tenantId: MVP_TENANT_ID,
+      sessionId,
+    });
     /**
      * Session Initialization: Load AI Settings
      * Retrieves the persona and vocal identity from the database.
@@ -60,6 +77,12 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
          */
         if (response.serverContent?.modelTurn) {
           ws.send(JSON.stringify(response.serverContent.modelTurn));
+
+          // Try to scrape text part for local transcript representation (for MVP bounds)
+          const parts = response.serverContent.modelTurn?.parts || [];
+          for (const p of parts) {
+            if (p.text) liveTranscript += p.text + " ";
+          }
         }
 
         /**
@@ -112,9 +135,22 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      * Ensures all external connections (like the Gemini stream) are
      * properly disposed of when the client disconnects.
      */
-    ws.on("close", () => {
+    ws.on("close", async () => {
       geminiWs.close();
-      console.log("[Server] Voice session closed");
+      const durationSecs = Math.floor((Date.now() - startTime) / 1000);
+      try {
+        await callLogService.endCallSession({
+          tenantId: MVP_TENANT_ID,
+          sessionId,
+          transcriptText: liveTranscript,
+          durationSeconds: durationSecs,
+        });
+      } catch (e) {
+        console.error("[Server] Error saving call log:", e);
+      }
+      console.log(
+        "[Server] Voice session closed. Duration: " + durationSecs + "s",
+      );
     });
   } catch (err) {
     console.error("[Server] Session initialization error:", err);

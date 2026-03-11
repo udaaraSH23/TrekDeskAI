@@ -1,4 +1,4 @@
-import { CallLogStats } from "../../models/logs.schema";
+import { CallLogStats, UpdateCallLogPayload } from "../../models/logs.schema";
 
 /**
  * Interface definition for the interactions surrounding AI session Call Logs.
@@ -29,4 +29,24 @@ export interface ICallLogRepository {
    * @returns A Promise resolving to the structured CallLogStats object.
    */
   getStatsByTenant(tenantId: string): Promise<CallLogStats>;
+
+  /**
+   * Initializes a new call log trace row upon session start.
+   *
+   * @param tenantId - The UUID of the operator.
+   * @param sessionId - A unique string representing the voice connection.
+   */
+  createLog(tenantId: string, sessionId: string): Promise<any>;
+
+  /**
+   * Finalizes the call log trace array with full transcription and analytics.
+   *
+   * @param sessionId - A unique string representing the voice connection.
+   * @param tenantId - The UUID of the operator.
+   * @param transcript - The JSON object storing the conversation.
+   * @param summary - A text synopsis of the call.
+   * @param sentimentScore - A rating (e.g. 0 to 1).
+   * @param durationSeconds - The total time in seconds the call lasted.
+   */
+  updateLog(payload: UpdateCallLogPayload): Promise<void>;
 }

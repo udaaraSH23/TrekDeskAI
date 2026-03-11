@@ -1,3 +1,7 @@
+/**
+ * @file logs.schema.ts
+ * @description Zod schemas and TypeScript types for AI call logs and interaction statistics.
+ */
 import { z } from "zod";
 
 /**
@@ -28,3 +32,38 @@ export const CallLogSchema = z.object({
 });
 
 export type CallLog = z.infer<typeof CallLogSchema>;
+
+/**
+ * DTO for the internal payload required to initialize a new Call Log trace.
+ * This is typically triggered the moment a WebSocket establishes connection.
+ */
+export const CreateCallLogPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  sessionId: z.string().min(5),
+});
+export type CreateCallLogPayload = z.infer<typeof CreateCallLogPayloadSchema>;
+
+/**
+ * DTO for the internal payload required to seal a completed Call Log trace.
+ * Contains transcript data and synthetic analytics like sentiment and duration.
+ */
+export const UpdateCallLogPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  sessionId: z.string().min(5),
+  transcript: z.any(),
+  summary: z.string(),
+  sentimentScore: z.number().min(0).max(1),
+  durationSeconds: z.number().nonnegative(),
+});
+export type UpdateCallLogPayload = z.infer<typeof UpdateCallLogPayloadSchema>;
+
+/**
+ * DTO for the payload provided by the WebSocket when terminating a voice session.
+ */
+export const EndCallSessionPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  sessionId: z.string().min(5),
+  transcriptText: z.string(),
+  durationSeconds: z.number().nonnegative(),
+});
+export type EndCallSessionPayload = z.infer<typeof EndCallSessionPayloadSchema>;

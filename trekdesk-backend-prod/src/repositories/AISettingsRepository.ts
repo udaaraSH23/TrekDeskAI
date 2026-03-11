@@ -1,3 +1,7 @@
+/**
+ * @file AISettingsRepository.ts
+ * @description Data access logic for managing AI persona settings.
+ */
 import { query } from "../config/database";
 import { IAISettingsRepository } from "../interfaces/repositories/IAISettingsRepository";
 import { AISettingsRow, UpdateAISettingsPayload } from "../models/ai.schema";

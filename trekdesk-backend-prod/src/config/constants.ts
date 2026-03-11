@@ -1,4 +1,8 @@
 /**
+ * @file constants.ts
+ * @description Application-wide constant values, tenant IDs, and authentication whitelists.
+ */
+/**
  * Hardcoded Tenant ID for the MVP (Kandy Treks).
  * Using a fixed UUID forces the backend logic into a multi-tenant structure from day one,
  * enabling fast prototyping while ensuring zero architectural debt when expanding to new customers.

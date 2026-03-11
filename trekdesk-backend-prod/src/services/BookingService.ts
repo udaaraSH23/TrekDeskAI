@@ -5,6 +5,8 @@
  */
 
 import { IBookingService } from "../interfaces/services/IBookingService";
+import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
+import { BookingRow, CreateBookingPayload } from "../models/booking.schema";
 
 /**
  * Service class for handling booking-related operations.
@@ -14,8 +16,34 @@ export class BookingService implements IBookingService {
   /**
    * Creates an instance of BookingService.
    * @param tenantId - The unique identifier of the tenant context for this service instance.
+   * @param bookingRepository - The injected repository instance matching IBookingRepository.
    */
-  constructor(private tenantId: string) {}
+  constructor(
+    private tenantId: string,
+    private bookingRepository: IBookingRepository,
+  ) {}
+
+  /**
+   * Securely manages the flow to formally reserve a hike.
+   * Translates the validated conversational payload into a committed database record.
+   *
+   * @param payload - The conversational DTO to enforce required parameters.
+   * @returns The generated Booking context row.
+   */
+  public async createBooking(
+    payload: CreateBookingPayload,
+  ): Promise<BookingRow> {
+    console.log(
+      `[BookingService] Processing formal booking for ${payload.customerName} on Trek ${payload.trekId}`,
+    );
+
+    // Persist securely to PostgreSQL via the repository pipeline
+    const newBooking = await this.bookingRepository.createBooking(payload);
+
+    // NOTE: In a broader production application, this is where we would trigger
+    // WebSocket events to update the SaaS dashboard, or dispatch an email via SendGrid.
+    return newBooking;
+  }
 
   /**
    * Checks the availability of treks for a specific date.

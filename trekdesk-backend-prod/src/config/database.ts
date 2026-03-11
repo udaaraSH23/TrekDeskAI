@@ -1,3 +1,7 @@
+/**
+ * @file database.ts
+ * @description PostgreSQL connection pool management and query wrapper.
+ */
 import { Pool } from "pg";
 import { env } from "./env";
 

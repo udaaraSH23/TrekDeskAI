@@ -15,8 +15,10 @@ erDiagram
     TENANTS ||--o{ AI_SETTINGS : "configures"
     TENANTS ||--o{ CALL_LOGS : "records"
     TENANTS ||--o{ DOCUMENT_CHUNKS : "owns knowledge"
+    TENANTS ||--o{ BOOKINGS : "manages"
 
     TREKS ||--o{ DOCUMENT_CHUNKS : "scoped to"
+    TREKS ||--o{ BOOKINGS : "receives"
 
     USERS {
         uuid id PK
@@ -56,6 +58,18 @@ erDiagram
         text transcript
         varchar sentiment
         int duration_seconds
+    }
+
+    BOOKINGS {
+        uuid id PK
+        varchar tenant_id FK
+        uuid trek_id FK
+        varchar session_id
+        varchar customer_name
+        varchar customer_phone
+        int pax
+        timestamp target_date
+        varchar status
     }
 ```
 
@@ -126,3 +140,20 @@ Stores the metadata for completed AI voice sessions for dashboard analytics.
 - `sentiment` (VARCHAR) - 'positive', 'neutral', 'negative'
 - `actions_taken` (JSONB)
 - `created_at` (TIMESTAMP)
+
+### `bookings`
+
+Stores reservations and bookings made by users or directly by the AI agent during a call.
+
+- `id` (UUID, Primary Key)
+- `tenant_id` (VARCHAR)
+- `trek_id` (UUID, Foreign Key) - Links to the specific trek booked.
+- `session_id` (VARCHAR, nullable) - Links to the `call_logs` session if created via AI.
+- `customer_name` (VARCHAR)
+- `customer_email` (VARCHAR, nullable)
+- `customer_phone` (VARCHAR)
+- `pax` (INTEGER) - Number of participants.
+- `target_date` (DATE/TIMESTAMP)
+- `status` (VARCHAR/ENUM) - e.g., 'pending', 'confirmed', 'cancelled'.
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)

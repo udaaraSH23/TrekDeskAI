@@ -1,14 +1,21 @@
+/**
+ * @file di.ts
+ * @description Dependency Injection (DI) Container for the application layer architecture.
+ */
 import { UserRepository } from "../repositories/UserRepository";
 import { TourRepository } from "../repositories/TourRepository";
 import { CallLogRepository } from "../repositories/CallLogRepository";
 import { KnowledgeRepository } from "../repositories/KnowledgeRepository";
 import { AISettingsRepository } from "../repositories/AISettingsRepository";
+import { BookingRepository } from "../repositories/BookingRepository";
 
 import { AuthService } from "../services/AuthService";
 import { TourService } from "../services/TourService";
 import { KnowledgeService } from "../services/KnowledgeService";
 import { BookingService } from "../services/BookingService";
 import { ToolDispatcher } from "../services/ToolDispatcher";
+import { CallLogService } from "../services/CallLogService";
+import { PersonaService } from "../services/PersonaService";
 
 import { AuthController } from "../controllers/AuthController";
 import { TourController } from "../controllers/TourController";
@@ -32,6 +39,7 @@ export const tourRepository = new TourRepository();
 export const callLogRepository = new CallLogRepository();
 export const knowledgeRepository = new KnowledgeRepository();
 export const aiSettingsRepository = new AISettingsRepository();
+export const bookingRepository = new BookingRepository();
 
 // ============================================
 // 2. Services (Business Logic Layer)
@@ -39,8 +47,13 @@ export const aiSettingsRepository = new AISettingsRepository();
 export const authService = new AuthService(userRepository);
 export const tourService = new TourService(tourRepository);
 export const knowledgeService = new KnowledgeService(knowledgeRepository);
-// Booking Service needs a tenant ID per its constructor
-export const bookingService = new BookingService(MVP_TENANT_ID);
+// Booking Service needs a tenant ID per its constructor, plus the new repository
+export const bookingService = new BookingService(
+  MVP_TENANT_ID,
+  bookingRepository,
+);
+export const callLogService = new CallLogService(callLogRepository);
+export const personaService = new PersonaService(aiSettingsRepository);
 
 export const toolDispatcher = new ToolDispatcher(
   bookingService,
@@ -53,5 +66,5 @@ export const toolDispatcher = new ToolDispatcher(
 export const authController = new AuthController(authService);
 export const tourController = new TourController(tourService);
 export const knowledgeController = new KnowledgeController(knowledgeService);
-export const callLogController = new CallLogController(callLogRepository);
-export const personaController = new PersonaController(aiSettingsRepository);
+export const callLogController = new CallLogController(callLogService);
+export const personaController = new PersonaController(personaService);

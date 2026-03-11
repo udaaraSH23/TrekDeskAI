@@ -1,3 +1,7 @@
+/**
+ * @file KnowledgeRepository.ts
+ * @description Data access logic for managing vectorized knowledge base chunks.
+ */
 import { query } from "../config/database";
 import { IKnowledgeRepository } from "../interfaces/repositories/IKnowledgeRepository";
 import {

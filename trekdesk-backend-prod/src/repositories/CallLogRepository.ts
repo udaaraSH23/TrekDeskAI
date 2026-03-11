@@ -1,6 +1,10 @@
+/**
+ * @file CallLogRepository.ts
+ * @description Data access logic for retrieving AI call logs and analytics.
+ */
 import { query } from "../config/database";
 import { ICallLogRepository } from "../interfaces/repositories/ICallLogRepository";
-import { CallLogStats } from "../models/logs.schema";
+import { CallLogStats, UpdateCallLogPayload } from "../models/logs.schema";
 
 /**
  * Repository implementation for retrieving agent conversation transcripts and summaries.
@@ -64,5 +68,38 @@ export class CallLogRepository implements ICallLogRepository {
       hotLeads: leadRes.rows,
       leadsCount: leadRes.rowCount || 0,
     };
+  }
+
+  /**
+   * Initializes a new empty call session in the database.
+   */
+  public async createLog(tenantId: string, sessionId: string): Promise<any> {
+    const result = await query(
+      "INSERT INTO call_logs (tenant_id, session_id) VALUES ($1, $2) RETURNING id",
+      [tenantId, sessionId],
+    );
+    return result.rows[0];
+  }
+
+  /**
+   * Appends the finalized statistics and transcription to an existing session trace.
+   */
+  public async updateLog(payload: UpdateCallLogPayload): Promise<void> {
+    await query(
+      `UPDATE call_logs 
+       SET transcript = $1, 
+           summary = $2, 
+           sentiment_score = $3, 
+           duration_seconds = $4 
+       WHERE session_id = $5 AND tenant_id = $6`,
+      [
+        JSON.stringify(payload.transcript),
+        payload.summary,
+        payload.sentimentScore,
+        payload.durationSeconds,
+        payload.sessionId,
+        payload.tenantId,
+      ],
+    );
   }
 }

@@ -1,4 +1,8 @@
 /**
+ * @file tools.ts
+ * @description Gemini Multimodal Live API tool and function declarations.
+ */
+/**
  * TrekDesk AI - Gemini Tool Declarations
  *
  * This file defines the function declarations (tools) that the Google Gemini
@@ -105,6 +109,54 @@ export const tools = [
             },
           },
           required: ["query"],
+        },
+      },
+
+      /**
+       * Tool: book_trek
+       * Purpose: Formalizes a reservation and commits it to the database.
+       * Logic: Strictly requires customer details including a mobile/WhatsApp number to ensure the operator can follow up.
+       */
+      {
+        name: "book_trek",
+        description:
+          "Create a formal booking reservation for a trek. You MUST explicitly ask the user for their Mobile or WhatsApp number before calling this tool. Do not guess it.",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            trek_id: {
+              type: "STRING",
+              description: "The UUID of the trek being booked.",
+            },
+            date: {
+              type: "STRING",
+              description: "The target date of the trek in YYYY-MM-DD format.",
+            },
+            pax: {
+              type: "INTEGER",
+              description: "The total number of hikers.",
+            },
+            customer_name: {
+              type: "STRING",
+              description: "The name of the customer making the booking.",
+            },
+            customer_phone: {
+              type: "STRING",
+              description:
+                "The customer's mobile or WhatsApp number. This is strictly required.",
+            },
+            customer_email: {
+              type: "STRING",
+              description: "The customer's email address (Optional).",
+            },
+          },
+          required: [
+            "trek_id",
+            "date",
+            "pax",
+            "customer_name",
+            "customer_phone",
+          ],
         },
       },
     ],

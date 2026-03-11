@@ -1,6 +1,10 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
 /**
+ * @file swagger.ts
+ * @description Swagger/OpenAPI documentation configuration and specification generation.
+ */
+/**
  * Swagger API documentation configuration.
  * Generates an OpenAPI 3.0 compliant JSON schema for the entire backend application,
  * used to render the `/api-docs` UI.

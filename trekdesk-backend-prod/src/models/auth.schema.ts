@@ -1,3 +1,7 @@
+/**
+ * @file auth.schema.ts
+ * @description Zod schemas and TypeScript types for authentication and user sessions.
+ */
 import { z } from "zod";
 
 /**

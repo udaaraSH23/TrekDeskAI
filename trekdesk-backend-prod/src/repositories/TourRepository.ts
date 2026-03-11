@@ -1,3 +1,7 @@
+/**
+ * @file TourRepository.ts
+ * @description Repository for performing database operations on treks and tours.
+ */
 import { query } from "../config/database";
 import { ITourRepository } from "../interfaces/repositories/ITourRepository";
 import { CreateTrekPayload } from "../models/trek.schema";

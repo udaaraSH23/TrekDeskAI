@@ -1,4 +1,8 @@
 /**
+ * @file ai.ts
+ * @description Core TypeScript type definitions for the AI module.
+ */
+/**
  * TrekDesk AI - Core AI Type Definitions
  *
  * This file now re-exports the Zod-inferred TypeScript interfaces.

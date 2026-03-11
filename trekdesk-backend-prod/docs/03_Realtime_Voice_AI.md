@@ -55,8 +55,8 @@ sequenceDiagram
 
 When opening the connection to Google, we send a JSON configuration defining functions the AI _can_ call. For example:
 
+- `book_trek(tenantId, trekId, customerName, customerPhone, pax, targetDate)`
 - `check_guide_calendar(date: string)`
-- `generate_quote(pax: number, transport: boolean)`
 - `query_knowledge_base(query: string)`
 
 ### 2. Execution Interception

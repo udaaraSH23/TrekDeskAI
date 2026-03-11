@@ -1,3 +1,7 @@
+/**
+ * @file TourController.ts
+ * @description Controller for managing tour and trek catalog HTTP requests.
+ */
 import { Request, Response, NextFunction } from "express";
 import { NotFoundError } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
@@ -92,12 +96,10 @@ export class TourController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      // Validate incoming request body dynamically and safely
-      const validTrekData = TrekSchema.parse(req.body);
-
+      // The payload has already been strictly validated by the 'validate' middleware in tourRoutes.ts
       const newTrek = await this.tourService.createTrek({
         tenantId: MVP_TENANT_ID,
-        ...validTrekData,
+        ...req.body,
       });
 
       ApiResponse.sendSuccess(

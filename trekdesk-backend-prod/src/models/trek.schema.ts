@@ -1,3 +1,7 @@
+/**
+ * @file trek.schema.ts
+ * @description Zod schemas and TypeScript types for trek tour catalog entities.
+ */
 import { z } from "zod";
 
 /**

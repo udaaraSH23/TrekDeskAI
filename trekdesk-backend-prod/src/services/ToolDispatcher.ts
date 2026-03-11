@@ -6,6 +6,7 @@
 
 import { IBookingService } from "../interfaces/services/IBookingService";
 import { IKnowledgeService } from "../interfaces/services/IKnowledgeService";
+import { MVP_TENANT_ID } from "../config/constants";
 
 /**
  * Dispatcher class that routes AI-generated function calls to their respective service handlers.
@@ -62,6 +63,34 @@ export class ToolDispatcher {
               ? results
               : ["No specific information found in the guide book."],
         };
+
+      case "book_trek":
+        /** Converts verbal AI conversational intent into a committed PostgreSQL database booking row */
+        console.log(
+          `[ToolDispatcher] AI dispatching booking for: ${args.customer_name}`,
+        );
+        try {
+          const bookingRes = await this.bookingService.createBooking({
+            tenantId: MVP_TENANT_ID,
+            trekId: args.trek_id,
+            pax: args.pax,
+            targetDate: args.date,
+            customerName: args.customer_name,
+            customerPhone: args.customer_phone,
+            customerEmail: args.customer_email || undefined,
+          });
+          return {
+            status: "success",
+            booking_id: bookingRes.id,
+            message: `Booking successfully secured for ${args.customer_name} on ${args.date}.`,
+          };
+        } catch (error: any) {
+          console.error(`[ToolDispatcher] Booking Failed:`, error);
+          return {
+            status: "error",
+            message: `Could not complete the booking. Missing requirements or system error.`,
+          };
+        }
 
       default:
         /** Fallback for unrecognized tools to prevent system crashes */

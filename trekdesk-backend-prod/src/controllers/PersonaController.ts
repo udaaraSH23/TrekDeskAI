@@ -3,14 +3,14 @@ import { NotFoundError } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
-import { IAISettingsRepository } from "../interfaces/repositories/IAISettingsRepository";
+import { IPersonaService } from "../interfaces/services/IPersonaService";
 
 /**
  * Controller handling HTTP requests related to the AI Persona setup.
  * Manages the fetching and updating of AI behavioral definitions.
  */
 export class PersonaController {
-  constructor(private aiSettingsRepository: IAISettingsRepository) {}
+  constructor(private personaService: IPersonaService) {}
 
   /**
    * GET /api/persona/settings
@@ -27,7 +27,7 @@ export class PersonaController {
   ): Promise<void> {
     try {
       const settings =
-        await this.aiSettingsRepository.getSettingsByTenant(MVP_TENANT_ID);
+        await this.personaService.getSettingsByTenant(MVP_TENANT_ID);
 
       if (!settings) {
         throw new NotFoundError("AI settings not found");
@@ -60,7 +60,7 @@ export class PersonaController {
     const { voice_name, system_instruction, temperature } = req.body;
 
     try {
-      const settings = await this.aiSettingsRepository.updateSettings({
+      const settings = await this.personaService.updateSettings({
         tenant_id: MVP_TENANT_ID,
         voice_name,
         system_instruction,

@@ -1,4 +1,8 @@
 /**
+ * @file index.ts
+ * @description TrekDesk AI Backend Entry Point. Bootstrap for HTTP/WebSocket servers.
+ */
+/**
  * TrekDesk AI - Backend Entry Point
  *
  * This file serves as the bootstrap for the TrekDesk AI Scalable MVP.

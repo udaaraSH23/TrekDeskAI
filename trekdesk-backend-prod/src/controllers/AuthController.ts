@@ -1,3 +1,7 @@
+/**
+ * @file AuthController.ts
+ * @description Controller for handling authentication-related HTTP requests.
+ */
 import { Request, Response, NextFunction } from "express";
 import { IAuthService } from "../interfaces/services/IAuthService";
 import {

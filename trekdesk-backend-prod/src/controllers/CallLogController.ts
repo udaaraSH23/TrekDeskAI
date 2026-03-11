@@ -3,14 +3,14 @@ import { NotFoundError } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
-import { ICallLogRepository } from "../interfaces/repositories/ICallLogRepository";
+import { ICallLogService } from "../interfaces/services/ICallLogService";
 
 /**
  * Controller handling HTTP requests for the session Call Logs.
  * Supplies transcript reading and aggregated KPI capabilities to the frontend dashboard.
  */
 export class CallLogController {
-  constructor(private callLogRepository: ICallLogRepository) {}
+  constructor(private callLogService: ICallLogService) {}
 
   /**
    * GET /api/logs
@@ -26,7 +26,7 @@ export class CallLogController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const logs = await this.callLogRepository.getLogsByTenant(MVP_TENANT_ID);
+      const logs = await this.callLogService.getLogsByTenant(MVP_TENANT_ID);
 
       ApiResponse.sendSuccess(
         res,
@@ -56,7 +56,7 @@ export class CallLogController {
     const { logId } = req.params;
 
     try {
-      const log = await this.callLogRepository.getLogByIdAndTenant(
+      const log = await this.callLogService.getLogByIdAndTenant(
         logId as string,
         MVP_TENANT_ID,
       );
@@ -90,8 +90,7 @@ export class CallLogController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const stats =
-        await this.callLogRepository.getStatsByTenant(MVP_TENANT_ID);
+      const stats = await this.callLogService.getStatsByTenant(MVP_TENANT_ID);
 
       ApiResponse.sendSuccess(
         res,

@@ -1,3 +1,7 @@
+/**
+ * @file ai.schema.ts
+ * @description Zod schemas and TypeScript types for AI configuration and tool interaction.
+ */
 import { z } from "zod";
 
 /**
