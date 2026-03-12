@@ -16,7 +16,8 @@ import { BadRequestError } from "../utils/errors/CustomErrors";
  * @returns An Express middleware async function.
  */
 export const validate =
-  (schema: any) => async (req: Request, res: Response, next: NextFunction) => {
+  (schema: ZodSchema) =>
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       await schema.parseAsync({
         body: req.body,

@@ -1,0 +1,34 @@
+{
+  /**
+   * TSConfig for the TrekDesk AI React Application.
+   * Optimized for Vite-based development and modern Browser environments.
+   */
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    // Include Vite client types for env variables and HMR
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode: Optimized for modern bundlers like Esbuild/Rollup */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    // Vite handles the emission of JS files; TypeScript is used only for type checking
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Strict Quality & Linting Rules */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}

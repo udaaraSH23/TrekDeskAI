@@ -6,7 +6,7 @@
 
 import WebSocket from "ws";
 import dotenv from "dotenv";
-import { AISettings, ToolCall } from "../types/ai";
+import { AISettings } from "../types/ai";
 import { IGeminiService } from "../interfaces/services/IGeminiService";
 
 dotenv.config();

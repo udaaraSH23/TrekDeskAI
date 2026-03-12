@@ -1,0 +1,28 @@
+{
+  "name": "trekdesk-ai-monorepo",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "cd trekdesk-admin-dashboard && npm run lint",
+    "lint:backend": "cd trekdesk-backend-prod && npm run lint",
+    "format": "npx prettier --write ."
+  },
+  "lint-staged": {
+    "trekdesk-admin-dashboard/src/**/*.{ts,tsx}": [
+      "npx eslint --fix --config trekdesk-admin-dashboard/eslint.config.js",
+      "npx prettier --write"
+    ],
+    "trekdesk-backend-prod/src/**/*.ts": [
+      "npx eslint --fix --config trekdesk-backend-prod/.eslintrc.json",
+      "npx prettier --write"
+    ],
+    "*.{json,md}": [
+      "npx prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.3",
+    "prettier": "^3.8.1"
+  }
+}

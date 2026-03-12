@@ -68,11 +68,7 @@ export class AuthController {
    * @param res - Express response object.
    * @param next - Express next middleware function.
    */
-  public async verifySession(
-    req: any,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  public async verifySession(req: any, res: Response): Promise<void> {
     ApiResponse.sendSuccess(res, HttpStatus.OK, "Session verified", {
       user: req.user,
     });

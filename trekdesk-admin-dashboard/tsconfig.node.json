@@ -1,0 +1,36 @@
+{
+  /**
+   * TSConfig for Node.js-based configuration files (e.g., vite.config.ts).
+   * This configuration ensures that tooling scripts are compiled with appropriate settings
+   * for the current Node.js environment while maintaining compatibility with the bundler.
+   */
+  "compilerOptions": {
+    // Incremental build information storage for faster subsequent compilations
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "types": ["node"],
+    // Optimize performance by skipping library type checks
+    "skipLibCheck": true,
+
+    /* Bundler mode configuration */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    // Ensures TypeScript doesn't emit imports that are erased after compilation
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    // Tooling configs should not emit JS files
+    "noEmit": true,
+
+    /* Strict Quality & Linting Rules */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    // Enforce stricter checks for side-effect-only imports
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["vite.config.ts"]
+}

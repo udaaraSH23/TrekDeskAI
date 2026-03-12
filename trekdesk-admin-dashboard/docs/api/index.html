@@ -1,0 +1,761 @@
+<!doctype html>
+<html class="default" lang="en" data-base="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <title>TrekDesk AI Admin Dashboard - v0.0.0</title>
+    <meta
+      name="description"
+      content="Documentation for TrekDesk AI Admin Dashboard"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <link rel="stylesheet" href="assets/highlight.css" />
+    <script defer src="assets/main.js"></script>
+    <script async src="assets/icons.js" id="tsd-icons-script"></script>
+    <script async src="assets/search.js" id="tsd-search-script"></script>
+    <script async src="assets/navigation.js" id="tsd-nav-script"></script>
+  </head>
+  <body>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("tsd-theme") || "os";
+      document.body.style.display = "none";
+      setTimeout(
+        () =>
+          window.app
+            ? app.showPage()
+            : document.body.style.removeProperty("display"),
+        500,
+      );
+    </script>
+    <header class="tsd-page-toolbar">
+      <div class="tsd-toolbar-contents container">
+        <a href="index.html" class="title"
+          >TrekDesk AI Admin Dashboard - v0.0.0</a
+        >
+        <div id="tsd-toolbar-links">
+          <a href="https://github.com/axiolon/trekdesk-ai">GitHub</a>
+        </div>
+        <button id="tsd-search-trigger" class="tsd-widget" aria-label="Search">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <use href="assets/icons.svg#icon-search"></use>
+          </svg>
+        </button>
+        <dialog id="tsd-search" aria-label="Search">
+          <input
+            role="combobox"
+            id="tsd-search-input"
+            aria-controls="tsd-search-results"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            autocapitalize="off"
+            autocomplete="off"
+            placeholder="Search the docs"
+            maxlength="100"
+          />
+          <ul role="listbox" id="tsd-search-results"></ul>
+          <div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+            <div>Preparing search index...</div>
+          </div>
+        </dialog>
+        <a
+          href="#"
+          class="tsd-widget menu"
+          id="tsd-toolbar-menu-trigger"
+          data-toggle="menu"
+          aria-label="Menu"
+          ><svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <use href="assets/icons.svg#icon-menu"></use></svg
+        ></a>
+      </div>
+    </header>
+    <div class="container container-main">
+      <div class="col-content">
+        <div class="tsd-page-title">
+          <h1>TrekDesk AI Admin Dashboard - v0.0.0</h1>
+        </div>
+        <div class="tsd-panel tsd-typography">
+          <h1 id="trekdesk-ai-admin-dashboard" class="tsd-anchor-link">
+            TrekDesk AI — Admin Dashboard<a
+              href="#trekdesk-ai-admin-dashboard"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h1>
+          <blockquote>
+            <p>
+              Production administration dashboard for the
+              <strong>TrekDesk AI</strong> platform — an AI-powered voice
+              assistant for trekking tour operators. Manage AI persona settings,
+              tour knowledge bases, widget configuration, and monitor call
+              analytics from a single, secure interface.
+            </p>
+          </blockquote>
+          <hr />
+          <h2 id="table-of-contents" class="tsd-anchor-link">
+            Table of Contents<a
+              href="#table-of-contents"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <ul>
+            <li><a href="#tech-stack">Tech Stack</a></li>
+            <li><a href="#project-structure">Project Structure</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#environment-variables">Environment Variables</a></li>
+            <li><a href="#authentication">Authentication</a></li>
+            <li><a href="#architecture-overview">Architecture Overview</a></li>
+            <li><a href="#available-scripts">Available Scripts</a></li>
+            <li><a href="#testing">Testing</a></li>
+            <li><a href="#api-documentation">API Documentation</a></li>
+          </ul>
+          <hr />
+          <h2 id="tech-stack" class="tsd-anchor-link">
+            Tech Stack<a
+              href="#tech-stack"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Technology</th>
+                <th>Version</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>UI Framework</td>
+                <td>React</td>
+                <td>19</td>
+              </tr>
+              <tr>
+                <td>Language</td>
+                <td>TypeScript</td>
+                <td>~5.9</td>
+              </tr>
+              <tr>
+                <td>Build Tool</td>
+                <td>Vite</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>Routing</td>
+                <td>React Router DOM</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>Server State</td>
+                <td>TanStack Query (React Query)</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>Client State</td>
+                <td>Zustand</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>HTTP Client</td>
+                <td>Axios</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>Validation</td>
+                <td>Zod</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>Authentication</td>
+                <td>@react-oauth/google</td>
+                <td>0.13</td>
+              </tr>
+              <tr>
+                <td>Icons</td>
+                <td>Lucide React</td>
+                <td>Latest</td>
+              </tr>
+              <tr>
+                <td>Testing</td>
+                <td>Vitest + Testing Library</td>
+                <td>Latest</td>
+              </tr>
+            </tbody>
+          </table>
+          <hr />
+          <h2 id="project-structure" class="tsd-anchor-link">
+            Project Structure<a
+              href="#project-structure"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <pre><code><span class="hl-0">trekdesk</span><span class="hl-1">-</span><span class="hl-0">admin</span><span class="hl-1">-</span><span class="hl-0">dashboard</span><span class="hl-1">/</span><br/><span class="hl-1">├── </span><span class="hl-0">src</span><span class="hl-1">/</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">main</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">                  # </span><span class="hl-0">App</span><span class="hl-1"> </span><span class="hl-0">bootstrap</span><span class="hl-1"> + </span><span class="hl-0">provider</span><span class="hl-1"> </span><span class="hl-0">tree</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">App</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">                   # </span><span class="hl-0">Root</span><span class="hl-1"> </span><span class="hl-0">router</span><span class="hl-1"> </span><span class="hl-2">config</span><span class="hl-1"> (</span><span class="hl-0">lazy</span><span class="hl-1"> </span><span class="hl-0">loaded</span><span class="hl-1"> </span><span class="hl-0">routes</span><span class="hl-1">)</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">pages</span><span class="hl-1">/                    # </span><span class="hl-0">Route</span><span class="hl-1">-</span><span class="hl-0">level</span><span class="hl-1"> </span><span class="hl-0">page</span><span class="hl-1"> </span><span class="hl-0">components</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Login</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">             # </span><span class="hl-0">Google</span><span class="hl-1"> </span><span class="hl-0">OAuth</span><span class="hl-1"> + </span><span class="hl-0">dev</span><span class="hl-1">-</span><span class="hl-0">login</span><span class="hl-1"> </span><span class="hl-0">entry</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Overview</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">          # </span><span class="hl-0">Dashboard</span><span class="hl-1"> </span><span class="hl-0">home</span><span class="hl-1"> </span><span class="hl-3">with</span><span class="hl-1"> </span><span class="hl-0">analytics</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Conversations</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">     # </span><span class="hl-0">Call</span><span class="hl-1"> </span><span class="hl-0">log</span><span class="hl-1"> </span><span class="hl-0">viewer</span><span class="hl-1"> </span><span class="hl-0">and</span><span class="hl-1"> </span><span class="hl-0">transcript</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Persona</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">           # </span><span class="hl-4">AI</span><span class="hl-1"> </span><span class="hl-0">persona</span><span class="hl-1">/</span><span class="hl-0">prompt</span><span class="hl-1"> </span><span class="hl-0">configuration</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">KnowledgeBase</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">     # </span><span class="hl-4">RAG</span><span class="hl-1"> </span><span class="hl-0">doc</span><span class="hl-1"> </span><span class="hl-0">ingestion</span><span class="hl-1"> + </span><span class="hl-0">search</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">WidgetConfig</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">      # </span><span class="hl-0">Embeddable</span><span class="hl-1"> </span><span class="hl-0">widget</span><span class="hl-1"> </span><span class="hl-0">customizer</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">components</span><span class="hl-1">/</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Header</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">            # </span><span class="hl-0">Top</span><span class="hl-1"> </span><span class="hl-0">bar</span><span class="hl-1"> </span><span class="hl-3">with</span><span class="hl-1"> </span><span class="hl-0">search</span><span class="hl-1"> + </span><span class="hl-0">profile</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">Sidebar</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">           # </span><span class="hl-0">Navigation</span><span class="hl-1"> </span><span class="hl-0">sidebar</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">ProtectedRoute</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">    # </span><span class="hl-0">Auth</span><span class="hl-1"> </span><span class="hl-0">guard</span><span class="hl-1"> </span><span class="hl-0">component</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">ui</span><span class="hl-1">/                   # </span><span class="hl-0">Reusable</span><span class="hl-1"> </span><span class="hl-0">design</span><span class="hl-1">-</span><span class="hl-0">system</span><span class="hl-1"> </span><span class="hl-0">components</span><br/><span class="hl-1">│   │   │   ├── </span><span class="hl-0">Button</span><span class="hl-1">.</span><span class="hl-0">tsx</span><br/><span class="hl-1">│   │   │   ├── </span><span class="hl-0">Card</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">          # </span><span class="hl-0">Card</span><span class="hl-1"> + </span><span class="hl-0">CardHeader</span><span class="hl-1">/</span><span class="hl-0">Content</span><span class="hl-1">/</span><span class="hl-0">Footer</span><br/><span class="hl-1">│   │   │   ├── </span><span class="hl-0">Input</span><span class="hl-1">.</span><span class="hl-0">tsx</span><br/><span class="hl-1">│   │   │   └── </span><span class="hl-0">Badge</span><span class="hl-1">.</span><span class="hl-0">tsx</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">shared</span><span class="hl-1">/</span><br/><span class="hl-1">│   │       └── </span><span class="hl-0">ErrorBoundary</span><span class="hl-1">.</span><span class="hl-0">tsx</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">context</span><span class="hl-1">/</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">AuthContext</span><span class="hl-1">.</span><span class="hl-0">tsx</span><span class="hl-1">       # </span><span class="hl-0">Auth</span><span class="hl-1"> </span><span class="hl-0">state</span><span class="hl-1"> </span><span class="hl-0">Provider</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">hooks</span><span class="hl-1">/                    # </span><span class="hl-0">TanStack</span><span class="hl-1"> </span><span class="hl-0">Query</span><span class="hl-1"> </span><span class="hl-0">data</span><span class="hl-1"> </span><span class="hl-0">hooks</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">useAnalytics</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">useKnowledge</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">usePersona</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">useTours</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">services</span><span class="hl-1">/                 # </span><span class="hl-4">API</span><span class="hl-1"> </span><span class="hl-0">communication</span><span class="hl-1"> </span><span class="hl-0">layer</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">api</span><span class="hl-1">.</span><span class="hl-0">ts</span><span class="hl-1">                # </span><span class="hl-0">Axios</span><span class="hl-1"> </span><span class="hl-0">instance</span><span class="hl-1"> + </span><span class="hl-0">interceptors</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">AuthService</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">AnalyticsService</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">KnowledgeService</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">PersonaService</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">TourService</span><span class="hl-1">.</span><span class="hl-0">ts</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">store</span><span class="hl-1">/</span><br/><span class="hl-1">│   │   └── </span><span class="hl-0">uiStore</span><span class="hl-1">.</span><span class="hl-0">ts</span><span class="hl-1">            # </span><span class="hl-5">Zustand</span><span class="hl-1">: </span><span class="hl-0">sidebar</span><span class="hl-1"> + </span><span class="hl-0">theme</span><span class="hl-1"> </span><span class="hl-0">state</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-0">lib</span><span class="hl-1">/</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">queryClient</span><span class="hl-1">.</span><span class="hl-0">ts</span><span class="hl-1">        # </span><span class="hl-0">Singleton</span><span class="hl-1"> </span><span class="hl-0">TanStack</span><span class="hl-1"> </span><span class="hl-0">Query</span><span class="hl-1"> </span><span class="hl-0">client</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-0">errors</span><span class="hl-1">/</span><br/><span class="hl-1">│   │   │   └── </span><span class="hl-0">ApiError</span><span class="hl-1">.</span><span class="hl-0">ts</span><span class="hl-1">       # </span><span class="hl-0">Typed</span><span class="hl-1"> </span><span class="hl-0">error</span><span class="hl-1"> </span><span class="hl-6">class</span><span class="hl-1"> </span><span class="hl-7">for</span><span class="hl-1"> </span><span class="hl-7">API</span><span class="hl-1"> </span><span class="hl-7">failures</span><br/><span class="hl-1">│   │   └── </span><span class="hl-7">validators</span><span class="hl-1">/           # </span><span class="hl-7">Client</span><span class="hl-1">-</span><span class="hl-7">side</span><span class="hl-1"> </span><span class="hl-7">Zod</span><span class="hl-1"> </span><span class="hl-7">schemas</span><br/><span class="hl-1">│   │       ├── </span><span class="hl-7">knowledgeValidators</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │       ├── </span><span class="hl-7">personaValidators</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │       └── </span><span class="hl-7">tourValidators</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">types</span><span class="hl-1">/                    # </span><span class="hl-7">TypeScript</span><span class="hl-1"> </span><span class="hl-7">type</span><span class="hl-1"> </span><span class="hl-7">definitions</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-7">api</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><span class="hl-1">          # </span><span class="hl-7">Shared</span><span class="hl-1"> </span><span class="hl-7">API</span><span class="hl-1"> </span><span class="hl-7">envelope</span><span class="hl-1"> </span><span class="hl-7">types</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-7">auth</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-7">analytics</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-7">knowledge</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │   ├── </span><span class="hl-7">persona</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │   └── </span><span class="hl-7">tour</span><span class="hl-1">.</span><span class="hl-7">types</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">│   │</span><br/><span class="hl-1">│   └── </span><span class="hl-7">layouts</span><span class="hl-1">/</span><br/><span class="hl-1">│       └── </span><span class="hl-7">Layout</span><span class="hl-1">.</span><span class="hl-7">tsx</span><span class="hl-1">            # </span><span class="hl-7">Shell</span><span class="hl-1">: </span><span class="hl-7">Sidebar</span><span class="hl-1"> + </span><span class="hl-7">Header</span><span class="hl-1"> + &lt;</span><span class="hl-7">Outlet</span><span class="hl-1">&gt;</span><br/><span class="hl-1">│</span><br/><span class="hl-1">├── </span><span class="hl-7">docs</span><span class="hl-1">/                         # </span><span class="hl-7">Architecture</span><span class="hl-1"> &amp; </span><span class="hl-7">reference</span><span class="hl-1"> </span><span class="hl-7">documentation</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">ARCHITECTURE</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">STATE_MANAGEMENT</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">AUTH_FLOW</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">ERROR_HANDLING</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">VALIDATION</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">TESTING</span><span class="hl-1">.</span><span class="hl-7">md</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">components</span><span class="hl-1">/</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">pages</span><span class="hl-1">/</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">services</span><span class="hl-1">/</span><br/><span class="hl-1">│   ├── </span><span class="hl-7">hooks</span><span class="hl-1">/</span><br/><span class="hl-1">│   └── </span><span class="hl-7">api</span><span class="hl-1">/                      # </span><span class="hl-7">TypeDoc</span><span class="hl-1">-</span><span class="hl-7">generated</span><span class="hl-1"> </span><span class="hl-7">HTML</span><span class="hl-1"> </span><span class="hl-7">reference</span><br/><span class="hl-1">│</span><br/><span class="hl-1">├── </span><span class="hl-7">typedoc</span><span class="hl-1">.</span><span class="hl-7">json</span><span class="hl-1">                  # </span><span class="hl-7">TypeDoc</span><span class="hl-1"> </span><span class="hl-7">config</span><br/><span class="hl-1">├── </span><span class="hl-7">vite</span><span class="hl-1">.</span><span class="hl-7">config</span><span class="hl-1">.</span><span class="hl-7">ts</span><br/><span class="hl-1">├── </span><span class="hl-7">tsconfig</span><span class="hl-1">.</span><span class="hl-7">app</span><span class="hl-1">.</span><span class="hl-7">json</span><br/><span class="hl-1">└── </span><span class="hl-7">package</span><span class="hl-1">.</span><span class="hl-7">json</span>
+</code><button>Copy</button></pre>
+
+          <hr />
+          <h2 id="getting-started" class="tsd-anchor-link">
+            Getting Started<a
+              href="#getting-started"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <h3 id="prerequisites" class="tsd-anchor-link">
+            Prerequisites<a
+              href="#prerequisites"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h3>
+          <ul>
+            <li><strong>Node.js</strong> ≥ 18</li>
+            <li><strong>npm</strong> ≥ 9</li>
+            <li>A Google OAuth Client ID (for login)</li>
+            <li>
+              The TrekDesk backend running (see
+              <code>trekdesk-backend-prod</code>)
+            </li>
+          </ul>
+          <h3 id="installation" class="tsd-anchor-link">
+            Installation<a
+              href="#installation"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h3>
+          <pre><code class="bash"><span class="hl-8"># 1. Install dependencies</span><br/><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-9">install</span><br/><br/><span class="hl-8"># 2. Copy the example env file and fill in your values</span><br/><span class="hl-2">cp</span><span class="hl-1"> </span><span class="hl-9">.env.example</span><span class="hl-1"> </span><span class="hl-9">.env</span>
+</code><button type="button">Copy</button></pre>
+
+          <h3 id="development-server" class="tsd-anchor-link">
+            Development Server<a
+              href="#development-server"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h3>
+          <pre><code class="bash"><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-9">run</span><span class="hl-1"> </span><span class="hl-9">dev</span><br/><span class="hl-8"># → http://localhost:5173</span>
+</code><button type="button">Copy</button></pre>
+
+          <hr />
+          <h2 id="environment-variables" class="tsd-anchor-link">
+            Environment Variables<a
+              href="#environment-variables"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>VITE_API_URL</code></td>
+                <td>Yes</td>
+                <td>
+                  Backend API base URL (e.g.
+                  <code>http://localhost:3001/api/v1</code>)
+                </td>
+              </tr>
+              <tr>
+                <td><code>VITE_GOOGLE_CLIENT_ID</code></td>
+                <td>Yes</td>
+                <td>Google OAuth 2.0 Client ID</td>
+              </tr>
+              <tr>
+                <td><code>VITE_ENABLE_DEV_LOGIN</code></td>
+                <td>No</td>
+                <td>
+                  Set to <code>&quot;true&quot;</code> to show the dev-login
+                  bypass on the Login page
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr />
+          <h2 id="authentication" class="tsd-anchor-link">
+            Authentication<a
+              href="#authentication"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <p>The app supports two login flows:</p>
+          <ol>
+            <li>
+              <strong>Google OAuth</strong> (production) — Uses
+              <code>@react-oauth/google</code>. The Google ID Token is exchanged
+              for a backend-issued JWT via <code>POST /auth/google</code>.
+            </li>
+            <li>
+              <strong>Dev Secret Bypass</strong> (development only) — A
+              plaintext secret exchanged via <code>POST /auth/dev-login</code>.
+              Only visible when <code>VITE_ENABLE_DEV_LOGIN=true</code>.
+              Completely disabled at the backend in production.
+            </li>
+          </ol>
+          <p>
+            The JWT is persisted in <code>localStorage</code> under the key
+            <code>trekdesk_token</code> and automatically attached to every API
+            request via an Axios request interceptor. On a 401 response, the
+            interceptor clears the token and redirects to
+            <code>/login?expired=true</code>.
+          </p>
+          <p>
+            See <a href="media/AUTH_FLOW.md">docs/AUTH_FLOW.md</a> for the full
+            sequence diagram.
+          </p>
+          <hr />
+          <h2 id="architecture-overview" class="tsd-anchor-link">
+            Architecture Overview<a
+              href="#architecture-overview"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <pre><code><span class="hl-0">Browser</span><br/><span class="hl-1">  └── </span><span class="hl-0">React</span><span class="hl-1"> </span><span class="hl-2">SPA</span><span class="hl-1"> (</span><span class="hl-0">Vite</span><span class="hl-1">)</span><br/><span class="hl-1">        ├── </span><span class="hl-2">AuthProvider</span><span class="hl-1"> (</span><span class="hl-0">AuthContext</span><span class="hl-1">)   → </span><span class="hl-0">session</span><span class="hl-1"> </span><span class="hl-0">state</span><br/><span class="hl-1">        ├── </span><span class="hl-0">QueryClientProvider</span><span class="hl-1">          → </span><span class="hl-0">server</span><span class="hl-1">-</span><span class="hl-0">state</span><span class="hl-1"> </span><span class="hl-0">cache</span><br/><span class="hl-1">        ├── </span><span class="hl-0">GoogleOAuthProvider</span><span class="hl-1">          → </span><span class="hl-0">OAuth</span><span class="hl-1"> </span><span class="hl-0">identity</span><br/><span class="hl-1">        └── </span><span class="hl-2">App</span><span class="hl-1"> (</span><span class="hl-0">React</span><span class="hl-1"> </span><span class="hl-0">Router</span><span class="hl-1">)</span><br/><span class="hl-1">              ├── /</span><span class="hl-0">login</span><span class="hl-1">                → </span><span class="hl-0">Login</span><span class="hl-1"> </span><span class="hl-2">page</span><span class="hl-1"> (</span><span class="hl-0">public</span><span class="hl-1">)</span><br/><span class="hl-1">              └── </span><span class="hl-8">/*  [ProtectedRoute]</span><br/><span class="hl-8">                    └── Layout</span><br/><span class="hl-8">                          ├── Sidebar</span><br/><span class="hl-8">                          ├── Header</span><br/><span class="hl-8">                          └── &lt;Page&gt;</span><br/><span class="hl-8">                                └── useFoo() hook</span><br/><span class="hl-8">                                      └── FooService</span><br/><span class="hl-8">                                            └── api.ts (Axios)</span><br/><span class="hl-8">                                                  └── Backend API</span>
+</code><button>Copy</button></pre>
+
+          <p><strong>State is split into two tiers:</strong></p>
+          <ul>
+            <li>
+              <strong>Server state</strong> (API data) → TanStack Query cache,
+              managed via hooks in <code>src/hooks/</code>
+            </li>
+            <li>
+              <strong>Client/UI state</strong> (sidebar, theme) → Zustand store
+              in <code>src/store/uiStore.ts</code>
+            </li>
+          </ul>
+          <p>
+            See <a href="media/ARCHITECTURE.md">docs/ARCHITECTURE.md</a> for the
+            full architecture doc with Mermaid diagrams.
+          </p>
+          <hr />
+          <h2 id="available-scripts" class="tsd-anchor-link">
+            Available Scripts<a
+              href="#available-scripts"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Script</th>
+                <th>Command</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dev Server</td>
+                <td><code>npm run dev</code></td>
+                <td>Start Vite HMR dev server on port 5173</td>
+              </tr>
+              <tr>
+                <td>Build</td>
+                <td><code>npm run build</code></td>
+                <td>TypeScript compile + Vite production bundle</td>
+              </tr>
+              <tr>
+                <td>Preview</td>
+                <td><code>npm run preview</code></td>
+                <td>Serve the production build locally</td>
+              </tr>
+              <tr>
+                <td>Lint</td>
+                <td><code>npm run lint</code></td>
+                <td>Run ESLint over the entire <code>src/</code></td>
+              </tr>
+              <tr>
+                <td>Test</td>
+                <td><code>npm test</code></td>
+                <td>Run Vitest in watch mode</td>
+              </tr>
+              <tr>
+                <td>Test (CI)</td>
+                <td><code>npx vitest --run</code></td>
+                <td>Single-pass test run (for CI pipelines)</td>
+              </tr>
+              <tr>
+                <td>API Docs</td>
+                <td><code>npm run docs:api</code></td>
+                <td>Generate TypeDoc HTML into <code>docs/api/</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <hr />
+          <h2 id="testing" class="tsd-anchor-link">
+            Testing<a
+              href="#testing"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <p>
+            The test suite uses <strong>Vitest</strong> +
+            <strong>@testing-library/react</strong> + <strong>jsdom</strong>.
+          </p>
+          <pre><code class="bash"><span class="hl-8"># Watch mode (during development)</span><br/><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-9">test</span><br/><br/><span class="hl-8"># Single-pass run (CI / pre-commit)</span><br/><span class="hl-2">npx</span><span class="hl-1"> </span><span class="hl-9">vitest</span><span class="hl-1"> </span><span class="hl-6">--run</span>
+</code><button type="button">Copy</button></pre>
+
+          <p>
+            Test files sit alongside source files (<code>*.test.ts</code> /
+            <code>*.test.tsx</code>). Coverage areas:
+          </p>
+          <ul>
+            <li>
+              <strong>UI Components</strong>: <code>Button</code>,
+              <code>Input</code>, <code>Card</code>, <code>Badge</code>
+            </li>
+            <li><strong>Zustand store</strong>: <code>uiStore</code></li>
+            <li>
+              <strong>Validators</strong>: all Zod schemas in
+              <code>lib/validators/</code>
+            </li>
+            <li>
+              <strong>ApiError class</strong>:
+              <code>lib/errors/ApiError.test.ts</code>
+            </li>
+          </ul>
+          <p>
+            See <a href="media/TESTING.md">docs/TESTING.md</a> for full testing
+            guide and patterns.
+          </p>
+          <hr />
+          <h2 id="api-documentation" class="tsd-anchor-link">
+            API Documentation<a
+              href="#api-documentation"
+              aria-label="Permalink"
+              class="tsd-anchor-icon"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="assets/icons.svg#icon-anchor"></use></svg
+            ></a>
+          </h2>
+          <p>
+            Auto-generated TypeDoc reference from all <code>src/</code> modules.
+          </p>
+          <pre><code class="bash"><span class="hl-2">npm</span><span class="hl-1"> </span><span class="hl-9">run</span><span class="hl-1"> </span><span class="hl-9">docs:api</span><br/><span class="hl-8"># → Open docs/api/index.html in your browser</span>
+</code><button type="button">Copy</button></pre>
+
+          <p>
+            Hand-written reference docs are in the <code>docs/</code> folder:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="media/ARCHITECTURE.md">ARCHITECTURE.md</a></td>
+                <td>System architecture, folder guide, routing map</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="media/STATE_MANAGEMENT.md">STATE_MANAGEMENT.md</a>
+                </td>
+                <td>Zustand + TanStack Query state model</td>
+              </tr>
+              <tr>
+                <td><a href="media/AUTH_FLOW.md">AUTH_FLOW.md</a></td>
+                <td>Auth sequence diagrams, token lifecycle</td>
+              </tr>
+              <tr>
+                <td><a href="media/ERROR_HANDLING.md">ERROR_HANDLING.md</a></td>
+                <td>Centralized error handling strategy</td>
+              </tr>
+              <tr>
+                <td><a href="media/VALIDATION.md">VALIDATION.md</a></td>
+                <td>Zod schema catalogue and usage patterns</td>
+              </tr>
+              <tr>
+                <td><a href="media/TESTING.md">TESTING.md</a></td>
+                <td>Test setup, patterns, and coverage guide</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="media/UI_COMPONENTS.md"
+                    >components/UI_COMPONENTS.md</a
+                  >
+                </td>
+                <td>Button, Input, Card, Badge props reference</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="media/LAYOUT_COMPONENTS.md"
+                    >components/LAYOUT_COMPONENTS.md</a
+                  >
+                </td>
+                <td>Header, Sidebar, ProtectedRoute</td>
+              </tr>
+              <tr>
+                <td><a href="media/PAGES.md">pages/PAGES.md</a></td>
+                <td>Per-page route, data, and interaction reference</td>
+              </tr>
+              <tr>
+                <td><a href="media/SERVICES.md">services/SERVICES.md</a></td>
+                <td>Per-service method and endpoint table</td>
+              </tr>
+              <tr>
+                <td><a href="media/HOOKS.md">hooks/HOOKS.md</a></td>
+                <td>Hook purpose, query keys, return shape</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-sidebar">
+        <div class="page-menu">
+          <div class="tsd-navigation settings">
+            <details class="tsd-accordion">
+              <summary class="tsd-accordion-summary">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <use href="assets/icons.svg#icon-chevronDown"></use>
+                </svg>
+                <h3>Settings</h3>
+              </summary>
+              <div class="tsd-accordion-details">
+                <div class="tsd-filter-visibility">
+                  <span class="settings-label">Member Visibility</span>
+                  <ul id="tsd-filter-options">
+                    <li class="tsd-filter-item">
+                      <label class="tsd-filter-input"
+                        ><input
+                          type="checkbox"
+                          id="tsd-filter-protected"
+                          name="protected"
+                        /><svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 32 32"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            class="tsd-checkbox-background"
+                            width="30"
+                            height="30"
+                            x="1"
+                            y="1"
+                            rx="6"
+                            fill="none"
+                          ></rect>
+                          <path
+                            class="tsd-checkbox-checkmark"
+                            d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25"
+                            stroke="none"
+                            stroke-width="3.5"
+                            stroke-linejoin="round"
+                            fill="none"
+                          ></path></svg
+                        ><span>Protected</span></label
+                      >
+                    </li>
+                    <li class="tsd-filter-item">
+                      <label class="tsd-filter-input"
+                        ><input
+                          type="checkbox"
+                          id="tsd-filter-inherited"
+                          name="inherited"
+                          checked
+                        /><svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 32 32"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            class="tsd-checkbox-background"
+                            width="30"
+                            height="30"
+                            x="1"
+                            y="1"
+                            rx="6"
+                            fill="none"
+                          ></rect>
+                          <path
+                            class="tsd-checkbox-checkmark"
+                            d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25"
+                            stroke="none"
+                            stroke-width="3.5"
+                            stroke-linejoin="round"
+                            fill="none"
+                          ></path></svg
+                        ><span>Inherited</span></label
+                      >
+                    </li>
+                  </ul>
+                </div>
+                <div class="tsd-theme-toggle">
+                  <label class="settings-label" for="tsd-theme">Theme</label
+                  ><select id="tsd-theme">
+                    <option value="os">OS</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+          </div>
+          <details open class="tsd-accordion tsd-page-navigation">
+            <summary class="tsd-accordion-summary">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <use href="assets/icons.svg#icon-chevronDown"></use>
+              </svg>
+              <h3>On This Page</h3>
+            </summary>
+            <div class="tsd-accordion-details">
+              <a href="#trekdesk-ai-admin-dashboard"
+                ><span
+                  >Trek<wbr />Desk <wbr />AI — <wbr />Admin
+                  <wbr />Dashboard</span
+                ></a
+              >
+              <ul>
+                <li>
+                  <a href="#table-of-contents"
+                    ><span>Table of <wbr />Contents</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#tech-stack"
+                    ><span>Tech <wbr />Stack</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#project-structure"
+                    ><span>Project <wbr />Structure</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#getting-started"
+                    ><span>Getting <wbr />Started</span></a
+                  >
+                </li>
+                <li>
+                  <ul>
+                    <li>
+                      <a href="#prerequisites"><span>Prerequisites</span></a>
+                    </li>
+                    <li>
+                      <a href="#installation"><span>Installation</span></a>
+                    </li>
+                    <li>
+                      <a href="#development-server"
+                        ><span>Development <wbr />Server</span></a
+                      >
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="#environment-variables"
+                    ><span>Environment <wbr />Variables</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#authentication"><span>Authentication</span></a>
+                </li>
+                <li>
+                  <a href="#architecture-overview"
+                    ><span>Architecture <wbr />Overview</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#available-scripts"
+                    ><span>Available <wbr />Scripts</span></a
+                  >
+                </li>
+                <li>
+                  <a href="#testing"><span>Testing</span></a>
+                </li>
+                <li>
+                  <a href="#api-documentation"
+                    ><span>API <wbr />Documentation</span></a
+                  >
+                </li>
+              </ul>
+            </div>
+          </details>
+        </div>
+        <div class="site-menu">
+          <nav id="tsd-sidebar-links" class="tsd-navigation">
+            <a
+              href="https://github.com/axiolon/trekdesk-ai"
+              class="tsd-nav-link"
+              >GitHub</a
+            >
+          </nav>
+          <nav class="tsd-navigation">
+            <a href="modules.html">TrekDesk AI Admin Dashboard - v0.0.0</a>
+            <ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+              <li>Loading...</li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <footer></footer>
+    <div class="overlay"></div>
+  </body>
+</html>

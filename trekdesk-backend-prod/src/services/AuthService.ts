@@ -106,7 +106,7 @@ export class AuthService implements IAuthService {
   public verifyJWToken(token: string): AuthUser | null {
     try {
       return jwt.verify(token, JWT_SECRET) as AuthUser;
-    } catch (err) {
+    } catch {
       // Return null on invalid, expired, or malformed tokens
       return null;
     }

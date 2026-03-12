@@ -22,6 +22,7 @@ import { TourController } from "../controllers/TourController";
 import { KnowledgeController } from "../controllers/KnowledgeController";
 import { CallLogController } from "../controllers/CallLogController";
 import { PersonaController } from "../controllers/PersonaController";
+import { DevAuthController } from "../controllers/DevAuthController";
 
 import { MVP_TENANT_ID } from "./constants";
 
@@ -68,3 +69,4 @@ export const tourController = new TourController(tourService);
 export const knowledgeController = new KnowledgeController(knowledgeService);
 export const callLogController = new CallLogController(callLogService);
 export const personaController = new PersonaController(personaService);
+export const devAuthController = new DevAuthController(authService);

@@ -50,7 +50,7 @@ export class ToolDispatcher {
           trekName: args.trek_name,
         });
 
-      case "query_knowledge_base":
+      case "query_knowledge_base": {
         /** Performs semantic search across the specialized knowledge base */
         console.log(
           `[ToolDispatcher] Searching knowledge base for: ${args.query}`,
@@ -63,6 +63,7 @@ export class ToolDispatcher {
               ? results
               : ["No specific information found in the guide book."],
         };
+      }
 
       case "book_trek":
         /** Converts verbal AI conversational intent into a committed PostgreSQL database booking row */

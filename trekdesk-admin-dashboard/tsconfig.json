@@ -1,0 +1,14 @@
+{
+  /**
+   * Root TSConfig
+   * This file serves as a project reference container, delegating actual compilation
+   * settings to specialized configurations for the app and its tooling (node).
+   */
+  "files": [],
+  "references": [
+    // Configuration for the React application source code
+    { "path": "./tsconfig.app.json" },
+    // Configuration for development ecosystem paths (vite, vitest)
+    { "path": "./tsconfig.node.json" }
+  ]
+}

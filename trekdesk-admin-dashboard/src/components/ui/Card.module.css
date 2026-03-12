@@ -1,0 +1,49 @@
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.glass {
+  background: rgba(24, 24, 27, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hoverable:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}

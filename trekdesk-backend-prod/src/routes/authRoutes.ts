@@ -3,10 +3,49 @@
  * @description Express routes for Google OAuth authentication and session verification.
  */
 import { Router } from "express";
-import { authController } from "../config/di";
+import { authController, devAuthController } from "../config/di";
 import { authMiddleware } from "../middleware/authMiddleware";
+import { env } from "../config/env";
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/v1/auth/dev-login:
+ *   post:
+ *     summary: Development-Only Authentication Bypass
+ *     description: |
+ *       **[DEV ONLY]** Generates a real JWT for a fixed "Dev Admin" user.
+ *
+ *       **Requirements for availability:**
+ *       1. `NODE_ENV` must be set to `development`
+ *       2. `ENABLE_DEVELOPMENT_LOGIN` must be set to `true` in .env
+ *       3. Correct `secret` must be provided in request body
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - secret
+ *             properties:
+ *               secret:
+ *                 type: string
+ *                 description: The DEV_AUTH_SECRET defined in .env
+ *                 example: "development_only_secret_key"
+ *     responses:
+ *       200:
+ *         description: Login successful. Returns a real JWT.
+ *       403:
+ *         description: Forbidden. This endpoint is disabled on this server.
+ *       401:
+ *         description: Unauthorized. Incorrect dev secret.
+ */
+if (env.NODE_ENV === "development" && env.ENABLE_DEVELOPMENT_LOGIN) {
+  router.post("/dev-login", devAuthController.devLogin.bind(devAuthController));
+}
 
 /**
  * @swagger

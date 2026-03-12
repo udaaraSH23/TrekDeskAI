@@ -34,12 +34,20 @@ const envSchema = z.object({
   JWT_SECRET: z
     .string()
     .min(32, "JWT Secret must be at least 32 characters long"),
+
+  // Dev Testing (Industry Standard Bypass)
+  ENABLE_DEVELOPMENT_LOGIN: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((val) => val === "true"),
+  DEV_AUTH_SECRET: z.string().optional(),
 });
 
 // Validate `process.env` against the schema
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
+  // eslint-disable-next-line no-console
   console.error(
     "❌ Invalid environment variables:",
     parsedEnv.error.flatten().fieldErrors,

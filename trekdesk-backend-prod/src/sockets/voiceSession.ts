@@ -125,7 +125,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
         if (parsed.audio) {
           geminiService.sendAudio(geminiWs, parsed.audio);
         }
-      } catch (e) {
+      } catch {
         console.error("[Server] Client message parsing error");
       }
     });
@@ -145,8 +145,8 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
           transcriptText: liveTranscript,
           durationSeconds: durationSecs,
         });
-      } catch (e) {
-        console.error("[Server] Error saving call log:", e);
+      } catch {
+        console.error("[Server] Error saving call log:");
       }
       console.log(
         "[Server] Voice session closed. Duration: " + durationSecs + "s",

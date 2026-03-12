@@ -8,7 +8,6 @@ import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
 import { ITourService } from "../interfaces/services/ITourService";
-import { TrekSchema } from "../models/trek.schema";
 
 /**
  * Controller handling HTTP requests related to the Tour/Trek catalog.
