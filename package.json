@@ -13,7 +13,7 @@
       "npx prettier --write"
     ],
     "trekdesk-backend-prod/src/**/*.ts": [
-      "npx eslint --fix --config trekdesk-backend-prod/.eslintrc.json",
+      "npx eslint --fix --config trekdesk-backend-prod/eslint.config.mjs",
       "npx prettier --write"
     ],
     "*.{json,md}": [
