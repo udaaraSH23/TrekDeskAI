@@ -20,7 +20,7 @@ export type AISettings = z.infer<typeof AISettingsSchema>;
  */
 export const ToolCallSchema = z.object({
   name: z.string(),
-  args: z.any(),
+  args: z.record(z.string(), z.unknown()),
   id: z.string(),
 });
 export type ToolCall = z.infer<typeof ToolCallSchema>;

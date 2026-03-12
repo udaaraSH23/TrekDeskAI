@@ -1,4 +1,8 @@
-import { CallLogStats, UpdateCallLogPayload } from "../../models/logs.schema";
+import {
+  CallLog,
+  CallLogStats,
+  UpdateCallLogPayload,
+} from "../../models/logs.schema";
 
 /**
  * Interface definition for the interactions surrounding AI session Call Logs.
@@ -11,7 +15,7 @@ export interface ICallLogRepository {
    * @param tenantId - The UUID of the operator evaluating their analytics.
    * @returns A Promise resolving to a list of historical session records.
    */
-  getLogsByTenant(tenantId: string): Promise<any[]>;
+  getLogsByTenant(tenantId: string): Promise<CallLog[]>;
 
   /**
    * Fetches the specific, detailed transcript and trace of a single AI session.
@@ -20,7 +24,7 @@ export interface ICallLogRepository {
    * @param tenantId - The UUID guard constraint ensuring data privacy.
    * @returns A Promise resolving to the complex log object, or null.
    */
-  getLogByIdAndTenant(logId: string, tenantId: string): Promise<any | null>;
+  getLogByIdAndTenant(logId: string, tenantId: string): Promise<CallLog | null>;
 
   /**
    * Processes macroscopic trends across all logs, evaluating AI success rates and hot lead identification.
@@ -36,7 +40,7 @@ export interface ICallLogRepository {
    * @param tenantId - The UUID of the operator.
    * @param sessionId - A unique string representing the voice connection.
    */
-  createLog(tenantId: string, sessionId: string): Promise<any>;
+  createLog(tenantId: string, sessionId: string): Promise<void>;
 
   /**
    * Finalizes the call log trace array with full transcription and analytics.

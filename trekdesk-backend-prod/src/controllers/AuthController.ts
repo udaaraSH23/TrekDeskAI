@@ -10,6 +10,11 @@ import {
 } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
+import { AuthUser } from "../models/auth.schema";
+
+interface AuthenticatedRequest extends Request {
+  user?: AuthUser;
+}
 
 /**
  * Controller handling HTTP requests linked to authentication flows.
@@ -68,7 +73,10 @@ export class AuthController {
    * @param res - Express response object.
    * @param next - Express next middleware function.
    */
-  public async verifySession(req: any, res: Response): Promise<void> {
+  public async verifySession(
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> {
     ApiResponse.sendSuccess(res, HttpStatus.OK, "Session verified", {
       user: req.user,
     });

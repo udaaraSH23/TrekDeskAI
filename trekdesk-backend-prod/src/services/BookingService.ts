@@ -7,6 +7,7 @@
 import { IBookingService } from "../interfaces/services/IBookingService";
 import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
 import { BookingRow, CreateBookingPayload } from "../models/booking.schema";
+import { logger } from "../utils/logger";
 
 /**
  * Service class for handling booking-related operations.
@@ -33,7 +34,7 @@ export class BookingService implements IBookingService {
   public async createBooking(
     payload: CreateBookingPayload,
   ): Promise<BookingRow> {
-    console.log(
+    logger.info(
       `[BookingService] Processing formal booking for ${payload.customerName} on Trek ${payload.trekId}`,
     );
 
@@ -52,8 +53,10 @@ export class BookingService implements IBookingService {
    * @returns A Promise resolving to an object containing availability status.
    * @note Currently using mock logic. Integration with Google Calendar is planned.
    */
-  public async checkAvailability(data: { date: string }): Promise<any> {
-    console.log(
+  public async checkAvailability(data: {
+    date: string;
+  }): Promise<{ status: string }> {
+    logger.info(
       `[BookingService] Checking availability for ${data.date} on tenant ${this.tenantId}`,
     );
     // REAL implementation will involve: google.calendar.events.list({ ... })
@@ -70,8 +73,8 @@ export class BookingService implements IBookingService {
   public async generateQuote(data: {
     pax: number;
     transport: boolean;
-  }): Promise<any> {
-    console.log(
+  }): Promise<{ quote: string; breakdown: string }> {
+    logger.info(
       `[BookingService] Generating quote for ${data.pax} people, transport: ${data.transport}`,
     );
     // REAL implementation will involve: query('SELECT base_price_per_person, transport_fee FROM treks WHERE ...')
@@ -91,8 +94,8 @@ export class BookingService implements IBookingService {
   public async generateVisual(data: {
     type: string;
     trekName: string;
-  }): Promise<any> {
-    console.log(
+  }): Promise<{ status: string; download_url: string; message: string }> {
+    logger.info(
       `[BookingService] Generating ${data.type} for ${data.trekName}`,
     );
     return {

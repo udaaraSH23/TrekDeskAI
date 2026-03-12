@@ -30,3 +30,13 @@ export const CreateTrekPayloadSchema = TrekSchema.extend({
   tenantId: z.string().uuid(),
 });
 export type CreateTrekPayload = z.infer<typeof CreateTrekPayloadSchema>;
+
+/**
+ * Represents a saved Trek record in the database, including system-generated fields.
+ */
+export type TrekRecord = Trek & {
+  id: string;
+  tenant_id: string;
+  created_at?: Date;
+  updated_at?: Date;
+};

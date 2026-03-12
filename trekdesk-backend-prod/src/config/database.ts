@@ -21,6 +21,7 @@ const pool = new Pool({
  * @param text - The raw SQL string (parameterized with `$1`, `$2` etc)
  * @param params - The dynamic parameters mapped to the SQL vars.
  */
-export const query = (text: string, params?: any[]) => pool.query(text, params);
+export const query = (text: string, params?: unknown[]) =>
+  pool.query(text, params);
 
 export default pool;

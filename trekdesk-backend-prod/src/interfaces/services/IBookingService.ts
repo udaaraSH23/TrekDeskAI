@@ -18,7 +18,7 @@ export interface IBookingService {
    * @param data - DTO containing the target date string (e.g., "YYYY-MM-DD").
    * @returns A Promise resolving to an availability status object.
    */
-  checkAvailability(data: { date: string }): Promise<any>;
+  checkAvailability(data: { date: string }): Promise<{ status: string }>;
 
   /**
    * Generates a dynamic price quote combining base trek costs and optional transport fees.
@@ -26,7 +26,10 @@ export interface IBookingService {
    * @param data - DTO containing the headcount (pax) and transport flag.
    * @returns A Promise resolving to a quote breakdown object.
    */
-  generateQuote(data: { pax: number; transport: boolean }): Promise<any>;
+  generateQuote(data: {
+    pax: number;
+    transport: boolean;
+  }): Promise<{ quote: string; breakdown: string }>;
 
   /**
    * Dispatches the generation of visual collateral (like PDFs or stylized images) for a trek.
@@ -34,5 +37,8 @@ export interface IBookingService {
    * @param data - DTO identifying the collateral type and associated trek target.
    * @returns A Promise resolving to the generated asset URL and status.
    */
-  generateVisual(data: { type: string; trekName: string }): Promise<any>;
+  generateVisual(data: {
+    type: string;
+    trekName: string;
+  }): Promise<{ status: string; download_url: string; message: string }>;
 }

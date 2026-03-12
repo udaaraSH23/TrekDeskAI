@@ -8,6 +8,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IKnowledgeRepository } from "../interfaces/repositories/IKnowledgeRepository";
 import { IKnowledgeService } from "../interfaces/services/IKnowledgeService";
 import { MVP_TENANT_ID } from "../config/constants";
+import { logger } from "../utils/logger";
 
 /**
  * Initializes the Google Generative AI client with the provided API key.
@@ -43,7 +44,7 @@ export class KnowledgeService implements IKnowledgeService {
   public async ingestDocument(data: KnowledgeDocument) {
     const chunks = this.simpleChunk(data.content, 1000); // Fixed 1000 chars per chunk
 
-    console.log(`[KnowledgeService] Ingesting ${chunks.length} chunks...`);
+    logger.info(`[KnowledgeService] Ingesting ${chunks.length} chunks...`);
 
     for (const chunk of chunks) {
       try {
@@ -61,7 +62,7 @@ export class KnowledgeService implements IKnowledgeService {
         });
       } catch (err) {
         // Non-blocking error handling for individual chunk failures during ingestion
-        console.error("[KnowledgeService] Embedding error:", err);
+        logger.error("[KnowledgeService] Embedding error:", err);
       }
     }
 
@@ -94,7 +95,7 @@ export class KnowledgeService implements IKnowledgeService {
         limit,
       });
     } catch (err) {
-      console.error("[KnowledgeService] Search error:", err);
+      logger.error("[KnowledgeService] Search error:", err);
       return [];
     }
   }

@@ -27,14 +27,22 @@ export class ApiResponse {
     res: Response,
     statusCode: number = HttpStatus.OK,
     message: string = "Success",
-    data: any = null,
-    meta?: any,
+    data: unknown = null,
+    meta?: unknown,
   ): void {
-    res.status(statusCode).json({
+    const response: Record<string, unknown> = {
       status: "success",
       message,
-      ...(data !== null && { data }),
-      ...(meta && { meta }),
-    });
+    };
+
+    if (data !== null) {
+      response.data = data;
+    }
+
+    if (meta) {
+      response.meta = meta;
+    }
+
+    res.status(statusCode).json(response);
   }
 }

@@ -3,6 +3,7 @@
  * @description Interface definition for CallLog business logic.
  */
 import {
+  CallLog,
   CallLogStats,
   CreateCallLogPayload,
   EndCallSessionPayload,
@@ -20,7 +21,7 @@ export interface ICallLogService {
    * @param tenantId - The unique identifier of the tour operator/tenant.
    * @returns A promise resolving to an array of log objects.
    */
-  getLogsByTenant(tenantId: string): Promise<any[]>;
+  getLogsByTenant(tenantId: string): Promise<CallLog[]>;
 
   /**
    * Retrieves the comprehensive detail view of a singular call log.
@@ -30,7 +31,7 @@ export interface ICallLogService {
    * @param tenantId - The unique identifier of the tour operator/tenant.
    * @returns A promise resolving to the log object or null if not found.
    */
-  getLogByIdAndTenant(logId: string, tenantId: string): Promise<any | null>;
+  getLogByIdAndTenant(logId: string, tenantId: string): Promise<CallLog | null>;
 
   /**
    * Returns high-level business metrics summarizing call volume,

@@ -11,6 +11,7 @@ import { IUserRepository } from "../interfaces/repositories/IUserRepository";
 import { IAuthService } from "../interfaces/services/IAuthService";
 import { AuthUser } from "../models/auth.schema";
 import { env } from "../config/env";
+import { logger } from "../utils/logger";
 
 /**
  * Configuration for the Google OAuth2 client using the provided Client ID from environment variables.
@@ -53,7 +54,7 @@ export class AuthService implements IAuthService {
       // Business logic: Check against Whitelist for the MVP phase
       // This ensures only authorized testers/partners can access the system.
       if (!GOOGLE_AUTH_WHITELIST.includes(payload.email)) {
-        console.warn(
+        logger.warn(
           `[AuthService] Unauthorized login attempt: ${payload.email}`,
         );
         return null;
@@ -81,7 +82,7 @@ export class AuthService implements IAuthService {
       };
     } catch (err) {
       // Handle potential network or verification failures
-      console.error("[AuthService] Token verification error:", err);
+      logger.error("[AuthService] Token verification error:", err);
       return null;
     }
   }

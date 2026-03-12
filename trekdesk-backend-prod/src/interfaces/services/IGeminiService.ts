@@ -1,5 +1,6 @@
 import WebSocket from "ws";
 import { AISettings } from "../../types/ai";
+import { GeminiResponse } from "../../types/gemini";
 
 /**
  * Interface representing the integration logic with the Google Gemini Realtime API.
@@ -15,7 +16,7 @@ export interface IGeminiService {
    * @returns A Promise resolving to the active WebSocket instance.
    */
   connectToGemini(
-    onMessage: (response: any) => void,
+    onMessage: (response: GeminiResponse) => void,
     onClose: () => void,
     settings: AISettings,
   ): Promise<WebSocket>;
@@ -35,5 +36,8 @@ export interface IGeminiService {
    * @param geminiWs - The active WebSocket connection.
    * @param functionResponses - The structured output array resulting from tool executions.
    */
-  sendToolResponse(geminiWs: WebSocket, functionResponses: any[]): void;
+  sendToolResponse(
+    geminiWs: WebSocket,
+    functionResponses: Record<string, unknown>[],
+  ): void;
 }

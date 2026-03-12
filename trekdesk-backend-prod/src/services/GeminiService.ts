@@ -8,6 +8,8 @@ import WebSocket from "ws";
 import dotenv from "dotenv";
 import { AISettings } from "../types/ai";
 import { IGeminiService } from "../interfaces/services/IGeminiService";
+import { logger } from "../utils/logger";
+import { GeminiResponse, ToolDeclaration } from "../types/gemini";
 
 dotenv.config();
 
@@ -27,7 +29,7 @@ export class GeminiService implements IGeminiService {
    * Creates an instance of GeminiService.
    * @param tools - Array of tool definitions (function declarations) the model can invoke.
    */
-  constructor(private tools: any[]) {}
+  constructor(private tools: ToolDeclaration[]) {}
 
   /**
    * Establishes a WebSocket connection to Gemini and initializes the session with setup parameters.
@@ -38,14 +40,14 @@ export class GeminiService implements IGeminiService {
    * @returns A Promise resolving to the established WebSocket instance.
    */
   public async connectToGemini(
-    onMessage: (response: any) => void,
+    onMessage: (response: GeminiResponse) => void,
     onClose: () => void,
     settings: AISettings,
   ): Promise<WebSocket> {
     const geminiWs = new WebSocket(this.wsUrl);
 
     geminiWs.on("open", () => {
-      console.log("[GeminiService] Connected to Google Live API");
+      logger.info("[GeminiService] Connected to Google Live API");
 
       /**
        * Initial setup message sent upon connection.
@@ -72,17 +74,17 @@ export class GeminiService implements IGeminiService {
     });
 
     geminiWs.on("message", (data) => {
-      const response = JSON.parse(data.toString());
+      const response: GeminiResponse = JSON.parse(data.toString());
       onMessage(response);
     });
 
     geminiWs.on("close", (code, reason) => {
-      console.log(`[GeminiService] Disconnected: ${code} - ${reason}`);
+      logger.info(`[GeminiService] Disconnected: ${code} - ${reason}`);
       onClose();
     });
 
     geminiWs.on("error", (err) => {
-      console.error("[GeminiService] Error:", err);
+      logger.error("[GeminiService] Error:", err);
     });
 
     return geminiWs;
@@ -112,7 +114,10 @@ export class GeminiService implements IGeminiService {
    * @param geminiWs - The active WebSocket connection.
    * @param functionResponses - Array of responses mapped to specific model function calls.
    */
-  public sendToolResponse(geminiWs: WebSocket, functionResponses: any[]) {
+  public sendToolResponse(
+    geminiWs: WebSocket,
+    functionResponses: Record<string, unknown>[],
+  ) {
     if (geminiWs.readyState === WebSocket.OPEN) {
       geminiWs.send(
         JSON.stringify({

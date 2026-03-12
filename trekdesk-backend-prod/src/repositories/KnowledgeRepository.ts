@@ -50,6 +50,6 @@ export class KnowledgeRepository implements IKnowledgeRepository {
       [data.tenantId, `[${data.embedding.join(",")}]`, limit],
     );
 
-    return result.rows.map((row: any) => row.content);
+    return result.rows.map((row: { content: string }) => row.content);
   }
 }

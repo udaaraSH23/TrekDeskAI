@@ -28,7 +28,7 @@ export const validate =
     } catch (error) {
       if (error instanceof ZodError) {
         // Format the Zod issues into a readable string
-        const errorMessages = (error as any).errors.map((issue: any) => ({
+        const errorMessages = error.issues.map((issue) => ({
           message: `${issue.path.join(".")} is ${issue.message}`,
         }));
 

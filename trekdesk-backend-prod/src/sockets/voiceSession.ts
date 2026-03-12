@@ -13,6 +13,7 @@
 
 import { WebSocket } from "ws";
 import { GeminiService } from "../services/GeminiService";
+import { logger } from "../utils/logger";
 import {
   toolDispatcher,
   aiSettingsRepository,
@@ -36,7 +37,7 @@ const geminiService = new GeminiService(tools);
  * @param ws The client WebSocket connection.
  */
 export const handleVoiceConnection = async (ws: WebSocket) => {
-  console.log("[Server] Incoming Multimodal Voice Connection");
+  logger.info("[Server] Incoming Multimodal Voice Connection");
 
   const startTime = Date.now();
   const sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
@@ -92,7 +93,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
          * so it can incorporate the facts into its next response.
          */
         if (response.toolCall) {
-          console.log("[Server] Tool Calls Received", response.toolCall);
+          logger.info("[Server] Tool Calls Received", response.toolCall);
           const functionCalls = response.toolCall.functionCalls;
           const functionResponses = [];
 
@@ -118,7 +119,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      * Handle Incoming Client Messages
      * Listens for audio chunks or control messages from the web widget.
      */
-    ws.on("message", (message) => {
+    ws.on("message", (message: Buffer | string) => {
       try {
         const parsed = JSON.parse(message.toString());
         // Forward client audio stream directly to Gemini
@@ -126,7 +127,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
           geminiService.sendAudio(geminiWs, parsed.audio);
         }
       } catch {
-        console.error("[Server] Client message parsing error");
+        logger.error("[Server] Client message parsing error");
       }
     });
 
@@ -146,14 +147,14 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
           durationSeconds: durationSecs,
         });
       } catch {
-        console.error("[Server] Error saving call log:");
+        logger.error("[Server] Error saving call log:");
       }
-      console.log(
+      logger.info(
         "[Server] Voice session closed. Duration: " + durationSecs + "s",
       );
     });
-  } catch (err) {
-    console.error("[Server] Session initialization error:", err);
+  } catch (err: unknown) {
+    logger.error("[Server] Session initialization error:", err);
     ws.close();
   }
 };

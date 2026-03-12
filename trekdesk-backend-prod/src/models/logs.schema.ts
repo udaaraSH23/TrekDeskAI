@@ -10,7 +10,7 @@ import { z } from "zod";
  */
 export const CallLogStatsSchema = z.object({
   totalCalls: z.number().int().nonnegative(),
-  hotLeads: z.array(z.any()), // Can be typed further if the structure of hot leads is known
+  hotLeads: z.array(z.unknown()), // Can be typed further if the structure of hot leads is known
   leadsCount: z.number().int().nonnegative(),
 });
 
@@ -50,7 +50,7 @@ export type CreateCallLogPayload = z.infer<typeof CreateCallLogPayloadSchema>;
 export const UpdateCallLogPayloadSchema = z.object({
   tenantId: z.string().uuid(),
   sessionId: z.string().min(5),
-  transcript: z.any(),
+  transcript: z.record(z.string(), z.unknown()),
   summary: z.string(),
   sentimentScore: z.number().min(0).max(1),
   durationSeconds: z.number().nonnegative(),

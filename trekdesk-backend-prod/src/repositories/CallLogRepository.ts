@@ -4,7 +4,11 @@
  */
 import { query } from "../config/database";
 import { ICallLogRepository } from "../interfaces/repositories/ICallLogRepository";
-import { CallLogStats, UpdateCallLogPayload } from "../models/logs.schema";
+import {
+  CallLog,
+  CallLogStats,
+  UpdateCallLogPayload,
+} from "../models/logs.schema";
 
 /**
  * Repository implementation for retrieving agent conversation transcripts and summaries.
@@ -17,12 +21,12 @@ export class CallLogRepository implements ICallLogRepository {
    * @param tenantId - The UUID of the tenant/tour operator.
    * @returns A Promise resolving to an array of call log rows.
    */
-  public async getLogsByTenant(tenantId: string) {
+  public async getLogsByTenant(tenantId: string): Promise<CallLog[]> {
     const result = await query(
       "SELECT id, session_id, transcript, summary, sentiment_score, duration_seconds, created_at FROM call_logs WHERE tenant_id = $1 ORDER BY created_at DESC",
       [tenantId],
     );
-    return result.rows;
+    return result.rows as CallLog[];
   }
 
   /**
@@ -33,12 +37,15 @@ export class CallLogRepository implements ICallLogRepository {
    * @param tenantId - The UUID of the tenant/tour operator.
    * @returns A Promise resolving to the call log object, or null if not found.
    */
-  public async getLogByIdAndTenant(logId: string, tenantId: string) {
+  public async getLogByIdAndTenant(
+    logId: string,
+    tenantId: string,
+  ): Promise<CallLog | null> {
     const result = await query(
       "SELECT * FROM call_logs WHERE id = $1 AND tenant_id = $2",
       [logId, tenantId],
     );
-    return result.rows[0] || null;
+    return (result.rows[0] as CallLog) || null;
   }
 
   /**
@@ -73,12 +80,11 @@ export class CallLogRepository implements ICallLogRepository {
   /**
    * Initializes a new empty call session in the database.
    */
-  public async createLog(tenantId: string, sessionId: string): Promise<any> {
-    const result = await query(
+  public async createLog(tenantId: string, sessionId: string): Promise<void> {
+    await query(
       "INSERT INTO call_logs (tenant_id, session_id) VALUES ($1, $2) RETURNING id",
       [tenantId, sessionId],
     );
-    return result.rows[0];
   }
 
   /**

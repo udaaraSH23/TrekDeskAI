@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errors/AppError";
 import { HttpStatus } from "../utils/httpStatusCodes";
+import { logger } from "../utils/logger";
 
 /**
  * Global Error Handling Middleware.
@@ -36,7 +37,9 @@ export const errorHandler = (
 
   // Log error (in production, you might want to send this to Sentry/Datadog)
   if (!isOperational || process.env.NODE_ENV !== "production") {
-    console.error(`[Error] ${statusCode} - ${err.message}`, err.stack);
+    logger.error(`[Error] ${statusCode} - ${err.message}`, {
+      stack: err.stack,
+    });
   }
 
   // Construct standardized error payload

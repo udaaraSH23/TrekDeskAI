@@ -21,7 +21,7 @@ export default [
       },
     },
     rules: {
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { "endOfLine": "auto" }],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "no-console": "warn",

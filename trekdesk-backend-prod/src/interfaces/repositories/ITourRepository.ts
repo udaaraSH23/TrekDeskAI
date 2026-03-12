@@ -1,4 +1,4 @@
-import { CreateTrekPayload } from "../../models/trek.schema";
+import { CreateTrekPayload, TrekRecord } from "../../models/trek.schema";
 
 /**
  * Interface definition for the Tour/Trek data repository.
@@ -11,7 +11,7 @@ export interface ITourRepository {
    * @param tenantId - The UUID of the specific tour operator.
    * @returns A Promise resolving to a mapped array of trek objects.
    */
-  getActiveTreksByTenant(tenantId: string): Promise<any[]>;
+  getActiveTreksByTenant(tenantId: string): Promise<TrekRecord[]>;
 
   /**
    * Retrieves the detailed profile of a single trek, strictly guarded by tenant ownership.
@@ -20,7 +20,10 @@ export interface ITourRepository {
    * @param tenantId - The UUID of the operator attempting access.
    * @returns A Promise resolving to the trek details, or null if unauthorized/notFound.
    */
-  getTrekByIdAndTenant(trekId: string, tenantId: string): Promise<any | null>;
+  getTrekByIdAndTenant(
+    trekId: string,
+    tenantId: string,
+  ): Promise<TrekRecord | null>;
 
   /**
    * Persists a newly created trek object into the operator's catalog.
@@ -28,5 +31,5 @@ export interface ITourRepository {
    * @param data - The structured CreateTrekPayload enforcing multi-tenant mapping.
    * @returns A Promise resolving to the fully instantiated trek from the database.
    */
-  createTrek(data: CreateTrekPayload): Promise<any>;
+  createTrek(data: CreateTrekPayload): Promise<TrekRecord>;
 }

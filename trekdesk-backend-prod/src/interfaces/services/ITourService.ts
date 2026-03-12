@@ -1,4 +1,4 @@
-import { CreateTrekPayload } from "../../models/trek.schema";
+import { CreateTrekPayload, TrekRecord } from "../../models/trek.schema";
 
 /**
  * Interface representing the business logic layer for Trek operations.
@@ -9,7 +9,7 @@ export interface ITourService {
    * @param tenantId The UUID of the tenant/operator.
    * @returns Array of active treks.
    */
-  getActiveTreks(tenantId: string): Promise<any[]>;
+  getActiveTreks(tenantId: string): Promise<TrekRecord[]>;
 
   /**
    * Retrieves detailed information for a specific trek.
@@ -17,12 +17,12 @@ export interface ITourService {
    * @param tenantId The UUID of the tenant/operator.
    * @returns Trek details or null if not found.
    */
-  getTrekDetail(trekId: string, tenantId: string): Promise<any | null>;
+  getTrekDetail(trekId: string, tenantId: string): Promise<TrekRecord | null>;
 
   /**
    * Creates a new trek offering.
    * @param data The structure containing trek details (tenantId, name, price, etc).
    * @returns The created trek object.
    */
-  createTrek(data: CreateTrekPayload): Promise<any>;
+  createTrek(data: CreateTrekPayload): Promise<TrekRecord>;
 }

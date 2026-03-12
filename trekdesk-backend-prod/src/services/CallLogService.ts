@@ -5,6 +5,7 @@
 import { ICallLogService } from "../interfaces/services/ICallLogService";
 import { ICallLogRepository } from "../interfaces/repositories/ICallLogRepository";
 import {
+  CallLog,
   CallLogStats,
   CreateCallLogPayload,
   EndCallSessionPayload,
@@ -27,7 +28,7 @@ export class CallLogService implements ICallLogService {
    * @param tenantId - Tour Operator identity boundary.
    * @returns Array of structured raw transcript rows.
    */
-  public async getLogsByTenant(tenantId: string): Promise<any[]> {
+  public async getLogsByTenant(tenantId: string): Promise<CallLog[]> {
     return this.callLogRepository.getLogsByTenant(tenantId);
   }
 
@@ -42,7 +43,7 @@ export class CallLogService implements ICallLogService {
   public async getLogByIdAndTenant(
     logId: string,
     tenantId: string,
-  ): Promise<any | null> {
+  ): Promise<CallLog | null> {
     return this.callLogRepository.getLogByIdAndTenant(logId, tenantId);
   }
 

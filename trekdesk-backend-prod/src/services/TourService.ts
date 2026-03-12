@@ -7,7 +7,8 @@
 
 import { ITourService } from "../interfaces/services/ITourService";
 import { ITourRepository } from "../interfaces/repositories/ITourRepository";
-import { CreateTrekPayload } from "../models/trek.schema";
+import { CreateTrekPayload, TrekRecord } from "../models/trek.schema";
+import { logger } from "../utils/logger";
 
 /**
  * Service class responsible for trek-related business logic.
@@ -32,8 +33,8 @@ export class TourService implements ITourService {
    * @param tenantId - The unique identifier (UUID) of the tenant/tour operator.
    * @returns A promise resolving to an array of active trek objects.
    */
-  public async getActiveTreks(tenantId: string): Promise<any[]> {
-    console.log(`[TourService] Fetching active treks for tenant: ${tenantId}`);
+  public async getActiveTreks(tenantId: string): Promise<TrekRecord[]> {
+    logger.info(`[TourService] Fetching active treks for tenant: ${tenantId}`);
     return this.tourRepository.getActiveTreksByTenant(tenantId);
   }
 
@@ -51,8 +52,8 @@ export class TourService implements ITourService {
   public async getTrekDetail(
     trekId: string,
     tenantId: string,
-  ): Promise<any | null> {
-    console.log(
+  ): Promise<TrekRecord | null> {
+    logger.info(
       `[TourService] Fetching trek detail for ID: ${trekId} (Tenant: ${tenantId})`,
     );
     return this.tourRepository.getTrekByIdAndTenant(trekId, tenantId);
@@ -67,8 +68,8 @@ export class TourService implements ITourService {
    * @param data - The CreateTrekPayload containing all core details, including tenantId.
    * @returns A promise resolving to the newly created trek object as confirmed by the database.
    */
-  public async createTrek(data: CreateTrekPayload): Promise<any> {
-    console.log(`[TourService] Creating new trek for tenant: ${data.tenantId}`);
+  public async createTrek(data: CreateTrekPayload): Promise<TrekRecord> {
+    logger.info(`[TourService] Creating new trek for tenant: ${data.tenantId}`);
     return this.tourRepository.createTrek(data);
   }
 }
