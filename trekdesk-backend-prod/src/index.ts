@@ -21,6 +21,7 @@ import app from "./app";
 import { handleVoiceConnection } from "./sockets/voiceSession";
 import { env } from "./config/env";
 import { logger } from "./utils/logger";
+import pool, { testConnection } from "./config/database";
 
 /**
  * Initialize HTTP Server
@@ -41,25 +42,87 @@ const wss = new WebSocketServer({ server });
 const PORT = env.PORT || 3001;
 
 /**
- * WebSocket Router
+ * WebSocket Router & Connection Monitoring
  * Directs incoming voice/multimodal connections to the specialized
- * session handler. This module manages the bridge between the
- * client and the Google Gemini Multimodal Live API.
+ * session handler.
  */
-wss.on("connection", handleVoiceConnection);
+wss.on("connection", (ws, req) => {
+  const ip = req.socket.remoteAddress;
+  logger.info(`[WebSocket] New client connected from ${ip}`);
+
+  // Handle the specialized session logic
+  handleVoiceConnection(ws);
+
+  ws.on("close", (code, reason) => {
+    logger.info(
+      `[WebSocket] Client ${ip} disconnected (Code: ${code}, Reason: ${reason || "none"})`,
+    );
+  });
+
+  ws.on("error", (error) => {
+    logger.error(`[WebSocket] Client ${ip} error: ${error.message}`);
+  });
+});
 
 /**
- * Start Server
- * Begins listening for incoming HTTP/WebSocket traffic.
+ * Startup Logic
+ * Orchestrates the initialization of all systems.
  */
-server.listen(PORT, () => {
-  logger.info(
-    "----------------------------------------------------------------",
-  );
-  logger.info(`[TrekDesk Backend] Scalable MVP server is now LIVE`);
-  logger.info(`[Status] Running on port: ${PORT}`);
-  logger.info(`[Mode] ${env.NODE_ENV}`);
-  logger.info(
-    "----------------------------------------------------------------",
-  );
-});
+const startServer = async () => {
+  try {
+    // 1. Verify Database Connection
+    logger.info(`[Startup] Verifying database connectivity...`);
+    await testConnection();
+    logger.info(`[Startup] Database: OK (Connected)`);
+
+    // 2. Start Listening
+    server.listen(PORT, () => {
+      logger.info(
+        "----------------------------------------------------------------",
+      );
+      logger.info(`[TrekDesk Backend] Scalable MVP server is now LIVE`);
+      logger.info(`[Service] API & WebSocket: Active`);
+      logger.info(`[Status] Listening on port: ${PORT}`);
+      logger.info(`[Mode] ${env.NODE_ENV}`);
+      logger.info(
+        "----------------------------------------------------------------",
+      );
+    });
+  } catch (error) {
+    logger.error(`[Startup] FAILED to start server: ${error}`);
+    process.exit(1);
+  }
+};
+
+/**
+ * Graceful Shutdown Handling
+ * Ensures that all resources are cleaned up before the process exits.
+ */
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`[Shutdown] Received ${signal}. Starting graceful shutdown...`);
+
+  // 1. Close HTTP & WebSocket Server
+  server.close(() => {
+    logger.info(`[Shutdown] HTTP & WebSocket server closed.`);
+
+    // 2. Drain and close DB Pool
+    pool.end(() => {
+      logger.info(`[Shutdown] Database pool closed.`);
+      logger.info(`[Shutdown] Cleanup complete. Bye!`);
+      process.exit(0);
+    });
+  });
+
+  // Force exit if shutdown takes too long (10s)
+  setTimeout(() => {
+    logger.error(`[Shutdown] Forced shutdown due to timeout.`);
+    process.exit(1);
+  }, 10000);
+};
+
+// Start the sequence
+startServer();
+
+// Listen for termination signals
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));

@@ -107,15 +107,31 @@ app.use("/api/v1/analytics/calls", authMiddleware, callLogRoutes);
 app.use("/api/v1/tours", authMiddleware, tourRoutes);
 app.use("/api/v1/knowledge", authMiddleware, knowledgeRoutes);
 
+import { testConnection } from "./config/database";
+
 /**
  * Health Check Endpoint
  * Used by load balancers and container orchestrators (e.g., Google Cloud Run)
  * to verify that the service is healthy and responding to traffic.
  */
-app.get("/health", (req, res) => {
-  res
-    .status(200)
-    .json({ status: "healthy", timestamp: new Date().toISOString() });
+app.get("/health", async (req, res) => {
+  try {
+    await testConnection();
+    res.status(200).json({
+      status: "healthy",
+      database: "connected",
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error(`[Health Check] Failed: ${error}`);
+    res.status(503).json({
+      status: "unhealthy",
+      database: "disconnected",
+      error: error instanceof Error ? error.message : "Internal Server Error",
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 /**

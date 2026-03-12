@@ -3,7 +3,7 @@ exports.up = (pgm) => {
     id: {
       type: "uuid",
       primaryKey: true,
-      default: pgm.func("uuid_generate_v4()"),
+      default: pgm.func("gen_random_uuid()"),
     },
     tenant_id: {
       type: "uuid",

@@ -1,8 +1,7 @@
-/* eslint-disable camelcase */
 
-exports.shorthands = undefined;
+module.exports.shorthands = undefined;
 
-exports.up = (pgm) => {
+module.exports.up = (pgm) => {
   pgm.sql(`
     -- 1. Tenants (For future scale, Kandy Treks is ID 1)
     CREATE TABLE IF NOT EXISTS tenants (
@@ -82,7 +81,7 @@ exports.up = (pgm) => {
   `);
 };
 
-exports.down = (pgm) => {
+module.exports.down = (pgm) => {
   pgm.sql(`
     DROP TABLE IF EXISTS call_logs CASCADE;
     DROP TABLE IF EXISTS document_chunks CASCADE;

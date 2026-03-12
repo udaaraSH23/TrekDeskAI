@@ -24,4 +24,18 @@ const pool = new Pool({
 export const query = (text: string, params?: unknown[]) =>
   pool.query(text, params);
 
+/**
+ * Validates the database connection.
+ * Used during startup to ensure the backend can reach the PostgreSQL cluster.
+ */
+export const testConnection = async () => {
+  const client = await pool.connect();
+  try {
+    await client.query("SELECT 1");
+    return true;
+  } finally {
+    client.release();
+  }
+};
+
 export default pool;

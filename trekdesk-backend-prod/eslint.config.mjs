@@ -32,6 +32,15 @@ export default [
     },
   },
   {
+    files: ["migrations/**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     ignores: ["dist/", "node_modules/"],
   },
 ];
