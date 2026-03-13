@@ -29,6 +29,7 @@ export interface KnowledgeDocument {
  * The backend returns content chunks with similarity scores.
  */
 export interface KnowledgeSearchResult {
+  id: string;
   content: string;
   trek_id?: string | null;
   metadata?: Record<string, string>;
@@ -42,3 +43,13 @@ export type KnowledgeIngestResponse = ApiSuccessResponse<{ message: string }>;
 export type KnowledgeSearchResponse = ApiSuccessResponse<
   KnowledgeSearchResult[]
 >;
+
+/**
+ * Payload for PATCH /knowledge/:chunkId.
+ */
+export interface UpdateKnowledgePayload {
+  content: string;
+}
+
+/** Typed success response for update/delete */
+export type KnowledgeUpdateResponse = ApiSuccessResponse<{ message: string }>;

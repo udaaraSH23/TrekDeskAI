@@ -23,20 +23,13 @@ export class UserRepository implements IUserRepository {
     data: GoogleUserPayload,
   ): Promise<UserRow | null> {
     const result = await query(
-      `INSERT INTO users (google_id, email, full_name, picture_url, tenant_id, last_login)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+      `INSERT INTO users (google_id, email, full_name, tenant_id, last_login)
+       VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
        ON CONFLICT (google_id) DO UPDATE 
        SET last_login = CURRENT_TIMESTAMP,
-           full_name = EXCLUDED.full_name,
-           picture_url = EXCLUDED.picture_url
+           full_name = EXCLUDED.full_name
        RETURNING *`,
-      [
-        data.googleId,
-        data.email,
-        data.fullName,
-        data.pictureUrl,
-        data.tenantId,
-      ],
+      [data.googleId, data.email, data.fullName, data.tenantId],
     );
 
     return (result.rows[0] as UserRow) || null;

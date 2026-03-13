@@ -8,6 +8,8 @@ import { validate } from "../middleware/validate";
 import {
   ingestKnowledgeSchema,
   searchKnowledgeSchema,
+  updateKnowledgeSchema,
+  deleteKnowledgeSchema,
 } from "../validators/knowledgeValidators";
 import { authMiddleware } from "../middleware/authMiddleware";
 
@@ -111,6 +113,90 @@ router.get(
   validate(searchKnowledgeSchema),
   authMiddleware,
   knowledgeController.search.bind(knowledgeController),
+);
+
+/**
+ * @swagger
+ * /api/v1/knowledge/{chunkId}:
+ *   patch:
+ *     summary: Update an existing knowledge chunk
+ *     description: Re-vectorizes the provided content and updates the existing document chunk.
+ *     tags: [Knowledge Base]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: chunkId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "999e4567-e89b-12d3-a456"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Knowledge chunk updated successfully.
+ */
+router.patch(
+  "/:chunkId",
+  validate(updateKnowledgeSchema),
+  authMiddleware,
+  knowledgeController.updateKnowledge.bind(knowledgeController),
+);
+
+/**
+ * @swagger
+ * /api/v1/knowledge/{chunkId}:
+ *   delete:
+ *     summary: Delete a knowledge chunk
+ *     description: Removes a specific piece of factual knowledge from the vector store.
+ *     tags: [Knowledge Base]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: chunkId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "999e4567-e89b-12d3-a456"
+ *     responses:
+ *       200:
+ *         description: Knowledge chunk deleted successfully.
+ */
+router.delete(
+  "/:chunkId",
+  validate(deleteKnowledgeSchema),
+  authMiddleware,
+  knowledgeController.deleteKnowledge.bind(knowledgeController),
+);
+
+/**
+ * @swagger
+ * /api/v1/knowledge:
+ *   get:
+ *     summary: List all knowledge chunks
+ *     description: Retrieves all document segments stored for the current tenant.
+ *     tags: [Knowledge Base]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of knowledge chunks.
+ */
+router.get(
+  "/",
+  authMiddleware,
+  knowledgeController.list.bind(knowledgeController),
 );
 
 export default router;

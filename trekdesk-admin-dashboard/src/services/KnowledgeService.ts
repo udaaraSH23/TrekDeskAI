@@ -17,6 +17,8 @@ import type {
   KnowledgeSearchResult,
   KnowledgeIngestResponse,
   KnowledgeSearchResponse,
+  UpdateKnowledgePayload,
+  KnowledgeUpdateResponse,
 } from "../types/knowledge.types";
 
 // Re-export for backward compatibility during transition
@@ -50,6 +52,44 @@ export const KnowledgeService = {
     const response = await api.get<KnowledgeSearchResponse>(
       `/knowledge/search?q=${encodeURIComponent(query)}`,
     );
+    return response.data.data;
+  },
+
+  /**
+   * Updates an existing knowledge chunk.
+   * @param chunkId - UUID of the knowledge chunk to update.
+   * @param payload - The new content for the chunk.
+   * @returns A promise resolving to a success message.
+   * @throws {ApiError} If update fails.
+   */
+  updateKnowledge: async (
+    chunkId: string,
+    payload: UpdateKnowledgePayload,
+  ): Promise<{ message: string }> => {
+    const response = await api.patch<KnowledgeUpdateResponse>(
+      `/knowledge/${chunkId}`,
+      payload,
+    );
+    return response.data.data;
+  },
+
+  /**
+   * Deletes a specific knowledge chunk.
+   * @param chunkId - UUID of the knowledge chunk to delete.
+   * @returns A promise that resolves when the chunk is deleted.
+   * @throws {ApiError} If deletion fails.
+   */
+  deleteKnowledge: async (chunkId: string): Promise<void> => {
+    await api.delete(`/knowledge/${chunkId}`);
+  },
+
+  /**
+   * Retrieves all knowledge chunks for the current tenant.
+   * @returns A promise resolving to an array of all chunks.
+   * @throws {ApiError} If the list request fails.
+   */
+  listAll: async (): Promise<KnowledgeSearchResult[]> => {
+    const response = await api.get<KnowledgeSearchResponse>("/knowledge");
     return response.data.data;
   },
 };

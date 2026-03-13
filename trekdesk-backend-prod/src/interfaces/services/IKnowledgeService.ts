@@ -1,6 +1,9 @@
 import {
+  DeleteKnowledgePayload,
   KnowledgeDocument,
   KnowledgeSearchQuery,
+  UpdateKnowledgeServicePayload,
+  KnowledgeSearchResult,
 } from "../../models/knowledge.schema";
 
 /**
@@ -22,7 +25,33 @@ export interface IKnowledgeService {
    *
    * @param data - The KnowledgeSearchQuery DTO containing the active search string.
    * @param limit - Optional maximum number of relevant chunks to return (default applied in implementation).
-   * @returns A Promise resolving to an array of relevant text strings.
+   * @returns A Promise resolving to an array of relevant text segments with metadata.
    */
-  search(data: KnowledgeSearchQuery, limit?: number): Promise<string[]>;
+  search(
+    data: KnowledgeSearchQuery,
+    limit?: number,
+  ): Promise<KnowledgeSearchResult[]>;
+
+  /**
+   * Updates an existing knowledge chunk.
+   * This involves re-calculating the vector embedding for the new content.
+   *
+   * @param data - The UpdateKnowledgeServicePayload DTO.
+   */
+  updateKnowledge(data: UpdateKnowledgeServicePayload): Promise<void>;
+
+  /**
+   * Removes a knowledge chunk from the vector database.
+   *
+   * @param data - The DeleteKnowledgePayload DTO.
+   */
+  deleteKnowledge(data: DeleteKnowledgePayload): Promise<void>;
+
+  /**
+   * Retrieves all knowledge chunks for a specific tenant.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @returns A Promise resolving to an array of all chunks.
+   */
+  getAllChunks(tenantId: string): Promise<KnowledgeSearchResult[]>;
 }

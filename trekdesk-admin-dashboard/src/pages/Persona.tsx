@@ -19,11 +19,13 @@ import {
 } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
+import { VoicePlayground } from "../components/VoicePlayground";
 
 const Persona: React.FC = () => {
   const { data: settings, isLoading: loading, error } = usePersonaSettings();
   const updateMutation = useUpdatePersonaSettings();
 
+  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
   const [localSettings, setLocalSettings] = useState({
     voice_name: "Aoede",
     system_instruction: "",
@@ -71,16 +73,13 @@ const Persona: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <div>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
-            AI Persona
-          </h1>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            Define your AI's personality, knowledge constraints, and vocal
-            style.
-          </p>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "1.5rem",
+        }}
+      >
         <Button
           onClick={handleSave}
           isLoading={saving}
@@ -88,7 +87,7 @@ const Persona: React.FC = () => {
         >
           Save Changes
         </Button>
-      </header>
+      </div>
 
       {error && (
         <div style={errorBannerStyle}>
@@ -282,13 +281,22 @@ const Persona: React.FC = () => {
               >
                 Test how these instructions affect the AI's logic instantly.
               </p>
-              <Button variant="outline" style={{ width: "100%" }}>
+              <Button
+                variant="outline"
+                style={{ width: "100%" }}
+                onClick={() => setIsPlaygroundOpen(true)}
+              >
                 Open Voice Playground
               </Button>
             </CardContent>
           </Card>
         </aside>
       </div>
+
+      <VoicePlayground
+        isOpen={isPlaygroundOpen}
+        onClose={() => setIsPlaygroundOpen(false)}
+      />
     </div>
   );
 };
@@ -296,12 +304,6 @@ const Persona: React.FC = () => {
 // Styles
 const containerStyle: React.CSSProperties = {
   animation: "fadeIn 0.5s ease-out",
-};
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "2.5rem",
 };
 const layoutGridStyle: React.CSSProperties = {
   display: "grid",

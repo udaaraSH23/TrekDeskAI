@@ -1,4 +1,9 @@
-import { CreateTrekPayload, TrekRecord } from "../../models/trek.schema";
+import {
+  CreateTrekPayload,
+  TrekRecord,
+  UpdateTrekPayload,
+  DeleteTrekPayload,
+} from "../../models/trek.schema";
 
 /**
  * Interface definition for the Tour/Trek data repository.
@@ -32,4 +37,18 @@ export interface ITourRepository {
    * @returns A Promise resolving to the fully instantiated trek from the database.
    */
   createTrek(data: CreateTrekPayload): Promise<TrekRecord>;
+  /**
+   * Updates an existing trek catalog entry.
+   *
+   * @param data - The UpdateTrekPayload containing modified fields.
+   * @returns A Promise resolving to the updated trek object.
+   */
+  updateTrek(data: UpdateTrekPayload): Promise<TrekRecord>;
+
+  /**
+   * Removes a trek from the database based on ID and owner.
+   *
+   * @param data - The DeleteTrekPayload DTO.
+   */
+  deleteTrek(data: DeleteTrekPayload): Promise<void>;
 }

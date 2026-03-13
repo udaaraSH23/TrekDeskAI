@@ -8,6 +8,7 @@ import {
   CallLog,
   CallLogStats,
   CreateCallLogPayload,
+  DeleteCallLogPayload,
   EndCallSessionPayload,
 } from "../models/logs.schema";
 
@@ -108,5 +109,16 @@ export class CallLogService implements ICallLogService {
       sentimentScore,
       durationSeconds: payload.durationSeconds,
     });
+  }
+
+  /**
+   * Orchestrates the removal of a recorded AI session.
+   *
+   * @param logId - Target session ID.
+   * @param tenantId - Scoping boundary.
+   */
+  public async deleteLog(data: DeleteCallLogPayload): Promise<void> {
+    const { logId, tenantId } = data;
+    await this.callLogRepository.deleteLog({ logId, tenantId });
   }
 }

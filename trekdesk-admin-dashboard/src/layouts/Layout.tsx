@@ -17,10 +17,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         style={{
           ...mainContentStyle,
           marginLeft: isSidebarOpen ? "260px" : "0",
+          padding: "0 2rem",
         }}
       >
         <Header />
-        <main style={mainInnerStyle}>{children}</main>
+        <main style={{ flex: 1, paddingBottom: "2rem" }}>{children}</main>
       </div>
     </div>
   );
@@ -36,11 +37,6 @@ const mainContentStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   transition: "margin-left 0.3s ease",
-};
-
-const mainInnerStyle: React.CSSProperties = {
-  padding: "2rem",
-  flex: 1,
 };
 
 export default Layout;

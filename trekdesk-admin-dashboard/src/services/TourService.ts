@@ -64,7 +64,7 @@ export const TourService = {
    * @throws {ApiError} If update fails.
    */
   updateTour: async (id: string, payload: UpdateTrekPayload): Promise<Trek> => {
-    const response = await api.put<TrekResponse>(`/tours/${id}`, payload);
+    const response = await api.patch<TrekResponse>(`/tours/${id}`, payload);
     return response.data.data;
   },
 

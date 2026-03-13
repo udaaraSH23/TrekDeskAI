@@ -16,15 +16,18 @@ import { logger } from "../utils/logger";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 /**
- * Specifically uses the text-embedding-004 model for creating vector representations of text.
+ * Specifically uses the gemini-embedding-001 model for creating vector representations of text.
  */
 const embeddingModel = genAI.getGenerativeModel({
-  model: "text-embedding-004",
+  model: "gemini-embedding-001",
 });
 
 import {
+  DeleteKnowledgePayload,
   KnowledgeDocument,
   KnowledgeSearchQuery,
+  UpdateKnowledgeServicePayload,
+  KnowledgeSearchResult,
 } from "../models/knowledge.schema";
 
 /**
@@ -49,7 +52,11 @@ export class KnowledgeService implements IKnowledgeService {
     for (const chunk of chunks) {
       try {
         // Generate vector embedding for the current chunk
-        const result = await embeddingModel.embedContent(chunk);
+        // Note: gemini-embedding-001 defaults to 3072, so we force 768 to match our DB schema
+        const result = await embeddingModel.embedContent({
+          content: { role: "user", parts: [{ text: chunk }] },
+          outputDimensionality: 768,
+        } as never); // Cast as never/any to bypass outdated build-in SDK typings for dimensionality
         const embedding = result.embedding.values;
 
         // Persist chunk and its embedding to the vector database via the repository
@@ -79,10 +86,13 @@ export class KnowledgeService implements IKnowledgeService {
   public async search(
     data: KnowledgeSearchQuery,
     limit: number = 3,
-  ): Promise<string[]> {
+  ): Promise<KnowledgeSearchResult[]> {
     try {
       // Create embedding for the search query to enable vector similarity comparison
-      const embedResult = await embeddingModel.embedContent(data.q);
+      const embedResult = await embeddingModel.embedContent({
+        content: { role: "user", parts: [{ text: data.q }] },
+        outputDimensionality: 768,
+      } as never);
       const embedding = embedResult.embedding.values;
 
       /**
@@ -98,6 +108,53 @@ export class KnowledgeService implements IKnowledgeService {
       logger.error("[KnowledgeService] Search error:", err);
       return [];
     }
+  }
+
+  /**
+   * Updates an existing knowledge chunk and its vector representation.
+   */
+  public async updateKnowledge(
+    data: UpdateKnowledgeServicePayload,
+  ): Promise<void> {
+    const { chunkId, tenantId, content } = data;
+    logger.info(`[KnowledgeService] Updating knowledge chunk: ${chunkId}`);
+
+    try {
+      // Re-generate vector embedding for the updated content
+      const result = await embeddingModel.embedContent({
+        content: { role: "user", parts: [{ text: content }] },
+        outputDimensionality: 768,
+      } as never);
+      const embedding = result.embedding.values;
+
+      await this.knowledgeRepository.updateKnowledgeChunk({
+        tenantId,
+        chunkId,
+        content,
+        embedding,
+      });
+    } catch (err) {
+      logger.error("[KnowledgeService] Update/Embedding error:", err);
+      throw err;
+    }
+  }
+
+  /**
+   * Removes a knowledge chunk from the base.
+   */
+  public async deleteKnowledge(data: DeleteKnowledgePayload): Promise<void> {
+    const { chunkId, tenantId } = data;
+    logger.info(`[KnowledgeService] Deleting knowledge chunk: ${chunkId}`);
+    await this.knowledgeRepository.deleteKnowledgeChunk({ chunkId, tenantId });
+  }
+
+  /**
+   * Retrieves all knowledge chunks for a specific tenant.
+   */
+  public async getAllChunks(
+    tenantId: string,
+  ): Promise<KnowledgeSearchResult[]> {
+    return await this.knowledgeRepository.listAllChunks(tenantId);
   }
 
   /**

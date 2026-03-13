@@ -25,3 +25,24 @@ export const ingestKnowledgeSchema = z.object({
 export const searchKnowledgeSchema = z.object({
   query: KnowledgeSearchQuerySchema,
 });
+
+/**
+ * Validation schema for updating existing knowledge content.
+ */
+export const updateKnowledgeSchema = z.object({
+  params: z.object({
+    chunkId: z.string().uuid("Invalid Chunk ID format"),
+  }),
+  body: z.object({
+    content: z.string().min(10).max(50000),
+  }),
+});
+
+/**
+ * Validation schema for deleting knowledge chunks.
+ */
+export const deleteKnowledgeSchema = z.object({
+  params: z.object({
+    chunkId: z.string().uuid("Invalid Chunk ID format"),
+  }),
+});

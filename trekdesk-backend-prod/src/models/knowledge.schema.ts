@@ -31,6 +31,16 @@ export const KnowledgeSearchQuerySchema = z.object({
 export type KnowledgeSearchQuery = z.infer<typeof KnowledgeSearchQuerySchema>;
 
 /**
+ * Interface for semantic search result row.
+ */
+export interface KnowledgeSearchResult {
+  id: string;
+  content: string;
+  trek_id?: string | null;
+  similarity?: number;
+}
+
+/**
  * DTO for inserting a document chunk into the vector database.
  */
 export const InsertDocumentChunkPayloadSchema = z.object({
@@ -53,3 +63,38 @@ export const SemanticSearchPayloadSchema = z.object({
   limit: z.number().int().positive().optional(),
 });
 export type SemanticSearchPayload = z.infer<typeof SemanticSearchPayloadSchema>;
+/**
+ * DTO for updating an existing knowledge chunk.
+ */
+export const UpdateKnowledgeChunkPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  chunkId: z.string().uuid(),
+  content: z.string().min(10),
+  embedding: z.array(z.number()),
+});
+export type UpdateKnowledgeChunkPayload = z.infer<
+  typeof UpdateKnowledgeChunkPayloadSchema
+>;
+
+/**
+ * DTO for the Knowledge Service update operation (excludes the computed embedding).
+ */
+export const UpdateKnowledgeServicePayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  chunkId: z.string().uuid(),
+  content: z.string().min(10),
+});
+export type UpdateKnowledgeServicePayload = z.infer<
+  typeof UpdateKnowledgeServicePayloadSchema
+>;
+
+/**
+ * DTO for deleting knowledge chunks (enforces tenant scoping).
+ */
+export const DeleteKnowledgePayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  chunkId: z.string().uuid(),
+});
+export type DeleteKnowledgePayload = z.infer<
+  typeof DeleteKnowledgePayloadSchema
+>;

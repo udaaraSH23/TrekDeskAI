@@ -1,6 +1,9 @@
 import {
   InsertDocumentChunkPayload,
   SemanticSearchPayload,
+  UpdateKnowledgeChunkPayload,
+  DeleteKnowledgePayload,
+  KnowledgeSearchResult,
 } from "../../models/knowledge.schema";
 
 /**
@@ -20,7 +23,27 @@ export interface IKnowledgeRepository {
    * Queries the vector database to locate text segments semantically similar to an input vector.
    *
    * @param data - DTO housing the query vector, strict tenant limits, and result constraints.
-   * @returns A Promise resolving to an array of raw matched text strings.
+   * @returns A Promise resolving to an array of matched text segments with metadata.
    */
-  semanticSearch(data: SemanticSearchPayload): Promise<string[]>;
+  semanticSearch(data: SemanticSearchPayload): Promise<KnowledgeSearchResult[]>;
+  /**
+   * Updates an existing knowledge chunk and its vector representation.
+   *
+   * @param data - DTO containing update parameters.
+   */
+  updateKnowledgeChunk(data: UpdateKnowledgeChunkPayload): Promise<void>;
+  /**
+   * Deletes a knowledge chunk based on ID and tenant ownership.
+   *
+   * @param data - Target identity identity (chunkId and tenantId).
+   */
+  deleteKnowledgeChunk(data: DeleteKnowledgePayload): Promise<void>;
+
+  /**
+   * Retrieves all knowledge chunks for a specific tenant.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @returns A Promise resolving to an array of all chunks.
+   */
+  listAllChunks(tenantId: string): Promise<KnowledgeSearchResult[]>;
 }

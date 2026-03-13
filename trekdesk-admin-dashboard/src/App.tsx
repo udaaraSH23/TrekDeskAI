@@ -26,6 +26,7 @@ const Conversations = lazy(() => import("./pages/Conversations"));
 const Persona = lazy(() => import("./pages/Persona"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const WidgetConfig = lazy(() => import("./pages/WidgetConfig"));
+const Tours = lazy(() => import("./pages/Tours"));
 const Login = lazy(() => import("./pages/Login"));
 
 /**
@@ -81,6 +82,7 @@ function App() {
                         />
                         <Route path="/knowledge" element={<KnowledgeBase />} />
                         <Route path="/persona" element={<Persona />} />
+                        <Route path="/tours" element={<Tours />} />
                         <Route path="/widget" element={<WidgetConfig />} />
 
                         {/* Fallback redirect for authenticated users targeting invalid sub-paths */}

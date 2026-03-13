@@ -116,6 +116,16 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
     );
 
     /**
+     * Trigger Initial Greeting
+     * Automatically asks Gemini to greet the user once the session is active.
+     */
+    logger.info("[Server] Triggering initial voice greeting...");
+    geminiService.sendText(
+      geminiWs,
+      "Please greet the user with a warm, professional welcome message. Introduce yourself as their Trek Assistant and let them know you're ready to help with their Sri Lankan adventure.",
+    );
+
+    /**
      * Handle Incoming Client Messages
      * Listens for audio chunks or control messages from the web widget.
      */

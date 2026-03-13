@@ -67,3 +67,12 @@ export const EndCallSessionPayloadSchema = z.object({
   durationSeconds: z.number().nonnegative(),
 });
 export type EndCallSessionPayload = z.infer<typeof EndCallSessionPayloadSchema>;
+
+/**
+ * DTO for deleting a call log (enforces tenant scoping).
+ */
+export const DeleteCallLogPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  logId: z.string().uuid(),
+});
+export type DeleteCallLogPayload = z.infer<typeof DeleteCallLogPayloadSchema>;

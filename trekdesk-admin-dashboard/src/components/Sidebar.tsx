@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Database,
+  Map as MapIcon,
   Code2,
   UserCircle,
   ChevronLeft,
@@ -26,6 +27,7 @@ const Sidebar: React.FC = () => {
       path: "/knowledge",
     },
     { icon: <UserCircle size={20} />, label: "AI Persona", path: "/persona" },
+    { icon: <MapIcon size={20} />, label: "Tours & Treks", path: "/tours" },
     { icon: <Code2 size={20} />, label: "Widget Config", path: "/widget" },
   ];
 
@@ -81,31 +83,7 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      <div style={footerStyle}>
-        <div style={upgradeCardStyle}>
-          <p
-            style={{
-              fontSize: "0.8rem",
-              color: "var(--muted-foreground)",
-              marginBottom: "8px",
-            }}
-          >
-            Pro Plan
-          </p>
-          <p
-            style={{
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              marginBottom: "12px",
-            }}
-          >
-            Unlimited Leads
-          </p>
-          <button style={upgradeButtonStyle} className="gradient-bg">
-            Upgrade
-          </button>
-        </div>
-      </div>
+      {/* Footer / Upgrade Card removed as redundant for MVP */}
     </aside>
   );
 };
@@ -162,26 +140,6 @@ const navItemStyle: React.CSSProperties = {
   padding: "1rem 1.5rem",
   transition: "all 0.2s ease",
   fontSize: "0.95rem",
-};
-
-const footerStyle: React.CSSProperties = {
-  padding: "1.5rem",
-};
-
-const upgradeCardStyle: React.CSSProperties = {
-  backgroundColor: "#1c1c1f",
-  borderRadius: "12px",
-  padding: "1rem",
-  border: "1px solid var(--border)",
-};
-
-const upgradeButtonStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "0.6rem",
-  borderRadius: "8px",
-  color: "white",
-  fontWeight: 600,
-  fontSize: "0.8rem",
 };
 
 export default Sidebar;

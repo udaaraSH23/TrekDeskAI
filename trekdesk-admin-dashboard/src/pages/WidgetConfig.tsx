@@ -55,17 +55,6 @@ const WidgetConfig: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <div>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
-            Widget Configuration
-          </h1>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            Customize and deploy your AI widget to your website.
-          </p>
-        </div>
-      </header>
-
       <div style={contentGridStyle}>
         <div
           style={{
@@ -344,7 +333,6 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
 };
-const headerStyle: React.CSSProperties = { marginBottom: "2rem" };
 const contentGridStyle: React.CSSProperties = {
   display: "flex",
   gap: "1.5rem",

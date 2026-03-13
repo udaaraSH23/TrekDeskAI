@@ -126,7 +126,7 @@ const Login: React.FC = () => {
         </div>
 
         <div style={footerStyle}>
-          <p>© 2026 TrekDesk AI • Axiolon Labs</p>
+          <p>© 2026 TrekDesk AI • Udara Shanuka - Axiolon Labs</p>
         </div>
       </Card>
 

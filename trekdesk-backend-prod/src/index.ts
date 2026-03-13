@@ -89,7 +89,14 @@ const startServer = async () => {
       );
     });
   } catch (error) {
-    logger.error(`[Startup] FAILED to start server: ${error}`);
+    if (
+      error instanceof Error &&
+      error.message === "database is not connected"
+    ) {
+      logger.error(`[Startup] FAILED: database is not connected`);
+    } else {
+      logger.error(`[Startup] FAILED to start server: ${error}`);
+    }
     process.exit(1);
   }
 };

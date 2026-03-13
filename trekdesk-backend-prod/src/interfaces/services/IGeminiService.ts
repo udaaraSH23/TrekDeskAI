@@ -40,4 +40,13 @@ export interface IGeminiService {
     geminiWs: WebSocket,
     functionResponses: Record<string, unknown>[],
   ): void;
+
+  /**
+   * Sends a text part to Gemini as client content.
+   * Useful for initial greetings or text-based prompts during a voice session.
+   *
+   * @param geminiWs - The active WebSocket connection.
+   * @param text - The text message to send.
+   */
+  sendText(geminiWs: WebSocket, text: string): void;
 }

@@ -26,3 +26,22 @@ export const getTrekDetailSchema = z.object({
     trekId: z.string().uuid("Invalid Trek ID format"),
   }),
 });
+
+/**
+ * Validation schema for updating a trek.
+ */
+export const updateTrekSchema = z.object({
+  params: z.object({
+    trekId: z.string().uuid("Invalid Trek ID format"),
+  }),
+  body: TrekSchema.partial(),
+});
+
+/**
+ * Validation schema for deleting a trek.
+ */
+export const deleteTrekSchema = z.object({
+  params: z.object({
+    trekId: z.string().uuid("Invalid Trek ID format"),
+  }),
+});

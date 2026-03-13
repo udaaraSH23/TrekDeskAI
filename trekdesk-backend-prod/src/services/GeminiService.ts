@@ -20,6 +20,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /**
  * Service class for managing bidirectional communication with the Gemini API.
+ * Uses WebSockets to provide low-latency multimodal interactions.
  */
 export class GeminiService implements IGeminiService {
   /** The WebSocket URL for Gemini's Generative Service BidiGenerateContent endpoint */
@@ -37,7 +38,7 @@ export class GeminiService implements IGeminiService {
    * @param onMessage - Callback function triggered when a response is received from the model.
    * @param onClose - Callback function triggered when the connection is closed.
    * @param settings - Configuration settings including system instructions and voice selection.
-   * @returns A Promise resolving to the established WebSocket instance.
+   * @returns A Promise resolving to the established WebSocket instance once setup is complete.
    */
   public async connectToGemini(
     onMessage: (response: GeminiResponse) => void,
@@ -46,48 +47,80 @@ export class GeminiService implements IGeminiService {
   ): Promise<WebSocket> {
     const geminiWs = new WebSocket(this.wsUrl);
 
-    geminiWs.on("open", () => {
-      logger.info("[GeminiService] Connected to Google Live API");
-
+    return new Promise((resolve, reject) => {
       /**
-       * Initial setup message sent upon connection.
-       * Configures the model, system instructions, tools, and output modalities (AUDIO).
+       * Safety timeout to prevent successful TCP connections from hanging
+       * if the API setup never acknowledges.
        */
-      const setupMessage = {
-        setup: {
-          model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
-          systemInstruction: {
-            parts: [{ text: settings.systemInstruction }],
-          },
-          tools: this.tools,
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: settings.voiceName },
+      const timeout = setTimeout(() => {
+        logger.error(
+          "[GeminiService] Handshake timeout: No setupComplete received.",
+        );
+        geminiWs.close();
+        reject(new Error("Gemini handshake timeout"));
+      }, 10000);
+
+      geminiWs.on("open", () => {
+        /**
+         * Initial setup message sent upon connection.
+         * Configures the model, system instructions, tools, and output modalities (AUDIO).
+         */
+        const setupMessage = {
+          setup: {
+            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
+            systemInstruction: {
+              parts: [{ text: settings.systemInstruction }],
+            },
+            tools: this.tools,
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: settings.voiceName || "Aoede",
+                  },
+                },
               },
             },
           },
-        },
-      };
-      geminiWs.send(JSON.stringify(setupMessage));
-    });
+        };
 
-    geminiWs.on("message", (data) => {
-      const response: GeminiResponse = JSON.parse(data.toString());
-      onMessage(response);
-    });
+        geminiWs.send(JSON.stringify(setupMessage));
+      });
 
-    geminiWs.on("close", (code, reason) => {
-      logger.info(`[GeminiService] Disconnected: ${code} - ${reason}`);
-      onClose();
-    });
+      geminiWs.on("message", (data) => {
+        try {
+          const raw = data.toString();
+          const response = JSON.parse(raw);
 
-    geminiWs.on("error", (err) => {
-      logger.error("[GeminiService] Error:", err);
-    });
+          /**
+           * Wait for 'setupComplete: true' before resolving the connection.
+           * This ensures the session is ready to receive media or client content.
+           */
+          if (response.setupComplete) {
+            logger.info("[GeminiService] Session authenticated and ready.");
+            clearTimeout(timeout);
+            resolve(geminiWs);
+          }
 
-    return geminiWs;
+          onMessage(response as GeminiResponse);
+        } catch (err) {
+          logger.error("[GeminiService] Failed to parse API message:", err);
+        }
+      });
+
+      geminiWs.on("close", (code) => {
+        logger.info(`[GeminiService] Connection closed with code: ${code}`);
+        clearTimeout(timeout);
+        onClose();
+      });
+
+      geminiWs.on("error", (err) => {
+        logger.error("[GeminiService] Connection Error:", err);
+        clearTimeout(timeout);
+        reject(err);
+      });
+    });
   }
 
   /**
@@ -119,13 +152,35 @@ export class GeminiService implements IGeminiService {
     functionResponses: Record<string, unknown>[],
   ) {
     if (geminiWs.readyState === WebSocket.OPEN) {
-      geminiWs.send(
-        JSON.stringify({
-          toolResponse: {
-            functionResponses: functionResponses,
-          },
-        }),
-      );
+      const message = {
+        toolResponse: {
+          functionResponses: functionResponses,
+        },
+      };
+      geminiWs.send(JSON.stringify(message));
+    }
+  }
+
+  /**
+   * Sends a text prompt to Gemini as client content.
+   * Useful for initial greetings or forcing model actions during a voice session.
+   *
+   * @param geminiWs - The active WebSocket connection.
+   * @param text - The text to send as human role content.
+   */
+  public sendText(geminiWs: WebSocket, text: string) {
+    if (geminiWs.readyState === WebSocket.OPEN) {
+      const message = {
+        clientContent: {
+          turns: [{ role: "user", parts: [{ text }] }],
+          /**
+           * CRITICAL: turnComplete must be true for the model to process
+           * and start generating a response voice.
+           */
+          turnComplete: true,
+        },
+      };
+      geminiWs.send(JSON.stringify(message));
     }
   }
 }

@@ -113,4 +113,32 @@ router.get(
   callLogController.getLogDetail.bind(callLogController),
 );
 
+/**
+ * @swagger
+ * /api/v1/analytics/calls/{logId}:
+ *   delete:
+ *     summary: Delete a specific call log
+ *     description: Permanently removes a conversation record from the analytics history.
+ *     tags: [Call Logs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: logId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "123e4567-e89b-12d3-a456-426614174000"
+ *     responses:
+ *       200:
+ *         description: Call log deleted successfully.
+ *       404:
+ *         description: Call log not found.
+ */
+router.delete(
+  "/:logId",
+  validate(getLogDetailSchema),
+  callLogController.deleteLog.bind(callLogController),
+);
+
 export default router;

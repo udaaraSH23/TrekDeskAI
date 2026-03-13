@@ -8,6 +8,7 @@ import {
   CallLog,
   CallLogStats,
   UpdateCallLogPayload,
+  DeleteCallLogPayload,
 } from "../models/logs.schema";
 
 /**
@@ -107,5 +108,16 @@ export class CallLogRepository implements ICallLogRepository {
         payload.tenantId,
       ],
     );
+  }
+
+  /**
+   * Deletes a specific call log entry from the database.
+   */
+  public async deleteLog(data: DeleteCallLogPayload): Promise<void> {
+    const { logId, tenantId } = data;
+    await query("DELETE FROM call_logs WHERE id = $1 AND tenant_id = $2", [
+      logId,
+      tenantId,
+    ]);
   }
 }

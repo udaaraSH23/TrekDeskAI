@@ -6,6 +6,7 @@ import {
   CallLog,
   CallLogStats,
   CreateCallLogPayload,
+  DeleteCallLogPayload,
   EndCallSessionPayload,
 } from "../../models/logs.schema";
 
@@ -60,4 +61,10 @@ export interface ICallLogService {
    * @returns A promise resolving when the log is completely finalized.
    */
   endCallSession(payload: EndCallSessionPayload): Promise<void>;
+  /**
+   * Permanently removes a specific call log from the database.
+   *
+   * @param data - The DeleteCallLogPayload DTO.
+   */
+  deleteLog(data: DeleteCallLogPayload): Promise<void>;
 }

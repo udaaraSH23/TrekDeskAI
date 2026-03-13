@@ -2,6 +2,7 @@ import {
   CallLog,
   CallLogStats,
   UpdateCallLogPayload,
+  DeleteCallLogPayload,
 } from "../../models/logs.schema";
 
 /**
@@ -53,4 +54,10 @@ export interface ICallLogRepository {
    * @param durationSeconds - The total time in seconds the call lasted.
    */
   updateLog(payload: UpdateCallLogPayload): Promise<void>;
+  /**
+   * Deletes a call log entry from the database.
+   *
+   * @param data - The DeleteCallLogPayload DTO.
+   */
+  deleteLog(data: DeleteCallLogPayload): Promise<void>;
 }

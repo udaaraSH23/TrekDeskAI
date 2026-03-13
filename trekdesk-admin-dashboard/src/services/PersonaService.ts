@@ -22,7 +22,7 @@ export const PersonaService = {
    * @throws {ApiError} If the API request fails.
    */
   getSettings: async (): Promise<PersonaSettings> => {
-    const response = await api.get<PersonaResponse>("/persona");
+    const response = await api.get<PersonaResponse>("/persona/settings");
     return response.data.data;
   },
 
@@ -36,7 +36,10 @@ export const PersonaService = {
   updateSettings: async (
     settings: PersonaSettings,
   ): Promise<PersonaSettings> => {
-    const response = await api.patch<PersonaResponse>("/persona", settings);
+    const response = await api.put<PersonaResponse>(
+      "/persona/settings",
+      settings,
+    );
     return response.data.data;
   },
 };

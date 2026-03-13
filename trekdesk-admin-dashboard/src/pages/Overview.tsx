@@ -1,5 +1,4 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
   Users,
   MessageSquare,
@@ -17,12 +16,11 @@ import {
   CardTitle,
   CardContent,
 } from "../components/ui/Card";
-import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
-import type { CallLog } from "../types/analytics.types";
+import { VoicePlayground } from "../components/VoicePlayground";
 
 const Overview: React.FC = () => {
-  const navigate = useNavigate();
+  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
   const { data: stats, isLoading: loading, error } = useAnalyticsStats();
 
   const statsConfig = [
@@ -73,21 +71,6 @@ const Overview: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <div>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
-            Command Center
-          </h1>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            Welcome back, Kandy Treks. Here's your AI's performance today.
-          </p>
-        </div>
-        <div style={statusBadgeStyle}>
-          <div style={pulseStyle}></div>
-          <Badge variant="success">AI Agent Active</Badge>
-        </div>
-      </header>
-
       {error && (
         <div
           style={{
@@ -137,116 +120,46 @@ const Overview: React.FC = () => {
       </section>
 
       <div style={mainGridStyle}>
-        <Card style={{ flex: 2 }}>
-          <CardHeader
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingBottom: 0,
-              border: "none",
-            }}
-          >
-            <CardTitle>Conversation Volume</CardTitle>
-            <select style={selectStyle}>
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-            </select>
+        <Card style={{ flex: 1 }}>
+          <CardHeader style={{ border: "none" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <Activity size={20} color="var(--primary)" />
+              <CardTitle>Voice Playground</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
-            <div style={chartPlaceholderStyle}>
-              {/* Simulated Chart - Implementation pending real time-series data */}
-              <Activity size={48} color="rgba(16, 185, 129, 0.2)" />
-              <p
-                style={{ color: "var(--muted-foreground)", marginTop: "1rem" }}
+            <p
+              style={{
+                color: "var(--muted-foreground)",
+                marginBottom: "1.5rem",
+                fontSize: "0.9rem",
+                lineHeight: "1.6",
+              }}
+            >
+              Test your AI persona in real-time. This live sandbox uses your
+              current system instructions and voice configuration to simulate
+              authentic customer interactions.
+            </p>
+            <div style={playgroundPreviewStyle}>
+              <div style={promoIconStyle}>
+                <Play size={24} fill="white" />
+              </div>
+              <Button
+                variant="primary"
+                style={{ width: "200px" }}
+                onClick={() => setIsPlaygroundOpen(true)}
               >
-                Volume visualization live
-              </p>
+                Start Testing
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.5rem",
-          }}
-        >
-          <Card style={promoCardStyle}>
-            <CardContent style={{ padding: "1.5rem" }}>
-              <div style={promoIconStyle}>
-                <Play size={24} fill="white" />
-              </div>
-              <CardTitle style={{ color: "white" }}>Quick Test</CardTitle>
-              <p
-                style={{
-                  fontSize: "0.85rem",
-                  color: "rgba(255,255,255,0.7)",
-                  margin: "8px 0 16px",
-                }}
-              >
-                Test your current AI persona and tools in the live sandbox.
-              </p>
-              <Button
-                variant="secondary"
-                style={{ width: "100%" }}
-                onClick={() => navigate("/widget")}
-              >
-                Launch Simulator
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader style={{ paddingBottom: "0.5rem", border: "none" }}>
-              <CardTitle>Recent Hot Leads</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div style={{ marginTop: "0.5rem" }}>
-                {stats?.hot_leads && stats.hot_leads.length > 0 ? (
-                  stats.hot_leads.map((lead: CallLog, i: number) => (
-                    <div key={i} style={leadItemStyle}>
-                      <div style={avatarSmallStyle}>
-                        <Users size={14} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "0.9rem", fontWeight: 600 }}>
-                          {lead.session_id.substring(0, 8)}...
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "var(--muted-foreground)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            maxWidth: "180px",
-                          }}
-                        >
-                          {lead.summary || "Lead Inquiry"}
-                        </p>
-                      </div>
-                      <Badge variant="destructive">Hot</Badge>
-                    </div>
-                  ))
-                ) : (
-                  <p
-                    style={{
-                      fontSize: "0.85rem",
-                      color: "var(--muted-foreground)",
-                      textAlign: "center",
-                      padding: "1rem",
-                    }}
-                  >
-                    No hot leads yet.
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Voice Playground Modal */}
+        <VoicePlayground
+          isOpen={isPlaygroundOpen}
+          onClose={() => setIsPlaygroundOpen(false)}
+        />
       </div>
     </div>
   );
@@ -254,32 +167,6 @@ const Overview: React.FC = () => {
 
 const containerStyle: React.CSSProperties = {
   animation: "fadeIn 0.5s ease-out",
-};
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-  marginBottom: "2.5rem",
-};
-
-const statusBadgeStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-  backgroundColor: "rgba(16, 185, 129, 0.1)",
-  padding: "0.6rem 1rem",
-  borderRadius: "20px",
-  border: "1px solid rgba(16, 185, 129, 0.2)",
-};
-
-const pulseStyle: React.CSSProperties = {
-  width: "8px",
-  height: "8px",
-  borderRadius: "50%",
-  backgroundColor: "var(--primary)",
-  boxShadow: "0 0 10px var(--primary)",
-  animation: "pulse 2s infinite",
 };
 
 const statsGridStyle: React.CSSProperties = {
@@ -316,59 +203,26 @@ const mainGridStyle: React.CSSProperties = {
   gap: "1.5rem",
 };
 
-const chartPlaceholderStyle: React.CSSProperties = {
-  height: "300px",
+const playgroundPreviewStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
+  padding: "2rem",
+  backgroundColor: "rgba(0,0,0,0.2)",
+  borderRadius: "16px",
   border: "1px dashed var(--border)",
-  borderRadius: "12px",
-};
-
-const selectStyle: React.CSSProperties = {
-  padding: "0.4rem 0.8rem",
-  borderRadius: "8px",
-  backgroundColor: "var(--secondary)",
-  color: "white",
-  border: "1px solid var(--border)",
-};
-
-const promoCardStyle: React.CSSProperties = {
-  background: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
-  color: "white",
-  border: "none",
 };
 
 const promoIconStyle: React.CSSProperties = {
   width: "48px",
   height: "48px",
   borderRadius: "12px",
-  backgroundColor: "rgba(255, 255, 255, 0.2)",
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   marginBottom: "1rem",
-};
-
-const leadItemStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  padding: "12px 0",
-  borderBottom: "1px solid var(--border)",
-};
-
-const avatarSmallStyle: React.CSSProperties = {
-  width: "32px",
-  height: "32px",
-  borderRadius: "50%",
-  backgroundColor: "var(--secondary)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "0.75rem",
-  fontWeight: 600,
 };
 
 export default Overview;

@@ -3,13 +3,15 @@ import {
   Search,
   Filter,
   Clock,
-  PlayCircle,
-  Download,
-  Share2,
   Trash2,
   MessageSquare,
+  Terminal,
 } from "lucide-react";
-import { useCallLogs, useCallLogDetails } from "../hooks/useAnalytics";
+import {
+  useCallLogs,
+  useCallLogDetails,
+  useDeleteCallLog,
+} from "../hooks/useAnalytics";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
@@ -25,6 +27,15 @@ const Conversations: React.FC = () => {
     selectedLogId || "",
   );
 
+  const deleteMutation = useDeleteCallLog();
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this conversation?")) {
+      setSelectedLogId(null);
+      await deleteMutation.mutateAsync(id);
+    }
+  };
+
   const filteredLogs = logs.filter(
     (log) =>
       log.session_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -34,18 +45,6 @@ const Conversations: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <div>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
-            Conversations
-          </h1>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            Review call recordings, transcripts, and lead data captured by your
-            AI.
-          </p>
-        </div>
-      </header>
-
       {error && (
         <Badge
           variant="destructive"
@@ -245,74 +244,83 @@ const Conversations: React.FC = () => {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: "10px" }}>
-                    <Button variant="secondary" size="icon" title="Coming Soon">
-                      <Download size={18} />
-                    </Button>
-                    <Button variant="secondary" size="icon" title="Coming Soon">
-                      <Share2 size={18} />
-                    </Button>
-                    <Button variant="ghost" size="icon" title="Coming Soon">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => detailLog && handleDelete(detailLog.id)}
+                      isLoading={deleteMutation.isPending}
+                    >
                       <Trash2 size={18} color="#ef4444" />
                     </Button>
                   </div>
                 </div>
 
-                <div style={playerContainerStyle}>
-                  <div style={playerProgressContainerStyle}>
-                    <div style={playerProgressStyle}></div>
-                    <div style={playerThumbStyle}></div>
+                <div style={insightsPanelStyle}>
+                  <div style={insightItemStyle}>
+                    <div style={insightLabelStyle}>Summary</div>
+                    <p style={insightValueStyle}>
+                      {detailLog.summary ||
+                        "No summary available for this session."}
+                    </p>
                   </div>
                   <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginTop: "12px",
-                    }}
+                    style={{ display: "flex", gap: "2rem", marginTop: "1rem" }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "20px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <PlayCircle
-                        size={32}
-                        color="var(--primary)"
-                        style={{ cursor: "pointer" }}
-                      />
-                      <span style={{ fontSize: "0.9rem" }}>
-                        00:00 / {Math.floor(detailLog.duration_seconds / 60)}:
+                    <div>
+                      <div style={insightLabelStyle}>Sentiment Score</div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Badge
+                          variant={
+                            detailLog.sentiment_score > 0.7
+                              ? "success"
+                              : "secondary"
+                          }
+                        >
+                          {(detailLog.sentiment_score * 100).toFixed(0)}%
+                        </Badge>
+                        <span
+                          style={{
+                            fontSize: "0.8rem",
+                            color: "var(--muted-foreground)",
+                          }}
+                        >
+                          {detailLog.sentiment_score > 0.7
+                            ? "Positive / Hot Lead"
+                            : "Neutral / Inquiry"}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <div style={insightLabelStyle}>Duration</div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          fontSize: "0.9rem",
+                        }}
+                      >
+                        <Clock size={14} color="var(--primary)" />
+                        {Math.floor(detailLog.duration_seconds / 60)}:
                         {(detailLog.duration_seconds % 60)
                           .toString()
                           .padStart(2, "0")}
-                      </span>
-                    </div>
-                    <div style={audioVisualizationStyle}>
-                      {[
-                        1, 2, 3, 4, 5, 4, 3, 2, 3, 4, 6, 8, 5, 3, 2, 4, 3, 2, 3,
-                        4, 5, 6, 3,
-                      ].map((h, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            height: h * 3,
-                            width: "3px",
-                            backgroundColor: "var(--primary)",
-                            borderRadius: "2px",
-                            opacity: 0.6,
-                          }}
-                        ></div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div style={tabContainerStyle}>
-                  <button style={activeTabStyle}>Transcript</button>
-                  <button style={tabStyle}>Lead CRM</button>
-                  <button style={tabStyle}>AI Analysis</button>
+                  <div style={activeTabStyle}>
+                    <Terminal size={14} style={{ marginRight: "6px" }} />
+                    Full Transcript
+                  </div>
                 </div>
 
                 <div style={transcriptContainerStyle}>
@@ -413,7 +421,6 @@ const containerStyle: React.CSSProperties = {
   animation: "fadeIn 0.5s ease-out",
   height: "100%",
 };
-const headerStyle: React.CSSProperties = { marginBottom: "2rem" };
 const layoutStyle: React.CSSProperties = {
   display: "flex",
   gap: "1.5rem",
@@ -482,48 +489,35 @@ const detailHeaderStyle: React.CSSProperties = {
   alignItems: "center",
 };
 
-const playerContainerStyle: React.CSSProperties = {
+const insightsPanelStyle: React.CSSProperties = {
   padding: "1.5rem 2rem",
   backgroundColor: "rgba(255,255,255,0.02)",
   borderBottom: "1px solid var(--border)",
 };
 
-const playerProgressContainerStyle: React.CSSProperties = {
-  height: "4px",
-  width: "100%",
-  backgroundColor: "var(--border)",
-  borderRadius: "2px",
-  position: "relative",
+const insightItemStyle: React.CSSProperties = {
+  marginBottom: "1rem",
 };
 
-const playerProgressStyle: React.CSSProperties = {
-  height: "100%",
-  width: "0%",
-  backgroundColor: "var(--primary)",
-  borderRadius: "2px",
+const insightLabelStyle: React.CSSProperties = {
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  color: "var(--muted-foreground)",
+  textTransform: "uppercase",
+  marginBottom: "4px",
+  letterSpacing: "0.05em",
 };
 
-const playerThumbStyle: React.CSSProperties = {
-  position: "absolute",
-  left: "0%",
-  top: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "12px",
-  height: "12px",
-  backgroundColor: "white",
-  borderRadius: "50%",
-  boxShadow: "0 0 10px var(--primary)",
-};
-
-const audioVisualizationStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "2px",
+const insightValueStyle: React.CSSProperties = {
+  fontSize: "0.95rem",
+  lineHeight: "1.6",
+  color: "var(--foreground)",
+  margin: 0,
 };
 
 const tabContainerStyle: React.CSSProperties = {
   display: "flex",
-  padding: "1rem 2rem",
+  padding: "1.2rem 2rem",
   borderBottom: "1px solid var(--border)",
   gap: "1.5rem",
 };
@@ -536,13 +530,14 @@ const tabStyle: React.CSSProperties = {
   fontWeight: 600,
   paddingBottom: "8px",
   borderBottom: "2px solid transparent",
-  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
 };
 
 const activeTabStyle: React.CSSProperties = {
   ...tabStyle,
   color: "var(--primary)",
-  borderBottomColor: "var(--primary)",
+  borderBottom: "2px solid var(--primary)",
 };
 
 const transcriptContainerStyle: React.CSSProperties = {

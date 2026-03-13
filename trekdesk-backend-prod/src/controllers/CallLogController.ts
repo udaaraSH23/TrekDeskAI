@@ -108,4 +108,35 @@ export class CallLogController {
       next(err);
     }
   }
+
+  /**
+   * DELETE /api/logs/:logId
+   * Permanently removes a specific call record.
+   *
+   * @param req - Express request object.
+   * @param res - Express response object.
+   * @param next - Express next middleware function.
+   */
+  public async deleteLog(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { logId } = req.params;
+
+    try {
+      await this.callLogService.deleteLog({
+        logId: logId as string,
+        tenantId: MVP_TENANT_ID,
+      });
+
+      ApiResponse.sendSuccess(
+        res,
+        HttpStatus.OK,
+        "Call log deleted successfully",
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
 }

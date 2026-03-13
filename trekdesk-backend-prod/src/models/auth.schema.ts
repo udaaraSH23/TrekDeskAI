@@ -14,7 +14,7 @@ export const UserRowSchema = z.object({
   google_id: z.string(),
   email: z.string().email(),
   full_name: z.string(),
-  picture_url: z.string().url(),
+  picture_url: z.string().url().optional().nullable(),
   role: z.string(),
   last_login: z.date(),
   created_at: z.date(),
@@ -30,7 +30,7 @@ export const AuthUserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   fullName: z.string(),
-  pictureUrl: z.string().url(),
+  pictureUrl: z.string().url().optional().nullable(),
   tenantId: z.string().uuid(),
 });
 
@@ -44,7 +44,7 @@ export const GoogleUserPayloadSchema = z.object({
   googleId: z.string(),
   email: z.string().email(),
   fullName: z.string(),
-  pictureUrl: z.string().url(),
+  pictureUrl: z.string().url().optional().nullable(),
   tenantId: z.string().uuid(),
 });
 

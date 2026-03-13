@@ -7,6 +7,9 @@ import { IKnowledgeRepository } from "../interfaces/repositories/IKnowledgeRepos
 import {
   InsertDocumentChunkPayload,
   SemanticSearchPayload,
+  UpdateKnowledgeChunkPayload,
+  DeleteKnowledgePayload,
+  KnowledgeSearchResult,
 } from "../models/knowledge.schema";
 
 /**
@@ -40,16 +43,64 @@ export class KnowledgeRepository implements IKnowledgeRepository {
   /**
    * Performs a vector similarity search (Cosine Distance) to find relevant knowledge chunks.
    */
-  public async semanticSearch(data: SemanticSearchPayload): Promise<string[]> {
+  public async semanticSearch(
+    data: SemanticSearchPayload,
+  ): Promise<KnowledgeSearchResult[]> {
     const limit = data.limit ?? 3;
     const result = await query(
-      `SELECT content FROM document_chunks 
+      `SELECT id, content, trek_id, (1 - (embedding <=> $2)) as similarity 
+       FROM document_chunks 
        WHERE tenant_id = $1
        ORDER BY embedding <=> $2 
        LIMIT $3`,
       [data.tenantId, `[${data.embedding.join(",")}]`, limit],
     );
 
-    return result.rows.map((row: { content: string }) => row.content);
+    return result.rows;
+  }
+
+  /**
+   * Updates an existing knowledge chunk in the database.
+   */
+  public async updateKnowledgeChunk(
+    data: UpdateKnowledgeChunkPayload,
+  ): Promise<void> {
+    await query(
+      `UPDATE document_chunks 
+       SET content = $1, embedding = $2 
+       WHERE id = $3 AND tenant_id = $4`,
+      [
+        data.content,
+        `[${data.embedding.join(",")}]`,
+        data.chunkId,
+        data.tenantId,
+      ],
+    );
+  }
+
+  /**
+   * Deletes a specific knowledge chunk from the database.
+   */
+  public async deleteKnowledgeChunk(
+    data: DeleteKnowledgePayload,
+  ): Promise<void> {
+    const { chunkId, tenantId } = data;
+    await query(
+      "DELETE FROM document_chunks WHERE id = $1 AND tenant_id = $2",
+      [chunkId, tenantId],
+    );
+  }
+
+  /**
+   * Retrieves all knowledge chunks for a specific tenant.
+   */
+  public async listAllChunks(
+    tenantId: string,
+  ): Promise<KnowledgeSearchResult[]> {
+    const result = await query(
+      "SELECT id, content, trek_id FROM document_chunks WHERE tenant_id = $1 ORDER BY created_at DESC",
+      [tenantId],
+    );
+    return result.rows;
   }
 }

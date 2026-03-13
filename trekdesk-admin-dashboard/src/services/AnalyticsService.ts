@@ -54,4 +54,14 @@ export const AnalyticsService = {
     );
     return response.data.data;
   },
+
+  /**
+   * Deletes a specific call log.
+   * @param id - The unique identifier of the call log to delete.
+   * @returns A promise that resolves when the log is deleted.
+   * @throws {ApiError} If the API request fails.
+   */
+  deleteLog: async (id: string): Promise<void> => {
+    await api.delete(`/analytics/calls/${id}`);
+  },
 };

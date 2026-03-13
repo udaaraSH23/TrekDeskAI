@@ -17,5 +17,5 @@ export const MVP_TENANT_ID = "00000000-0000-0000-0000-000000000001";
 export const GOOGLE_AUTH_WHITELIST = [
   "admin@kandytreks.com",
   "developer@axiolonlabs.com",
-  "ds@summitlogic.io", // Primary developer access
+  "rosalovershop@gmail.com", // Primary developer access,
 ];

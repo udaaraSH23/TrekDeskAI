@@ -29,12 +29,19 @@ export const query = (text: string, params?: unknown[]) =>
  * Used during startup to ensure the backend can reach the PostgreSQL cluster.
  */
 export const testConnection = async () => {
-  const client = await pool.connect();
   try {
-    await client.query("SELECT 1");
-    return true;
-  } finally {
-    client.release();
+    const client = await pool.connect();
+    try {
+      await client.query("SELECT 1");
+      return true;
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    const dbError = new Error("database is not connected");
+    // @ts-expect-error - 'cause' is not in ES2020 Error but required by lint
+    dbError.cause = err;
+    throw dbError;
   }
 };
 

@@ -53,9 +53,14 @@ export class AuthService implements IAuthService {
 
       // Business logic: Check against Whitelist for the MVP phase
       // This ensures only authorized testers/partners can access the system.
-      if (!GOOGLE_AUTH_WHITELIST.includes(payload.email)) {
+      const normalizedEmail = payload.email.toLowerCase().trim();
+      const isWhitelisted = GOOGLE_AUTH_WHITELIST.some(
+        (e) => e.toLowerCase().trim() === normalizedEmail,
+      );
+
+      if (!isWhitelisted) {
         logger.warn(
-          `[AuthService] Unauthorized login attempt: ${payload.email}`,
+          `[AuthService] Unauthorized login attempt: ${normalizedEmail}`,
         );
         return null;
       }

@@ -40,3 +40,22 @@ export type TrekRecord = Trek & {
   created_at?: Date;
   updated_at?: Date;
 };
+
+/**
+ * Payload for updating an existing Trek.
+ * Makes all Trek fields optional using .partial()
+ */
+export const UpdateTrekPayloadSchema = TrekSchema.partial().extend({
+  tenantId: z.string().uuid(),
+  trekId: z.string().uuid(),
+});
+export type UpdateTrekPayload = z.infer<typeof UpdateTrekPayloadSchema>;
+
+/**
+ * DTO for deleting a trek (enforces tenant scoping).
+ */
+export const DeleteTrekPayloadSchema = z.object({
+  tenantId: z.string().uuid(),
+  trekId: z.string().uuid(),
+});
+export type DeleteTrekPayload = z.infer<typeof DeleteTrekPayloadSchema>;

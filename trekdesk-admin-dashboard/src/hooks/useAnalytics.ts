@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AnalyticsService } from "../services/AnalyticsService";
 
 /**
@@ -33,5 +33,21 @@ export const useCallLogDetails = (id: string) => {
     queryKey: ["analytics", "logs", id],
     queryFn: () => AnalyticsService.getCallDetail(id),
     enabled: !!id,
+  });
+};
+
+/**
+ * Custom hook to delete a call log.
+ * @returns {UseMutationResult} TanStack Query mutation result.
+ */
+export const useDeleteCallLog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => AnalyticsService.deleteLog(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics", "logs"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics", "stats"] });
+    },
   });
 };

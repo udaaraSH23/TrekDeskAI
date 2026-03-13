@@ -7,7 +7,12 @@
 
 import { ITourService } from "../interfaces/services/ITourService";
 import { ITourRepository } from "../interfaces/repositories/ITourRepository";
-import { CreateTrekPayload, TrekRecord } from "../models/trek.schema";
+import {
+  CreateTrekPayload,
+  TrekRecord,
+  UpdateTrekPayload,
+  DeleteTrekPayload,
+} from "../models/trek.schema";
 import { logger } from "../utils/logger";
 
 /**
@@ -71,5 +76,19 @@ export class TourService implements ITourService {
   public async createTrek(data: CreateTrekPayload): Promise<TrekRecord> {
     logger.info(`[TourService] Creating new trek for tenant: ${data.tenantId}`);
     return this.tourRepository.createTrek(data);
+  }
+
+  /**
+   * Modifies an existing trek's attributes.
+   */
+  public async updateTrek(data: UpdateTrekPayload): Promise<TrekRecord> {
+    logger.info(`[TourService] Updating trek: ${data.trekId}`);
+    return this.tourRepository.updateTrek(data);
+  }
+
+  public async deleteTrek(data: DeleteTrekPayload): Promise<void> {
+    const { trekId, tenantId } = data;
+    logger.info(`[TourService] Deleting trek: ${trekId}`);
+    await this.tourRepository.deleteTrek({ trekId, tenantId });
   }
 }

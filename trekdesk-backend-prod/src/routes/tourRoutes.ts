@@ -8,6 +8,8 @@ import { validate } from "../middleware/validate";
 import {
   createTrekSchema,
   getTrekDetailSchema,
+  updateTrekSchema,
+  deleteTrekSchema,
 } from "../validators/tourValidators";
 
 const router = Router();
@@ -160,6 +162,59 @@ router.post(
   "/",
   validate(createTrekSchema),
   tourController.createTrek.bind(tourController),
+);
+
+/**
+ * @swagger
+ * /api/v1/tours/{trekId}:
+ *   patch:
+ *     summary: Update an existing trek
+ *     description: Modifies the details of a specific tour package.
+ *     tags: [Tours]
+ *     parameters:
+ *       - in: path
+ *         name: trekId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "223e4567-e89b-12d3-a456-426614174000"
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Trek'
+ *     responses:
+ *       200:
+ *         description: Trek updated successfully.
+ */
+router.patch(
+  "/:trekId",
+  validate(updateTrekSchema),
+  tourController.updateTrek.bind(tourController),
+);
+
+/**
+ * @swagger
+ * /api/v1/tours/{trekId}:
+ *   delete:
+ *     summary: Delete a trek
+ *     description: Permanently removes a tour package from the catalog.
+ *     tags: [Tours]
+ *     parameters:
+ *       - in: path
+ *         name: trekId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "223e4567-e89b-12d3-a456-426614174000"
+ *     responses:
+ *       200:
+ *         description: Trek deleted successfully.
+ */
+router.delete(
+  "/:trekId",
+  validate(deleteTrekSchema),
+  tourController.deleteTrek.bind(tourController),
 );
 
 export default router;

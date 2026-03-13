@@ -111,4 +111,60 @@ export class TourController {
       next(err);
     }
   }
+
+  /**
+   * PATCH /api/treks/:trekId
+   * Updates an existing trek's metadata or pricing.
+   */
+  public async updateTrek(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { trekId } = req.params;
+
+    try {
+      const updatedTrek = await this.tourService.updateTrek({
+        tenantId: MVP_TENANT_ID,
+        trekId: trekId as string,
+        ...req.body,
+      });
+
+      if (!updatedTrek) {
+        throw new NotFoundError("Trek not found");
+      }
+
+      ApiResponse.sendSuccess(
+        res,
+        HttpStatus.OK,
+        "Trek updated successfully",
+        updatedTrek,
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * DELETE /api/treks/:trekId
+   * Removes a trek from the catalog.
+   */
+  public async deleteTrek(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { trekId } = req.params;
+
+    try {
+      await this.tourService.deleteTrek({
+        trekId: trekId as string,
+        tenantId: MVP_TENANT_ID,
+      });
+
+      ApiResponse.sendSuccess(res, HttpStatus.OK, "Trek deleted successfully");
+    } catch (err) {
+      next(err);
+    }
+  }
 }

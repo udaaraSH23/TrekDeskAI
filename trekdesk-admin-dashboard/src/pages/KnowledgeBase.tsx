@@ -6,8 +6,19 @@ import {
   UploadCloud,
   CheckCircle2,
   AlertCircle,
+  Trash2,
+  Edit2,
+  Save,
+  X,
 } from "lucide-react";
-import { useKnowledgeSearch, useIngestKnowledge } from "../hooks/useKnowledge";
+import {
+  useKnowledgeSearch,
+  useIngestKnowledge,
+  useDeleteKnowledge,
+  useUpdateKnowledge,
+  useAllKnowledge,
+} from "../hooks/useKnowledge";
+import type { KnowledgeSearchResult } from "../types/knowledge.types";
 import {
   Card,
   CardHeader,
@@ -19,19 +30,51 @@ import { Badge } from "../components/ui/Badge";
 import { Input } from "../components/ui/Input";
 
 const KnowledgeBase: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"documents" | "search">(
+  const [activeTab, setActiveTab] = useState<"documents" | "search" | "manage">(
     "documents",
   );
   const [ingestContent, setIngestContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   const ingestMutation = useIngestKnowledge();
+  const deleteMutation = useDeleteKnowledge();
+  const updateMutation = useUpdateKnowledge();
+
   const {
     data: searchResults = [],
     isLoading: searchLoading,
     error: searchError,
   } = useKnowledgeSearch(searchQuery);
+
+  const {
+    data: allChunks = [],
+    isLoading: listLoading,
+    error: listError,
+  } = useAllKnowledge();
+
+  const handleDelete = async (chunkId: string) => {
+    if (
+      window.confirm("Are you sure you want to delete this knowledge chunk?")
+    ) {
+      await deleteMutation.mutateAsync(chunkId);
+    }
+  };
+
+  const startEdit = (chunk: KnowledgeSearchResult) => {
+    setEditingId(chunk.id);
+    setEditContent(chunk.content);
+  };
+
+  const handleUpdate = async (chunkId: string) => {
+    await updateMutation.mutateAsync({
+      chunkId,
+      payload: { content: editContent },
+    });
+    setEditingId(null);
+  };
 
   const handleIngest = async () => {
     if (!ingestContent.trim()) return;
@@ -52,22 +95,10 @@ const KnowledgeBase: React.FC = () => {
     // Search is handled automatically by useKnowledgeSearch fetching on query change
   };
 
-  const error = ingestMutation.error || searchError;
+  const error = ingestMutation.error || searchError || listError;
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <div>
-          <h1 style={{ fontSize: "1.8rem", marginBottom: "8px" }}>
-            Knowledge Base
-          </h1>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            Upload tour guides, PDFs, and trek info for the RAG (Retrieval
-            Augmented Generation) pipeline.
-          </p>
-        </div>
-      </header>
-
       {error && (
         <div style={errorBannerStyle}>
           <AlertCircle size={18} style={{ marginRight: "8px" }} />
@@ -97,6 +128,12 @@ const KnowledgeBase: React.FC = () => {
           onClick={() => setActiveTab("documents")}
         >
           Ingest Content
+        </button>
+        <button
+          style={activeTab === "manage" ? activeTabStyle : tabStyle}
+          onClick={() => setActiveTab("manage")}
+        >
+          Manage Knowledge
         </button>
         <button
           style={activeTab === "search" ? activeTabStyle : tabStyle}
@@ -167,7 +204,7 @@ const KnowledgeBase: React.FC = () => {
                         marginTop: "4px",
                       }}
                     >
-                      Using Google `text-embedding-004`
+                      Using Google `gemini-embedding-001`
                     </p>
                   </div>
                 </CardContent>
@@ -175,22 +212,152 @@ const KnowledgeBase: React.FC = () => {
               <Card>
                 <CardHeader style={{ border: "none", paddingBottom: "0.5rem" }}>
                   <CardTitle style={{ fontSize: "1rem" }}>
-                    Recent Uploads
+                    Knowledge Base Stats
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      Total Chunks:
+                    </span>
+                    <Badge variant="outline">{allChunks.length}</Badge>
+                  </div>
                   <p
                     style={{
                       fontSize: "0.8rem",
                       color: "var(--muted-foreground)",
+                      marginTop: "1rem",
                     }}
                   >
-                    Vectors are stored in PostgreSQL via pgvector.
+                    Vectors are stored in PostgreSQL with 768 dimensions.
                   </p>
                 </CardContent>
               </Card>
             </div>
           </div>
+        ) : activeTab === "manage" ? (
+          <Card>
+            <CardHeader style={{ border: "none" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <Database size={20} color="var(--primary)" />
+                <CardTitle>Injected Knowledge Records</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div style={resultsContainerStyle}>
+                {listLoading ? (
+                  <p
+                    style={{
+                      textAlign: "center",
+                      padding: "2rem",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
+                    Loading items...
+                  </p>
+                ) : allChunks.length > 0 ? (
+                  allChunks.map((chunk: KnowledgeSearchResult) => (
+                    <div key={chunk.id} style={resultItemStyle}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={resultBadgeStyle}>
+                          ID: {chunk.id.split("-")[0]}...
+                        </span>
+                        <div style={{ display: "flex", gap: "5px" }}>
+                          {editingId === chunk.id ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdate(chunk.id)}
+                                isLoading={updateMutation.isPending}
+                              >
+                                <Save size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditingId(null)}
+                              >
+                                <X size={14} />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => startEdit(chunk)}
+                              >
+                                <Edit2 size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(chunk.id)}
+                                isLoading={deleteMutation.isPending}
+                              >
+                                <Trash2 size={14} color="#ef4444" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {editingId === chunk.id ? (
+                        <textarea
+                          style={{
+                            ...textareaStyle,
+                            height: "120px",
+                            fontSize: "0.85rem",
+                          }}
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                        />
+                      ) : (
+                        <p
+                          style={{
+                            fontSize: "0.95rem",
+                            lineHeight: "1.6",
+                            margin: 0,
+                          }}
+                        >
+                          {chunk.content}
+                        </p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p
+                    style={{
+                      textAlign: "center",
+                      padding: "2rem",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
+                    No knowledge records found.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         ) : (
           <Card>
             <CardHeader style={{ border: "none" }}>
@@ -198,7 +365,7 @@ const KnowledgeBase: React.FC = () => {
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <Search size={20} color="var(--primary)" />
-                <CardTitle>Test RAG Search</CardTitle>
+                <CardTitle>Semantic Search Test</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -206,7 +373,7 @@ const KnowledgeBase: React.FC = () => {
                 style={{ display: "flex", gap: "10px", marginBottom: "2rem" }}
               >
                 <Input
-                  placeholder="Ask a question about your guides..."
+                  placeholder="Ask a question or search for specific text..."
                   style={{ flex: 1 }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -223,30 +390,101 @@ const KnowledgeBase: React.FC = () => {
 
               <div style={resultsContainerStyle}>
                 {searchResults.length > 0 ? (
-                  searchResults.map((result: string, i: number) => (
-                    <div key={i} style={resultItemStyle}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "8px",
-                        }}
-                      >
-                        <span style={resultBadgeStyle}>Rank #{i + 1}</span>
-                        <span
+                  searchResults.map(
+                    (result: KnowledgeSearchResult, i: number) => (
+                      <div key={result.id || i} style={resultItemStyle}>
+                        <div
                           style={{
-                            fontSize: "0.75rem",
-                            color: "var(--muted-foreground)",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: "8px",
                           }}
                         >
-                          Cosine Similarity Match
-                        </span>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "8px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span style={resultBadgeStyle}>Rank #{i + 1}</span>
+                            {result.similarity && (
+                              <span
+                                style={{
+                                  fontSize: "0.7rem",
+                                  color: "var(--primary)",
+                                  opacity: 0.8,
+                                }}
+                              >
+                                Sim: {(result.similarity * 100).toFixed(1)}%
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", gap: "5px" }}>
+                            {editingId === result.id ? (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUpdate(result.id)}
+                                  isLoading={updateMutation.isPending}
+                                >
+                                  <Save size={14} />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingId(null)}
+                                >
+                                  <X size={14} />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => startEdit(result)}
+                                >
+                                  <Edit2 size={14} />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDelete(result.id)}
+                                  isLoading={deleteMutation.isPending}
+                                >
+                                  <Trash2 size={14} color="#ef4444" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {editingId === result.id ? (
+                          <textarea
+                            style={{
+                              ...textareaStyle,
+                              height: "120px",
+                              fontSize: "0.85rem",
+                            }}
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                          />
+                        ) : (
+                          <p
+                            style={{
+                              fontSize: "0.95rem",
+                              lineHeight: "1.6",
+                              margin: 0,
+                            }}
+                          >
+                            {result.content}
+                          </p>
+                        )}
                       </div>
-                      <p style={{ fontSize: "0.95rem", lineHeight: "1.6" }}>
-                        {result}
-                      </p>
-                    </div>
-                  ))
+                    ),
+                  )
                 ) : searchQuery && !searchLoading ? (
                   <p
                     style={{
@@ -282,7 +520,6 @@ const KnowledgeBase: React.FC = () => {
 const containerStyle: React.CSSProperties = {
   animation: "fadeIn 0.5s ease-out",
 };
-const headerStyle: React.CSSProperties = { marginBottom: "2.5rem" };
 const layoutGridStyle: React.CSSProperties = {
   display: "flex",
   gap: "1.5rem",

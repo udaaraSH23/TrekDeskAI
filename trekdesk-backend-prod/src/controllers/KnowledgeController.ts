@@ -3,6 +3,7 @@ import { IKnowledgeService } from "../interfaces/services/IKnowledgeService";
 import { BadRequestError } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
+import { MVP_TENANT_ID } from "../config/constants";
 
 import {
   KnowledgeDocument,
@@ -75,6 +76,86 @@ export class KnowledgeController {
         res,
         HttpStatus.OK,
         "Search completed successfully",
+        results,
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * PATCH /api/knowledge/:chunkId
+   * Updates an existing knowledge chunk.
+   */
+  public async updateKnowledge(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { chunkId } = req.params;
+    const { content } = req.body;
+
+    if (!content) {
+      return next(new BadRequestError("New content is required for update"));
+    }
+
+    try {
+      await this.knowledgeService.updateKnowledge({
+        chunkId: chunkId as string,
+        tenantId: MVP_TENANT_ID,
+        content,
+      });
+      ApiResponse.sendSuccess(
+        res,
+        HttpStatus.OK,
+        "Knowledge chunk updated successfully",
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * DELETE /api/knowledge/:chunkId
+   * Removes a knowledge chunk from the vector store.
+   */
+  public async deleteKnowledge(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const { chunkId } = req.params;
+
+    try {
+      await this.knowledgeService.deleteKnowledge({
+        chunkId: chunkId as string,
+        tenantId: MVP_TENANT_ID,
+      });
+      ApiResponse.sendSuccess(
+        res,
+        HttpStatus.OK,
+        "Knowledge chunk deleted successfully",
+      );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * GET /api/v1/knowledge
+   * Retrieves all knowledge chunks for the current tenant.
+   */
+  public async list(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const results = await this.knowledgeService.getAllChunks(MVP_TENANT_ID);
+      ApiResponse.sendSuccess(
+        res,
+        HttpStatus.OK,
+        "Knowledge chunks retrieved successfully",
         results,
       );
     } catch (err) {
