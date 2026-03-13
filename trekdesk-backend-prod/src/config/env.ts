@@ -21,14 +21,20 @@ const envSchema = z.object({
   PORT: z.string().default("3001"),
 
   // Database
-  DATABASE_URL: z.string().url("Must be a valid PostgreSQL connection string"),
+  DATABASE_URL: z
+    .string()
+    .min(1, "Database URL is required")
+    .refine(
+      (val) => val.startsWith("postgresql://") || val.startsWith("postgres://"),
+      "Must be a valid PostgreSQL connection string",
+    ),
 
   // Third-Party Keys
   GEMINI_API_KEY: z.string().min(1, "Gemini API Key is required"),
   GOOGLE_CLIENT_ID: z.string().min(1, "Google Client ID is required"),
-  GOOGLE_CALENDAR_API_KEY: z
-    .string()
-    .min(1, "Google Calendar API Key is required"),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, "Google Client Secret is required"),
+  GOOGLE_CALENDAR_API_KEY: z.string().optional(),
+  GOOGLE_REFRESH_TOKEN: z.string().optional(),
 
   // Security
   JWT_SECRET: z
@@ -47,7 +53,6 @@ const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  // eslint-disable-next-line no-console
   console.error(
     "❌ Invalid environment variables:",
     parsedEnv.error.flatten().fieldErrors,

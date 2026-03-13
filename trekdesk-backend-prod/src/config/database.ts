@@ -12,7 +12,15 @@ import { env } from "./env";
  */
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
-  ssl: env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  // Only enable SSL if we are in production AND NOT using a local proxy or Cloud SQL socket
+  ssl:
+    env.NODE_ENV === "production" &&
+    !env.DATABASE_URL.includes("localhost") &&
+    !env.DATABASE_URL.includes("127.0.0.1") &&
+    !env.DATABASE_URL.includes("host.docker.internal") &&
+    !env.DATABASE_URL.includes("/cloudsql/")
+      ? { rejectUnauthorized: false }
+      : false,
 });
 
 /**

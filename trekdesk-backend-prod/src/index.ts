@@ -69,36 +69,37 @@ wss.on("connection", (ws, req) => {
  * Orchestrates the initialization of all systems.
  */
 const startServer = async () => {
-  try {
-    // 1. Verify Database Connection
-    logger.info(`[Startup] Verifying database connectivity...`);
-    await testConnection();
-    logger.info(`[Startup] Database: OK (Connected)`);
+  // 1. Start Listening immediately so Cloud Run health checks pass
+  server.listen(PORT, async () => {
+    logger.info(
+      "----------------------------------------------------------------",
+    );
+    logger.info(`[TrekDesk Backend] Scalable MVP server is now LIVE`);
+    logger.info(`[Service] API & WebSocket: Active`);
+    logger.info(`[Status] Listening on port: ${PORT}`);
+    logger.info(`[Mode] ${env.NODE_ENV}`);
+    logger.info(
+      "----------------------------------------------------------------",
+    );
 
-    // 2. Start Listening
-    server.listen(PORT, () => {
-      logger.info(
-        "----------------------------------------------------------------",
-      );
-      logger.info(`[TrekDesk Backend] Scalable MVP server is now LIVE`);
-      logger.info(`[Service] API & WebSocket: Active`);
-      logger.info(`[Status] Listening on port: ${PORT}`);
-      logger.info(`[Mode] ${env.NODE_ENV}`);
-      logger.info(
-        "----------------------------------------------------------------",
-      );
-    });
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === "database is not connected"
-    ) {
-      logger.error(`[Startup] FAILED: database is not connected`);
-    } else {
-      logger.error(`[Startup] FAILED to start server: ${error}`);
+    // 2. Verify Database Connection in the background
+    try {
+      logger.info(`[Startup] Verifying database connectivity...`);
+      await testConnection();
+      logger.info(`[Startup] Database: OK (Connected)`);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "database is not connected"
+      ) {
+        logger.error(`[Startup] WARNING: Database is not connected yet.`);
+      } else {
+        logger.error(`[Startup] Unexpected error during DB check: ${error}`);
+      }
+      // Note: We don't exit(1) here anymore so Cloud Run keeps the container alive
+      // while you fix the environment variables in the console.
     }
-    process.exit(1);
-  }
+  });
 };
 
 /**

@@ -39,6 +39,13 @@ import { authMiddleware } from "./middleware/authMiddleware";
 const app = express();
 
 /**
+ * Trust Proxy
+ * Required for Cloud Run, Heroku, etc. so that Express correctly identifies
+ * the user's IP address behind the load balancer for rate limiting.
+ */
+app.set("trust proxy", 1);
+
+/**
  * Global Middleware Stack
  */
 // Helmet helps secure Express apps by setting various HTTP headers

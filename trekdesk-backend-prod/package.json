@@ -23,6 +23,7 @@
   "dependencies": {
     "@google/genai": "^1.44.0",
     "@google/generative-ai": "^0.24.1",
+    "@googleapis/calendar": "^14.2.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.5",
     "@types/pg": "^8.18.0",

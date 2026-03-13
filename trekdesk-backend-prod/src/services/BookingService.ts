@@ -6,6 +6,7 @@
 
 import { IBookingService } from "../interfaces/services/IBookingService";
 import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
+import { IGoogleCalendarService } from "../interfaces/services/IGoogleCalendarService";
 import { BookingRow, CreateBookingPayload } from "../models/booking.schema";
 import { logger } from "../utils/logger";
 
@@ -18,10 +19,12 @@ export class BookingService implements IBookingService {
    * Creates an instance of BookingService.
    * @param tenantId - The unique identifier of the tenant context for this service instance.
    * @param bookingRepository - The injected repository instance matching IBookingRepository.
+   * @param googleCalendarService - The Google Calendar service for sync and availability checks.
    */
   constructor(
     private tenantId: string,
     private bookingRepository: IBookingRepository,
+    private googleCalendarService: IGoogleCalendarService,
   ) {}
 
   /**
@@ -41,8 +44,23 @@ export class BookingService implements IBookingService {
     // Persist securely to PostgreSQL via the repository pipeline
     const newBooking = await this.bookingRepository.createBooking(payload);
 
-    // NOTE: In a broader production application, this is where we would trigger
-    // WebSocket events to update the SaaS dashboard, or dispatch an email via SendGrid.
+    // Sync to Google Calendar
+    try {
+      await this.googleCalendarService.createEvent({
+        summary: `Trek Booking: ${payload.customerName}`,
+        description: `Booking for ${payload.customerName} (Phone: ${payload.customerPhone}) on Trek ID ${payload.trekId}`,
+        start: new Date(payload.targetDate).toISOString(),
+        end: new Date(
+          new Date(payload.targetDate).getTime() + 4 * 60 * 60 * 1000,
+        ).toISOString(), // 4h duration default
+      });
+    } catch (error) {
+      logger.error(
+        `[BookingService] Failed to sync booking to Google Calendar`,
+        error,
+      );
+    }
+
     return newBooking;
   }
 
@@ -51,7 +69,6 @@ export class BookingService implements IBookingService {
    *
    * @param data - DTO containing the target date for the trek inquiry.
    * @returns A Promise resolving to an object containing availability status.
-   * @note Currently using mock logic. Integration with Google Calendar is planned.
    */
   public async checkAvailability(data: {
     date: string;
@@ -59,8 +76,23 @@ export class BookingService implements IBookingService {
     logger.info(
       `[BookingService] Checking availability for ${data.date} on tenant ${this.tenantId}`,
     );
-    // REAL implementation will involve: google.calendar.events.list({ ... })
-    return { status: "Available" };
+
+    // Check if the whole day or specific slots are busy.
+    // For MVP, we'll check listing events for that day.
+    try {
+      const events = await this.googleCalendarService.listEvents(data.date);
+      if (events.length >= 5) {
+        // Simple logic: max 5 bookings per day
+        return { status: "Fully Booked" };
+      }
+      return { status: "Available" };
+    } catch (error) {
+      logger.error(
+        `[BookingService] Google Calendar check failed, falling back to mock`,
+        error,
+      );
+      return { status: "Available" };
+    }
   }
 
   /**

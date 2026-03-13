@@ -12,6 +12,7 @@ import { BookingRepository } from "../repositories/BookingRepository";
 import { AuthService } from "../services/AuthService";
 import { TourService } from "../services/TourService";
 import { KnowledgeService } from "../services/KnowledgeService";
+import { GoogleCalendarService } from "../services/GoogleCalendarService";
 import { BookingService } from "../services/BookingService";
 import { ToolDispatcher } from "../services/ToolDispatcher";
 import { CallLogService } from "../services/CallLogService";
@@ -48,10 +49,13 @@ export const bookingRepository = new BookingRepository();
 export const authService = new AuthService(userRepository);
 export const tourService = new TourService(tourRepository);
 export const knowledgeService = new KnowledgeService(knowledgeRepository);
+export const googleCalendarService = new GoogleCalendarService();
+
 // Booking Service needs a tenant ID per its constructor, plus the new repository
 export const bookingService = new BookingService(
   MVP_TENANT_ID,
   bookingRepository,
+  googleCalendarService,
 );
 export const callLogService = new CallLogService(callLogRepository);
 export const personaService = new PersonaService(aiSettingsRepository);
