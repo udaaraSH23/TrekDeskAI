@@ -6,6 +6,7 @@
 
 import { IBookingService } from "../interfaces/services/IBookingService";
 import { IKnowledgeService } from "../interfaces/services/IKnowledgeService";
+import { ITourService } from "../interfaces/services/ITourService";
 import { MVP_TENANT_ID } from "../config/constants";
 import { logger } from "../utils/logger";
 import { GeminiFunctionCall } from "../types/gemini";
@@ -22,6 +23,7 @@ export class ToolDispatcher {
   constructor(
     private bookingService: IBookingService,
     private knowledgeService: IKnowledgeService,
+    private tourService: ITourService,
   ) {}
 
   /**
@@ -34,6 +36,10 @@ export class ToolDispatcher {
     const { name, args } = functionCall;
 
     switch (name) {
+      case "get_available_treks":
+        /** Fetches the list of treks so AI knows the IDs to book */
+        return await this.tourService.getActiveTreks(MVP_TENANT_ID);
+
       case "check_guide_calendar":
         /** Handles availability inquiries for specific dates */
         return await this.bookingService.checkAvailability({

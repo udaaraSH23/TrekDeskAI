@@ -12,67 +12,53 @@ import {
   Navigate,
 } from "react-router-dom";
 import Layout from "./layouts/Layout";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./features/auth/components/ProtectedRoute";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
 /**
  * Route Splitting (Lazy Loading)
  * Components are only loaded when the user navigates to the respective route.
- * This significantly improves the initial "Time to Interactive" (TTI) for the dashboard.
  */
-const Overview = lazy(() => import("./pages/Overview"));
-const Conversations = lazy(() => import("./pages/Conversations"));
-const Persona = lazy(() => import("./pages/Persona"));
-const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
-const WidgetConfig = lazy(() => import("./pages/WidgetConfig"));
-const Tours = lazy(() => import("./pages/Tours"));
-const Login = lazy(() => import("./pages/Login"));
+const Overview = lazy(() => import("./features/overview/pages/Overview"));
+const Conversations = lazy(
+  () => import("./features/conversations/pages/Conversations"),
+);
+const Persona = lazy(() => import("./features/persona/pages/Persona"));
+const KnowledgeBase = lazy(
+  () => import("./features/knowledge/pages/KnowledgeBase"),
+);
+const WidgetConfig = lazy(() => import("./features/widget/pages/WidgetConfig"));
+const Tours = lazy(() => import("./features/tours/pages/Tours"));
+const Login = lazy(() => import("./features/auth/pages/Login"));
+const AIDebugger = lazy(() => import("./features/devtools/pages/AIDebugger"));
+const EmbedChat = lazy(() => import("./features/widget/pages/EmbedChat"));
 
 /**
  * Global Intermediate Loader
- * Displayed during chunk fetching between navigation events.
  */
 const PageLoader = () => (
-  <div
-    style={{
-      display: "flex",
-      height: "100%",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
+  <div className="flex-center h-full">
     <Loader2 className="animate-spin" size={32} color="var(--primary)" />
   </div>
 );
 
-/**
- * App Main Component
- * Implements a standard flat-then-nested layout:
- * - /login: Publicly accessible entry point.
- * - /* : Root catch-all for the dashboard, wrapped in security and layout constraints.
- */
 function App() {
   return (
     <ErrorBoundary>
       <Router>
-        {/* Top-level Suspense handles the initial application chunk loading */}
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Public Entryway */}
             <Route path="/login" element={<Login />} />
+            <Route path="/embed/chat" element={<EmbedChat />} />
 
-            {/* 
-              Protected Administration Area 
-              All sub-routes within this section require a valid user session.
-              The Layout component provides the Sidebar and Header infrastructure.
-            */}
+            {/* Protected Administration Area */}
             <Route
               path="/*"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    {/* Inner Suspense allows for granular loading states per dashboard view */}
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<Overview />} />
@@ -84,8 +70,9 @@ function App() {
                         <Route path="/persona" element={<Persona />} />
                         <Route path="/tours" element={<Tours />} />
                         <Route path="/widget" element={<WidgetConfig />} />
+                        <Route path="/debugger" element={<AIDebugger />} />
 
-                        {/* Fallback redirect for authenticated users targeting invalid sub-paths */}
+                        {/* Fallback redirect */}
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </Suspense>

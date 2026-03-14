@@ -1,0 +1,194 @@
+.container {
+  animation: fadeIn 0.5s ease-out;
+  height: 100%;
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+  height: calc(100vh - 200px);
+}
+
+.listPanel {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.searchBox {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px);
+}
+
+.callItem {
+  padding: 1.2rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.callItemActive {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.detailPanel {
+  flex: 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.detailHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.insightsPanel {
+  padding: 1.5rem 2rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border);
+}
+
+.insightItem {
+  margin-bottom: 1rem;
+}
+
+.insightLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+
+.insightValue {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.tabContainer {
+  display: flex;
+  padding: 1.2rem 2rem;
+  border-bottom: 1px solid var(--border);
+  gap: 1.5rem;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.activeTab {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.transcriptContainer {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.message {
+  margin-bottom: 1.5rem;
+}
+
+.messageHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.roleLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.aiRole {
+  color: var(--primary);
+}
+
+.userRole {
+  color: var(--secondary-foreground);
+}
+
+.messageContent {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding-left: 12px;
+}
+
+.aiContent {
+  color: var(--foreground);
+  border-left: 2px solid var(--primary);
+}
+
+.userContent {
+  color: rgba(255, 255, 255, 0.8);
+  border-left: 2px solid var(--border);
+}
+
+.emptyState {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  padding: 2rem;
+  text-align: center;
+}

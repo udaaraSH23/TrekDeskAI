@@ -65,3 +65,6 @@ Desktop.ini
 .cache
 .parcel-cache
 
+
+# --- Firebase ---
+.firebase/

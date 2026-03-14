@@ -90,3 +90,14 @@
   background-color: var(--destructive);
   color: var(--destructive-foreground);
 }
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.iconSpan {
+  margin-right: 0.5rem;
+  display: flex;
+}

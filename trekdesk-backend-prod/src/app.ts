@@ -12,6 +12,7 @@
 
 import express from "express";
 import cors from "cors";
+import path from "path";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
@@ -27,6 +28,8 @@ import personaRoutes from "./routes/personaRoutes";
 import callLogRoutes from "./routes/callLogRoutes";
 import tourRoutes from "./routes/tourRoutes";
 import knowledgeRoutes from "./routes/knowledgeRoutes";
+import widgetRoutes from "./routes/widgetRoutes";
+import chatRoutes from "./routes/chatRoutes";
 
 /**
  * Middleware Imports
@@ -49,7 +52,12 @@ app.set("trust proxy", 1);
  * Global Middleware Stack
  */
 // Helmet helps secure Express apps by setting various HTTP headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+  }),
+);
 
 // Morgan provides automated HTTP request logging for development/monitoring
 // Stream morgan logs to winston
@@ -64,6 +72,16 @@ app.use(cors());
 
 // Parse incoming JSON payloads automatically
 app.use(express.json());
+
+// Serve static files from the 'static' directory with explicit cross-origin headers
+app.use(
+  "/static",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(path.join(__dirname, "../static")),
+);
 
 /**
  * API Route Registration
@@ -103,6 +121,8 @@ const authLimiter = rateLimit({
  */
 app.use("/api", apiLimiter); // Apply general rate limiting to all API routes
 app.use("/api/v1/auth", authLimiter, authRoutes);
+app.use("/api/v1/widget", widgetRoutes);
+app.use("/api/v1/chat", chatRoutes);
 
 /**
  * Protected Management Routes
@@ -113,6 +133,12 @@ app.use("/api/v1/persona", authMiddleware, personaRoutes);
 app.use("/api/v1/analytics/calls", authMiddleware, callLogRoutes);
 app.use("/api/v1/tours", authMiddleware, tourRoutes);
 app.use("/api/v1/knowledge", authMiddleware, knowledgeRoutes);
+app.use("/api/v1/widget", authMiddleware, widgetRoutes);
+
+import devRoutes from "./routes/devRoutes";
+if (env.NODE_ENV === "development") {
+  app.use("/api/v1/dev", devRoutes);
+}
 
 import { testConnection } from "./config/database";
 

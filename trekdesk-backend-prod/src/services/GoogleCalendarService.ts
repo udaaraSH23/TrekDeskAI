@@ -80,11 +80,23 @@ export class GoogleCalendarService implements IGoogleCalendarService {
     date: string,
     calendarId: string = "primary",
   ): Promise<calendar_v3.Schema$Event[]> {
-    try {
-      const timeMin = new Date(`${date}T00:00:00Z`).toISOString();
-      const timeMax = new Date(`${date}T23:59:59Z`).toISOString();
+    const timeMin = new Date(`${date}T00:00:00Z`).toISOString();
+    const timeMax = new Date(`${date}T23:59:59Z`).toISOString();
+    return this.listEventsRange(timeMin, timeMax, calendarId);
+  }
 
-      logger.info(`[GoogleCalendarService] Listing events for ${date}`);
+  /**
+   * Lists events for a specific date range.
+   */
+  public async listEventsRange(
+    timeMin: string,
+    timeMax: string,
+    calendarId: string = "primary",
+  ): Promise<calendar_v3.Schema$Event[]> {
+    try {
+      logger.info(
+        `[GoogleCalendarService] Listing events from ${timeMin} to ${timeMax}`,
+      );
 
       const response = await this.calendar.events.list({
         calendarId,
@@ -96,7 +108,10 @@ export class GoogleCalendarService implements IGoogleCalendarService {
 
       return response.data.items || [];
     } catch (error) {
-      logger.error("[GoogleCalendarService] Error listing events:", error);
+      logger.error(
+        "[GoogleCalendarService] Error listing events range:",
+        error,
+      );
       throw error;
     }
   }

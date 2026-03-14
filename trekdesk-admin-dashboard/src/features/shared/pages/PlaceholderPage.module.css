@@ -1,0 +1,29 @@
+.container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.description {
+  color: var(--muted-foreground);
+  margin-top: 0;
+}
+
+.placeholderCard {
+  margin-top: 2.5rem;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+}
+
+.placeholderText {
+  color: var(--muted-foreground);
+}

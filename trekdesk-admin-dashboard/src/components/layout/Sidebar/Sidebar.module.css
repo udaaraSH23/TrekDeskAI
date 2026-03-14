@@ -1,0 +1,89 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+  background-color: rgba(10, 10, 12, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 12px;
+}
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.5rem;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--muted-foreground);
+  border-right: 2px solid transparent;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: white;
+}
+
+.activeNavItem {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--primary) !important;
+  border-right-color: var(--primary);
+}
+
+.navLabel {
+  margin-left: 12px;
+  font-weight: 500;
+}

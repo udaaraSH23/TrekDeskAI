@@ -36,8 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading && (
           <svg
-            className="animate-spin"
-            style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }}
+            className={`${styles.spinner} animate-spin`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -56,9 +55,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             ></path>
           </svg>
         )}
-        {!isLoading && icon && (
-          <span style={{ marginRight: "0.5rem", display: "flex" }}>{icon}</span>
-        )}
+        {!isLoading && icon && <span className={styles.iconSpan}>{icon}</span>}
         {children}
       </button>
     );

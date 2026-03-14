@@ -8,6 +8,7 @@ import { CallLogRepository } from "../repositories/CallLogRepository";
 import { KnowledgeRepository } from "../repositories/KnowledgeRepository";
 import { AISettingsRepository } from "../repositories/AISettingsRepository";
 import { BookingRepository } from "../repositories/BookingRepository";
+import { WidgetSettingsRepository } from "../repositories/WidgetSettingsRepository";
 
 import { AuthService } from "../services/AuthService";
 import { TourService } from "../services/TourService";
@@ -17,41 +18,42 @@ import { BookingService } from "../services/BookingService";
 import { ToolDispatcher } from "../services/ToolDispatcher";
 import { CallLogService } from "../services/CallLogService";
 import { PersonaService } from "../services/PersonaService";
+import { WidgetSettingsService } from "../services/WidgetSettingsService";
+import { ChatService } from "../services/ChatService";
+import { WidgetChatService } from "../services/WidgetChatService";
+import { DevService } from "../services/DevService";
 
 import { AuthController } from "../controllers/AuthController";
 import { TourController } from "../controllers/TourController";
 import { KnowledgeController } from "../controllers/KnowledgeController";
 import { CallLogController } from "../controllers/CallLogController";
 import { PersonaController } from "../controllers/PersonaController";
+import { WidgetController } from "../controllers/WidgetController";
+import { ChatController } from "../controllers/ChatController";
 import { DevAuthController } from "../controllers/DevAuthController";
+import { DevController } from "../controllers/DevController";
 
 import { MVP_TENANT_ID } from "./constants";
 
 /**
- * Dependency Injection (DI) Container.
- * Manages the instantiation and wire-up of the application's entire layer architecture.
- * Ensures Repositories are injected into Services, and Services into Controllers.
+ * Repositories (Data Access Layer)
  */
-
-// ============================================
-// 1. Repositories (Data Access Layer)
-// ============================================
 export const userRepository = new UserRepository();
 export const tourRepository = new TourRepository();
 export const callLogRepository = new CallLogRepository();
 export const knowledgeRepository = new KnowledgeRepository();
 export const aiSettingsRepository = new AISettingsRepository();
 export const bookingRepository = new BookingRepository();
+export const widgetSettingsRepository = new WidgetSettingsRepository();
 
-// ============================================
-// 2. Services (Business Logic Layer)
-// ============================================
+/**
+ * Services (Business Logic Layer)
+ */
 export const authService = new AuthService(userRepository);
 export const tourService = new TourService(tourRepository);
 export const knowledgeService = new KnowledgeService(knowledgeRepository);
 export const googleCalendarService = new GoogleCalendarService();
 
-// Booking Service needs a tenant ID per its constructor, plus the new repository
 export const bookingService = new BookingService(
   MVP_TENANT_ID,
   bookingRepository,
@@ -59,18 +61,37 @@ export const bookingService = new BookingService(
 );
 export const callLogService = new CallLogService(callLogRepository);
 export const personaService = new PersonaService(aiSettingsRepository);
+export const widgetService = new WidgetSettingsService(
+  widgetSettingsRepository,
+);
 
 export const toolDispatcher = new ToolDispatcher(
   bookingService,
   knowledgeService,
+  tourService,
 );
 
-// ============================================
-// 3. Controllers (Presentation/Routes Layer)
-// ============================================
+export const chatService = new ChatService(toolDispatcher);
+export const widgetChatService = new WidgetChatService(
+  chatService,
+  widgetSettingsRepository,
+  aiSettingsRepository,
+);
+export const devService = new DevService(
+  chatService,
+  aiSettingsRepository,
+  googleCalendarService,
+);
+
+/**
+ * Controllers (Presentation/Routes Layer)
+ */
 export const authController = new AuthController(authService);
 export const tourController = new TourController(tourService);
 export const knowledgeController = new KnowledgeController(knowledgeService);
 export const callLogController = new CallLogController(callLogService);
 export const personaController = new PersonaController(personaService);
+export const widgetController = new WidgetController(widgetService);
+export const chatController = new ChatController(widgetChatService);
 export const devAuthController = new DevAuthController(authService);
+export const devController = new DevController(devService);

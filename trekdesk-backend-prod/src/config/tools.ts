@@ -2,6 +2,8 @@
  * @file tools.ts
  * @description Gemini Multimodal Live API tool and function declarations.
  */
+import { ToolDeclaration } from "../types/gemini";
+
 /**
  * TrekDesk AI - Gemini Tool Declarations
  *
@@ -9,18 +11,13 @@
  * Multimodal Live API can invoke. These tools extend the AI's capabilities,
  * allowing it to perform real-world actions like checking calendars,
  * generating quotes, and searching the RAG-enabled knowledge base.
- *
- * Each function defined here must have a corresponding handler implementation
- * in the ToolDispatcher service.
  */
-
-export const tools = [
+export const tools: ToolDeclaration[] = [
   {
     functionDeclarations: [
       /**
        * Tool: check_guide_calendar
        * Purpose: Enables the AI to verify tour guide availability in real-time.
-       * Logic: Queries the backend calendar service (Mocked for MVP, integrates with Google Calendar).
        */
       {
         name: "check_guide_calendar",
@@ -40,7 +37,6 @@ export const tools = [
       /**
        * Tool: generate_quote
        * Purpose: Provides immediate pricing estimates for trekking packages.
-       * Logic: Calculates costs based on group size (pax) and logistics (transport).
        */
       {
         name: "generate_quote",
@@ -66,7 +62,6 @@ export const tools = [
       /**
        * Tool: generate_weather_itinerary
        * Purpose: Generates rich multimodal artifacts for the user.
-       * Logic: Can lead to the creation of downloadable PDFs or dynamic weather data displays.
        */
       {
         name: "generate_weather_itinerary",
@@ -92,8 +87,7 @@ export const tools = [
 
       /**
        * Tool: query_knowledge_base
-       * Purpose: Connects the AI to the RAG (Retrieval Augmented Generation) pipeline.
-       * Logic: Performs a semantic vector search across ingested tour PDFs and guides.
+       * Purpose: Connects the AI to the RAG pipeline.
        */
       {
         name: "query_knowledge_base",
@@ -115,12 +109,11 @@ export const tools = [
       /**
        * Tool: book_trek
        * Purpose: Formalizes a reservation and commits it to the database.
-       * Logic: Strictly requires customer details including a mobile/WhatsApp number to ensure the operator can follow up.
        */
       {
         name: "book_trek",
         description:
-          "Create a formal booking reservation for a trek. You MUST explicitly ask the user for their Mobile or WhatsApp number before calling this tool. Do not guess it.",
+          "Create a formal booking reservation for a trek. You MUST explicitly ask the user for their Mobile or WhatsApp number before calling this tool.",
         parameters: {
           type: "OBJECT",
           properties: {
@@ -142,8 +135,7 @@ export const tools = [
             },
             customer_phone: {
               type: "STRING",
-              description:
-                "The customer's mobile or WhatsApp number. This is strictly required.",
+              description: "The customer's mobile or WhatsApp number.",
             },
             customer_email: {
               type: "STRING",
@@ -157,6 +149,21 @@ export const tools = [
             "customer_name",
             "customer_phone",
           ],
+        },
+      },
+
+      /**
+       * Tool: get_available_treks
+       * Purpose: Provides the AI with the list of treks offered by the operator.
+       */
+      {
+        name: "get_available_treks",
+        description:
+          "Fetch the list of all available trek packages including their IDs. Use this to find the correct trek_id when a user wants to book.",
+        parameters: {
+          type: "OBJECT",
+          properties: {},
+          required: [],
         },
       },
     ],

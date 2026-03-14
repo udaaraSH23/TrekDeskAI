@@ -3,6 +3,8 @@ import { AlertTriangle, RefreshCcw } from "lucide-react";
 import { Card, CardTitle, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
 
+import styles from "./ErrorBoundary.module.css";
+
 interface Props {
   children?: ReactNode;
 }
@@ -29,56 +31,23 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div
-          style={{
-            height: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-        >
-          <Card
-            style={{
-              maxWidth: "500px",
-              width: "100%",
-              background: "rgba(239, 68, 68, 0.05)",
-              border: "1px solid rgba(239, 68, 68, 0.2)",
-            }}
-          >
-            <CardContent
-              style={{
-                padding: "2rem",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                gap: "1rem",
-              }}
-            >
-              <div
-                style={{
-                  padding: "1rem",
-                  borderRadius: "50%",
-                  background: "rgba(239, 68, 68, 0.1)",
-                  color: "#ef4444",
-                }}
-              >
+        <div className={styles.container}>
+          <Card className={styles.errorCard}>
+            <CardContent className={styles.cardContent}>
+              <div className={styles.iconWrapper}>
                 <AlertTriangle size={32} />
               </div>
-              <CardTitle style={{ color: "#ef4444" }}>
+              <CardTitle className={styles.errorTitle}>
                 Something went wrong
               </CardTitle>
-              <p
-                style={{ color: "var(--muted-foreground)", fontSize: "0.9rem" }}
-              >
+              <p className={styles.errorMessage}>
                 {this.state.error?.message ||
                   "An unexpected error occurred in the application."}
               </p>
-              <div style={{ marginTop: "1rem" }}>
+              <div className={styles.reloadButtonContainer}>
                 <Button
                   onClick={() => window.location.reload()}
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  className="flex items-center gap-sm"
                 >
                   <RefreshCcw size={16} />
                   Reload Page
