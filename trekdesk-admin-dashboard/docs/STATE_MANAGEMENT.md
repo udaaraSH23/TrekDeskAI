@@ -2,11 +2,11 @@
 
 The app uses a **two-tier state model**. This separation is intentional and important:
 
-| State Kind                  | Tool           | Location                      | Example                            |
-| --------------------------- | -------------- | ----------------------------- | ---------------------------------- |
-| **Server state** (API data) | TanStack Query | `src/hooks/`                  | Call logs, persona settings, tours |
-| **Auth state**              | React Context  | `src/context/AuthContext.tsx` | Logged-in user, token lifecycle    |
-| **Client/UI state**         | Zustand        | `src/store/uiStore.ts`        | Sidebar open/closed, theme         |
+| State Kind                  | Tool           | Location                     | Example                            |
+| --------------------------- | -------------- | ---------------------------- | ---------------------------------- |
+| **Server state** (API data) | TanStack Query | `src/features/[f]/hooks/`    | Call logs, persona settings, tours |
+| **Auth state**              | React Context  | `src/features/auth/context/` | Logged-in user, token lifecycle    |
+| **Client/UI state**         | Zustand        | `src/store/uiStore.ts`       | Sidebar open/closed, theme         |
 
 ---
 
@@ -45,10 +45,10 @@ All data that comes from the backend API is owned by TanStack Query. It handles:
 ```mermaid
 flowchart LR
     Page["Page Component"]
-    Hook["useXxx() hook\n(src/hooks/)"]
+    Hook["useXxx() hook\n(features/[f]/hooks/)"]
     Cache["TanStack Query Cache"]
-    Service["XxxService\n(src/services/)"]
-    API["api.ts (Axios)\n+ interceptors"]
+    Service["XxxService\n(features/[f]/services/)"]
+    API["api.ts (src/services/Axios)\n+ interceptors"]
     Backend["Backend REST API"]
 
     Page -->|"calls"| Hook

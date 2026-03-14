@@ -129,7 +129,7 @@ This means any protected page that receives a 401 will automatically redirect th
 
 ## ProtectedRoute Guard
 
-`components/ProtectedRoute.tsx` wraps all dashboard routes. It reads from `AuthContext` and:
+`src/features/auth/components/ProtectedRoute.tsx` wraps all dashboard routes. It reads from `AuthContext` and:
 
 1. **If `loading` is true** → Renders a full-screen spinner (prevents login-flash during session verification)
 2. **If `user` is null** → Redirects to `/login`, preserving the original path in `location.state.from`

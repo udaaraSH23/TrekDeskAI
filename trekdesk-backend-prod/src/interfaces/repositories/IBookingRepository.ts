@@ -3,7 +3,7 @@
  * @description Interface definition for the Booking data access layer.
  */
 
-import { BookingRow, CreateBookingPayload } from "../../models/booking.schema";
+import { CreateBookingDTO, BookingResponseDTO } from "../../dtos/BookingDTO";
 
 /**
  * Defines the contract for persisting and retrieving tour bookings.
@@ -16,5 +16,5 @@ export interface IBookingRepository {
    * @param payload - Structured and validated DTO containing the user's details and target trek.
    * @returns A promise resolving to the fully instantiated database row representing the booking.
    */
-  createBooking(payload: CreateBookingPayload): Promise<BookingRow>;
+  createBooking(payload: CreateBookingDTO): Promise<BookingResponseDTO>;
 }

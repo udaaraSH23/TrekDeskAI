@@ -3,7 +3,7 @@
  * @description Interface definition for standardizing AI Persona business logic.
  */
 
-import { AISettingsRow, UpdateAISettingsPayload } from "../../models/ai.schema";
+import { UpdatePersonaDTO, PersonaResponseDTO } from "../../dtos/PersonaDTO";
 
 export interface IPersonaService {
   /**
@@ -12,7 +12,7 @@ export interface IPersonaService {
    * @param tenantId - The UUID identity boundary of the operator.
    * @returns A promise resolving to the AI settings config object.
    */
-  getSettingsByTenant(tenantId: string): Promise<AISettingsRow | null>;
+  getSettingsByTenant(tenantId: string): Promise<PersonaResponseDTO | null>;
 
   /**
    * Persists new constraints and vocal identities to the AI Agent.
@@ -20,5 +20,5 @@ export interface IPersonaService {
    * @param payload - The data transfer object containing the modified settings and scoped tenant block.
    * @returns A promise resolving to the updated configuration.
    */
-  updateSettings(payload: UpdateAISettingsPayload): Promise<AISettingsRow>;
+  updateSettings(payload: UpdatePersonaDTO): Promise<PersonaResponseDTO>;
 }

@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
 import { IPersonaService } from "../interfaces/services/IPersonaService";
+import { UpdatePersonaDTO } from "../dtos/PersonaDTO";
 
 /**
  * Controller handling HTTP requests related to the AI Persona setup.
@@ -14,6 +15,7 @@ export class PersonaController {
 
   /**
    * GET /api/persona/settings
+
    * Retrieves the current AI interaction settings (voice, instructions, temperature).
    *
    * @param req - Express request object.
@@ -60,12 +62,13 @@ export class PersonaController {
     const { voice_name, system_instruction, temperature } = req.body;
 
     try {
-      const settings = await this.personaService.updateSettings({
+      const dto: UpdatePersonaDTO = {
         tenant_id: MVP_TENANT_ID,
         voice_name,
         system_instruction,
         temperature,
-      });
+      };
+      const settings = await this.personaService.updateSettings(dto);
 
       ApiResponse.sendSuccess(
         res,

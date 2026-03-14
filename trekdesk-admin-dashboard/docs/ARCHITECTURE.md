@@ -86,19 +86,44 @@ graph LR
 
 ## Directory Guide
 
-| Directory                | Role                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------ |
-| `src/pages/`             | One component per route. Consumes hooks and renders the data view.                   |
-| `src/components/ui/`     | Primitive design-system components (Button, Card, Input, Badge). Framework-agnostic. |
-| `src/components/shared/` | App-wide utility components (e.g. ErrorBoundary).                                    |
-| `src/components/`        | Layout-wired components: Header, Sidebar, ProtectedRoute.                            |
-| `src/layouts/`           | Layout shell: renders Sidebar + Header + page outlet.                                |
-| `src/hooks/`             | TanStack Query wrappers. One file per domain.                                        |
-| `src/services/`          | Axios call functions. Knows nothing about React or query state.                      |
-| `src/context/`           | React Context: `AuthContext` + `useAuth` hook.                                       |
-| `src/store/`             | Zustand stores for purely client-side UI state.                                      |
-| `src/lib/`               | Framework-agnostic utility code: query client, error class, validators.              |
-| `src/types/`             | TypeScript interfaces mirroring backend schemas.                                     |
+| Directory                    | Role                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------- |
+| `src/features/`              | **The heart of the app.** Domain-specific logic grouped by feature (e.g. `knowledge`, `persona`). |
+| `src/features/[f]/pages/`    | One component per route. Consumes feature-specific hooks and renders the data view.               |
+| `src/features/[f]/hooks/`    | TanStack Query wrappers for this feature's domain.                                                |
+| `src/features/[f]/services/` | Axios call functions for this feature's domain.                                                   |
+| `src/features/[f]/types/`    | TypeScript interfaces mirroring backend schemas for this feature.                                 |
+| `src/components/ui/`         | Primitive design-system components (Button, Card, Input, Badge). Framework-agnostic.              |
+| `src/components/shared/`     | App-wide utility components (e.g. ErrorBoundary).                                                 |
+| `src/layouts/`               | Layout shell: renders Sidebar + Header + page outlet.                                             |
+| `src/services/`              | Globalized services (e.g. `api.ts` Axios instance).                                               |
+| `src/store/`                 | Zustand stores for purely client-side UI state.                                                   |
+| `src/lib/`                   | Framework-agnostic utility code: query client, error class, validators.                           |
+| `src/types/`                 | Cross-cutting TypeScript interfaces (e.g. generic API responses).                                 |
+
+---
+
+## Feature-Based Architecture
+
+The dashboard uses a **Vertical Feature** structure. Instead of organizing files by technical role (e.g., all hooks in one folder), we organize them by business domain.
+
+Each folder in `src/features/` is a self-contained module containing its own pages, components, hooks, and services. This makes the codebase easier to navigate and prevents "folder bloating" as the app grows.
+
+```mermaid
+graph LR
+    F[features/]
+    A[auth/]
+    K[knowledge/]
+    P[persona/]
+    T[tours/]
+
+    K --> KP[pages/]
+    K --> KH[hooks/]
+    K --> KS[services/]
+    K --> KT[types/]
+```
+
+---
 
 ---
 

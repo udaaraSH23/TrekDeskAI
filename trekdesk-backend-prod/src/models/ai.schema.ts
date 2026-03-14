@@ -35,17 +35,6 @@ export const ChatMessageSchema = z.object({
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 /**
- * Zod schema validating the JSON arguments passed by the AI when executing the itinerary generation tool.
- */
-export const ItineraryGenerationArgsSchema = z.object({
-  type: z.enum(["weather", "itinerary"]),
-  trek_name: z.string(),
-});
-export type ItineraryGenerationArgs = z.infer<
-  typeof ItineraryGenerationArgsSchema
->;
-
-/**
  * Zod schema modeling the direct database representation of a tenant's AI Persona.
  */
 export const AISettingsRowSchema = z.object({

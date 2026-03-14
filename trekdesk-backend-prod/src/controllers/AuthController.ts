@@ -10,10 +10,10 @@ import {
 } from "../utils/errors/CustomErrors";
 import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
-import { AuthUser } from "../models/auth.schema";
+import { GoogleLoginDTO, UserDTO } from "../dtos/AuthDTO";
 
 interface AuthenticatedRequest extends Request {
-  user?: AuthUser;
+  user?: UserDTO;
 }
 
 /**
@@ -37,7 +37,7 @@ export class AuthController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const { idToken } = req.body;
+    const { idToken } = req.body as GoogleLoginDTO;
 
     if (!idToken) {
       return next(new BadRequestError("ID Token is required"));
@@ -67,7 +67,7 @@ export class AuthController {
 
   /**
    * GET /api/auth/verify
-   * Returns validation of the caller's active session, utilizing the AuthUser injected by `authMiddleware`.
+   * Returns validation of the caller's active session, utilizing the UserDTO injected by `authMiddleware`.
    *
    * @param req - Express (Authenticated) request object.
    * @param res - Express response object.

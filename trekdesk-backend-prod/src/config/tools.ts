@@ -41,10 +41,14 @@ export const tools: ToolDeclaration[] = [
       {
         name: "generate_quote",
         description:
-          "Generate a quote for a trek based on number of people and transport needs.",
+          "Generate a price quote for a specific trek. IMPORTANT: Do not offer discounts immediately. Wait for the client to express concern about the price before moving to the 'discount' or 'final' negotiation stages.",
         parameters: {
           type: "OBJECT",
           properties: {
+            trek_id: {
+              type: "STRING",
+              description: "The UUID of the trek to quote.",
+            },
             pax: {
               type: "INTEGER",
               description: "The total number of hikers in the group.",
@@ -54,34 +58,14 @@ export const tools: ToolDeclaration[] = [
               description:
                 "Whether private transport from the hotel is required.",
             },
-          },
-          required: ["pax", "transport"],
-        },
-      },
-
-      /**
-       * Tool: generate_weather_itinerary
-       * Purpose: Generates rich multimodal artifacts for the user.
-       */
-      {
-        name: "generate_weather_itinerary",
-        description:
-          "Generates a downloadable weather report or itinerary. Ask the user's permission first.",
-        parameters: {
-          type: "OBJECT",
-          properties: {
-            type: {
+            negotiation_stage: {
               type: "STRING",
-              enum: ["weather", "itinerary"],
-              description: "The type of document to generate.",
-            },
-            trek_name: {
-              type: "STRING",
+              enum: ["initial", "discount", "final"],
               description:
-                "The name of the trek (e.g., 'Knuckles Highland', 'Adam's Peak').",
+                "The current stage of price negotiation. Use 'initial' first. Move to 'discount' only if the user asks for a better price. Use 'final' as the last resort.",
             },
           },
-          required: ["type", "trek_name"],
+          required: ["trek_id", "pax", "transport"],
         },
       },
 

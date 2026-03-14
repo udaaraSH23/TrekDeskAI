@@ -37,7 +37,7 @@ try {
 
 ---
 
-## Centralized API Error Transformation (`services/api.ts`)
+## Centralized API Error Transformation (`src/services/api.ts`)
 
 The Axios **response interceptor** runs on every failed request and performs three steps:
 

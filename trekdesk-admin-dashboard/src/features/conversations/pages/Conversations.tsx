@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Search,
-  Filter,
-  Clock,
-  Trash2,
-  MessageSquare,
-  Terminal,
-} from "lucide-react";
+import { Clock, Trash2, MessageSquare } from "lucide-react";
 import {
   useCallLogs,
   useCallLogDetails,
@@ -15,7 +8,6 @@ import {
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Badge } from "../../../components/ui/Badge";
-import { Input } from "../../../components/ui/Input";
 import type { TranscriptMessage } from "../../overview/types/analytics.types";
 
 import styles from "./Conversations.module.css";
@@ -23,7 +15,6 @@ import styles from "./Conversations.module.css";
 const Conversations: React.FC = () => {
   const { data: logs = [], isLoading: loading, error } = useCallLogs();
   const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: detailLog, isLoading: detailLoading } = useCallLogDetails(
     selectedLogId || "",
@@ -37,13 +28,6 @@ const Conversations: React.FC = () => {
       await deleteMutation.mutateAsync(id);
     }
   };
-
-  const filteredLogs = logs.filter(
-    (log) =>
-      log.session_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (log.summary &&
-        log.summary.toLowerCase().includes(searchQuery.toLowerCase())),
-  );
 
   return (
     <div className={styles.container}>
@@ -66,24 +50,13 @@ const Conversations: React.FC = () => {
       <div className={styles.layout}>
         {/* Left List */}
         <Card className={styles.listPanel}>
-          <div className={styles.searchBox}>
-            <Search size={16} className="text-muted" />
-            <Input
-              placeholder="Search sessions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
-            />
-            <Filter size={16} className="text-muted cursor-pointer" />
-          </div>
-
           <div className={styles.list}>
             {loading && logs.length === 0 ? (
               <div className={styles.emptyState}>Loading...</div>
-            ) : filteredLogs.length === 0 ? (
+            ) : logs.length === 0 ? (
               <div className={styles.emptyState}>No sessions found</div>
             ) : (
-              filteredLogs.map((log) => (
+              logs.map((log) => (
                 <div
                   key={log.id}
                   onClick={() => setSelectedLogId(log.id)}
@@ -200,16 +173,17 @@ const Conversations: React.FC = () => {
                 </div>
 
                 <div className={styles.insightsPanel}>
-                  <div className={styles.insightItem}>
+                  <div className={styles.insightItemFull}>
                     <div className={styles.insightLabel}>Summary</div>
                     <p className={styles.insightValue}>
                       {detailLog.summary ||
                         "No summary available for this session."}
                     </p>
                   </div>
-                  <div className="flex gap-lg" style={{ marginTop: "1rem" }}>
-                    <div>
-                      <div className={styles.insightLabel}>Sentiment Score</div>
+
+                  <div className={styles.insightGrid}>
+                    <div className={styles.insightItem}>
+                      <div className={styles.insightLabel}>Sentiment</div>
                       <div className="flex items-center gap-sm">
                         <Badge
                           variant={
@@ -222,15 +196,16 @@ const Conversations: React.FC = () => {
                         </Badge>
                         <span
                           className="text-muted"
-                          style={{ fontSize: "0.8rem" }}
+                          style={{ fontSize: "0.75rem" }}
                         >
                           {detailLog.sentiment_score > 0.7
-                            ? "Positive / Hot Lead"
-                            : "Neutral / Inquiry"}
+                            ? "Hot Lead"
+                            : "Inquiry"}
                         </span>
                       </div>
                     </div>
-                    <div>
+
+                    <div className={styles.insightItem}>
                       <div className={styles.insightLabel}>Duration</div>
                       <div
                         className="flex items-center gap-sm"
@@ -246,24 +221,20 @@ const Conversations: React.FC = () => {
                   </div>
                 </div>
 
-                <div className={styles.tabContainer}>
-                  <div className={`${styles.tab} ${styles.activeTab}`}>
-                    <Terminal size={14} style={{ marginRight: "6px" }} />
-                    Full Transcript
-                  </div>
-                </div>
-
                 <div className={styles.transcriptContainer}>
                   {Array.isArray(detailLog.transcript) &&
                   detailLog.transcript.length > 0 ? (
                     detailLog.transcript.map(
                       (turn: TranscriptMessage, i: number) => (
-                        <div key={i} className={styles.message}>
+                        <div
+                          key={i}
+                          className={`${styles.message} ${turn.role === "ai" ? styles.ai : styles.user}`}
+                        >
                           <div className={styles.messageHeader}>
                             <span
                               className={`${styles.roleLabel} ${turn.role === "ai" ? styles.aiRole : styles.userRole}`}
                             >
-                              {turn.role === "ai" ? "AI" : "USER"}
+                              {turn.role === "ai" ? "Assistant" : "User"}
                             </span>
                           </div>
                           <p

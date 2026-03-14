@@ -1,10 +1,10 @@
 import {
-  DeleteKnowledgePayload,
-  KnowledgeDocument,
-  KnowledgeSearchQuery,
-  UpdateKnowledgeServicePayload,
-  KnowledgeSearchResult,
-} from "../../models/knowledge.schema";
+  KnowledgeIngestDTO,
+  KnowledgeSearchDTO,
+  KnowledgeSearchResultDTO,
+  UpdateKnowledgeDTO,
+  DeleteKnowledgeDTO,
+} from "../../dtos/KnowledgeDTO";
 
 /**
  * Interface representing the business logic layer for Knowledge Base operations.
@@ -15,37 +15,37 @@ export interface IKnowledgeService {
    * Processes and ingests a new document into the vector database.
    * Typically involves chunking the text and generating embeddings.
    *
-   * @param data - The KnowledgeDocument DTO containing the content and optional metadata.
+   * @param data - The KnowledgeIngestDTO containing the content and optional metadata.
    * @returns A Promise resolving when ingestion is complete.
    */
-  ingestDocument(data: KnowledgeDocument): Promise<void>;
+  ingestDocument(data: KnowledgeIngestDTO): Promise<void>;
 
   /**
    * Performs a semantic search against the ingested knowledge base to find relevant context.
    *
-   * @param data - The KnowledgeSearchQuery DTO containing the active search string.
+   * @param data - The KnowledgeSearchDTO containing the active search string.
    * @param limit - Optional maximum number of relevant chunks to return (default applied in implementation).
    * @returns A Promise resolving to an array of relevant text segments with metadata.
    */
   search(
-    data: KnowledgeSearchQuery,
+    data: KnowledgeSearchDTO,
     limit?: number,
-  ): Promise<KnowledgeSearchResult[]>;
+  ): Promise<KnowledgeSearchResultDTO[]>;
 
   /**
    * Updates an existing knowledge chunk.
    * This involves re-calculating the vector embedding for the new content.
    *
-   * @param data - The UpdateKnowledgeServicePayload DTO.
+   * @param data - The UpdateKnowledgeDTO.
    */
-  updateKnowledge(data: UpdateKnowledgeServicePayload): Promise<void>;
+  updateKnowledge(data: UpdateKnowledgeDTO): Promise<void>;
 
   /**
    * Removes a knowledge chunk from the vector database.
    *
-   * @param data - The DeleteKnowledgePayload DTO.
+   * @param data - The DeleteKnowledgeDTO.
    */
-  deleteKnowledge(data: DeleteKnowledgePayload): Promise<void>;
+  deleteKnowledge(data: DeleteKnowledgeDTO): Promise<void>;
 
   /**
    * Retrieves all knowledge chunks for a specific tenant.
@@ -53,5 +53,5 @@ export interface IKnowledgeService {
    * @param tenantId - The UUID of the tenant.
    * @returns A Promise resolving to an array of all chunks.
    */
-  getAllChunks(tenantId: string): Promise<KnowledgeSearchResult[]>;
+  getAllChunks(tenantId: string): Promise<KnowledgeSearchResultDTO[]>;
 }

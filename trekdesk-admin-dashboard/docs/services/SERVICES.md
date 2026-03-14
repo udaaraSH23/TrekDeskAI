@@ -29,9 +29,17 @@ The shared Axios instance used by all other services. Not imported or called dir
 
 ---
 
-## AuthService
+## Feature Services
 
-**File:** `src/services/AuthService.ts`
+Domain-specific services are located within their respective feature folders: `src/features/[feature]/services/`.
+
+---
+
+## auth Feature
+
+### AuthService
+
+**File:** `src/features/auth/services/AuthService.ts`
 
 | Method                       | HTTP | Endpoint          | Params                | Returns                         |
 | ---------------------------- | ---- | ----------------- | --------------------- | ------------------------------- |
@@ -46,9 +54,11 @@ The shared Axios instance used by all other services. Not imported or called dir
 
 ---
 
-## AnalyticsService
+## conversations Feature
 
-**File:** `src/services/AnalyticsService.ts`
+### AnalyticsService
+
+**File:** `src/features/conversations/services/AnalyticsService.ts`
 
 | Method              | HTTP | Endpoint                 | Params       | Returns                          |
 | ------------------- | ---- | ------------------------ | ------------ | -------------------------------- |
@@ -80,9 +90,11 @@ interface CallStats {
 
 ---
 
-## KnowledgeService
+## knowledge Feature
 
-**File:** `src/services/KnowledgeService.ts`
+### KnowledgeService
+
+**File:** `src/features/knowledge/services/KnowledgeService.ts`
 
 | Method          | HTTP | Endpoint                  | Params              | Returns                   |
 | --------------- | ---- | ------------------------- | ------------------- | ------------------------- |
@@ -108,9 +120,11 @@ interface KnowledgeSearchResult {
 
 ---
 
-## PersonaService
+## persona Feature
 
-**File:** `src/services/PersonaService.ts`
+### PersonaService
+
+**File:** `src/features/persona/services/PersonaService.ts`
 
 | Method                     | HTTP  | Endpoint   | Params            | Returns           |
 | -------------------------- | ----- | ---------- | ----------------- | ----------------- |
@@ -129,9 +143,11 @@ interface PersonaSettings {
 
 ---
 
-## TourService
+## tours Feature
 
-**File:** `src/services/TourService.ts`
+### TourService
+
+**File:** `src/features/tours/services/TourService.ts`
 
 | Method                    | HTTP   | Endpoint     | Params                  | Returns  |
 | ------------------------- | ------ | ------------ | ----------------------- | -------- |

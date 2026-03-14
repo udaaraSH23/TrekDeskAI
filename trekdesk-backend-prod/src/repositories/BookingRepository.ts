@@ -5,7 +5,7 @@
 
 import { query } from "../config/database";
 import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
-import { BookingRow, CreateBookingPayload } from "../models/booking.schema";
+import { CreateBookingDTO, BookingResponseDTO } from "../dtos/BookingDTO";
 
 /**
  * Repository handling direct PostgreSQL interactions for the bookings table.
@@ -18,10 +18,11 @@ export class BookingRepository implements IBookingRepository {
    * @returns A promise resolving to the fully hydrated booking row.
    */
   public async createBooking(
-    payload: CreateBookingPayload,
-  ): Promise<BookingRow> {
+    payload: CreateBookingDTO,
+  ): Promise<BookingResponseDTO> {
     const result = await query(
       `INSERT INTO bookings (
+
         tenant_id, 
         trek_id, 
         session_id, 

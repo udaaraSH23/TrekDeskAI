@@ -16,6 +16,7 @@ erDiagram
     TENANTS ||--o{ CALL_LOGS : "records"
     TENANTS ||--o{ DOCUMENT_CHUNKS : "owns knowledge"
     TENANTS ||--o{ BOOKINGS : "manages"
+    TENANTS ||--o{ WIDGET_SETTINGS : "customizes"
 
     TREKS ||--o{ DOCUMENT_CHUNKS : "scoped to"
     TREKS ||--o{ BOOKINGS : "receives"
@@ -32,7 +33,10 @@ erDiagram
         uuid id PK
         varchar tenant_id FK
         varchar name
-        decimal base_price
+        decimal base_price_per_person
+        decimal transport_fee
+        varchar difficulty_level
+        jsonb pricing_tiers
         boolean is_active
     }
 
@@ -41,6 +45,14 @@ erDiagram
         varchar tenant_id FK
         text system_instruction "AI Persona Prompt"
         varchar voice_name
+    }
+
+    WIDGET_SETTINGS {
+        varchar tenant_id PK, FK
+        varchar primary_color
+        varchar position "left | right"
+        text initial_message
+        jsonb allowed_origins
     }
 
     DOCUMENT_CHUNKS {
@@ -96,9 +108,10 @@ Stores predefined tour itineraries and packages offered by the operator.
 - `tenant_id` (VARCHAR)
 - `name` (VARCHAR) - e.g., "Knuckles Base Camp"
 - `description` (TEXT)
-- `duration_days` (INTEGER)
-- `difficulty` (VARCHAR)
-- `base_price` (DECIMAL)
+- `base_price_per_person` (DECIMAL)
+- `transport_fee` (DECIMAL) - Fixed overhead fee per booking
+- `difficulty_level` (VARCHAR) - 'easy', 'moderate', 'challenging', 'extreme'
+- `pricing_tiers` (JSONB) - Dynamic pricing based on group size
 - `is_active` (BOOLEAN)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
@@ -156,4 +169,15 @@ Stores reservations and bookings made by users or directly by the AI agent durin
 - `target_date` (DATE/TIMESTAMP)
 - `status` (VARCHAR/ENUM) - e.g., 'pending', 'confirmed', 'cancelled'.
 - `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+### `widget_settings`
+
+Stores the customization settings for the frontend chat widget.
+
+- `tenant_id` (VARCHAR, Primary Key, Foreign Key)
+- `primary_color` (VARCHAR(7)) - Hex code for widget branding
+- `position` (VARCHAR) - 'left' or 'right'
+- `initial_message` (TEXT) - The first message the widget displays
+- `allowed_origins` (JSONB) - List of domains permitted to embed this widget
 - `updated_at` (TIMESTAMP)

@@ -58,8 +58,8 @@ export class TourRepository implements ITourRepository {
    */
   public async createTrek(data: CreateTrekPayload): Promise<TrekRecord> {
     const result = await query(
-      `INSERT INTO treks (tenant_id, name, description, base_price_per_person, transport_fee, difficulty_level)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO treks (tenant_id, name, description, base_price_per_person, transport_fee, difficulty_level, pricing_tiers)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
       [
         data.tenantId,
@@ -68,8 +68,10 @@ export class TourRepository implements ITourRepository {
         data.base_price_per_person,
         data.transport_fee,
         data.difficulty_level,
+        JSON.stringify(data.pricing_tiers || []),
       ],
     );
+
     return result.rows[0];
   }
 
@@ -83,8 +85,9 @@ export class TourRepository implements ITourRepository {
            description = COALESCE($2, description),
            base_price_per_person = COALESCE($3, base_price_per_person),
            transport_fee = COALESCE($4, transport_fee),
-           difficulty_level = COALESCE($5, difficulty_level)
-       WHERE id = $6 AND tenant_id = $7
+           difficulty_level = COALESCE($5, difficulty_level),
+           pricing_tiers = COALESCE($6, pricing_tiers)
+       WHERE id = $7 AND tenant_id = $8
        RETURNING *`,
       [
         data.name ?? null,
@@ -92,10 +95,12 @@ export class TourRepository implements ITourRepository {
         data.base_price_per_person ?? null,
         data.transport_fee ?? null,
         data.difficulty_level ?? null,
+        data.pricing_tiers ? JSON.stringify(data.pricing_tiers) : null,
         data.trekId,
         data.tenantId,
       ],
     );
+
     return result.rows[0];
   }
 

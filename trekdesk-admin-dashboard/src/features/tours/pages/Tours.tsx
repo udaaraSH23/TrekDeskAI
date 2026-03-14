@@ -47,6 +47,11 @@ const Tours: React.FC = () => {
     base_price_per_person: 0,
     transport_fee: 0,
     difficulty_level: "moderate" as DifficultyLevel,
+    pricing_tiers: [] as {
+      pax_range: string;
+      min_price: number;
+      max_price: number;
+    }[],
   });
 
   const [editFormData, setEditFormData] = useState({
@@ -55,6 +60,11 @@ const Tours: React.FC = () => {
     base_price_per_person: 0,
     transport_fee: 0,
     difficulty_level: "moderate" as DifficultyLevel,
+    pricing_tiers: [] as {
+      pax_range: string;
+      min_price: number;
+      max_price: number;
+    }[],
   });
 
   const filteredTours = tours.filter((tour) =>
@@ -71,7 +81,54 @@ const Tours: React.FC = () => {
       base_price_per_person: 0,
       transport_fee: 0,
       difficulty_level: "moderate",
+      pricing_tiers: [],
     });
+  };
+
+  const addTier = (isEdit: boolean) => {
+    const newTier = { pax_range: "1", min_price: 15, max_price: 25 };
+    if (isEdit) {
+      setEditFormData({
+        ...editFormData,
+        pricing_tiers: [...(editFormData.pricing_tiers || []), newTier],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        pricing_tiers: [...formData.pricing_tiers, newTier],
+      });
+    }
+  };
+
+  const removeTier = (index: number, isEdit: boolean) => {
+    if (isEdit) {
+      setEditFormData({
+        ...editFormData,
+        pricing_tiers: editFormData.pricing_tiers.filter((_, i) => i !== index),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        pricing_tiers: formData.pricing_tiers.filter((_, i) => i !== index),
+      });
+    }
+  };
+
+  const updateTier = (
+    index: number,
+    field: "pax_range" | "min_price" | "max_price",
+    value: string | number,
+    isEdit: boolean,
+  ) => {
+    if (isEdit) {
+      const updated = [...(editFormData.pricing_tiers || [])];
+      updated[index] = { ...updated[index], [field]: value };
+      setEditFormData({ ...editFormData, pricing_tiers: updated });
+    } else {
+      const updated = [...formData.pricing_tiers];
+      updated[index] = { ...updated[index], [field]: value };
+      setFormData({ ...formData, pricing_tiers: updated });
+    }
   };
 
   const handleUpdate = async (id: string) => {
@@ -93,6 +150,7 @@ const Tours: React.FC = () => {
       base_price_per_person: tour.base_price_per_person,
       transport_fee: tour.transport_fee,
       difficulty_level: tour.difficulty_level || "moderate",
+      pricing_tiers: tour.pricing_tiers || [],
     });
   };
 
@@ -207,6 +265,80 @@ const Tours: React.FC = () => {
                     <option value="extreme">Extreme</option>
                   </select>
                 </div>
+
+                <div className={styles.tiersSection}>
+                  <div className={styles.tierHeader}>
+                    <label className={styles.label}>Pricing Tiers</label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => addTier(false)}
+                      className="flex items-center gap-xs"
+                    >
+                      <Plus size={14} /> Add Tier
+                    </Button>
+                  </div>
+                  {formData.pricing_tiers.map((tier, index) => (
+                    <div key={index} className={styles.tierRow}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Pax Range</label>
+                        <Input
+                          placeholder="e.g. 1, 2-3, 4+"
+                          value={tier.pax_range}
+                          onChange={(e) =>
+                            updateTier(
+                              index,
+                              "pax_range",
+                              e.target.value,
+                              false,
+                            )
+                          }
+                        />
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Min ($)</label>
+                        <Input
+                          type="number"
+                          value={tier.min_price}
+                          onChange={(e) =>
+                            updateTier(
+                              index,
+                              "min_price",
+                              Number(e.target.value),
+                              false,
+                            )
+                          }
+                        />
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Max ($)</label>
+                        <Input
+                          type="number"
+                          value={tier.max_price}
+                          onChange={(e) =>
+                            updateTier(
+                              index,
+                              "max_price",
+                              Number(e.target.value),
+                              false,
+                            )
+                          }
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeTier(index, false)}
+                        className="text-muted hover:text-destructive"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
                 <div className={styles.formActions}>
                   <Button
                     variant="ghost"
@@ -299,6 +431,79 @@ const Tours: React.FC = () => {
                       <option value="challenging">Challenging</option>
                       <option value="extreme">Extreme</option>
                     </select>
+
+                    <div className={styles.tiersSection}>
+                      <div className={styles.tierHeader}>
+                        <label className={styles.label}>Pricing Tiers</label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => addTier(true)}
+                          className="flex items-center gap-xs"
+                        >
+                          <Plus size={14} /> Add Tier
+                        </Button>
+                      </div>
+                      {(editFormData.pricing_tiers || []).map((tier, index) => (
+                        <div key={index} className={styles.tierRow}>
+                          <div className={styles.inputGroup}>
+                            <Input
+                              placeholder="Range"
+                              value={tier.pax_range}
+                              onChange={(e) =>
+                                updateTier(
+                                  index,
+                                  "pax_range",
+                                  e.target.value,
+                                  true,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className={styles.inputGroup}>
+                            <Input
+                              type="number"
+                              placeholder="Min"
+                              value={tier.min_price}
+                              onChange={(e) =>
+                                updateTier(
+                                  index,
+                                  "min_price",
+                                  Number(e.target.value),
+                                  true,
+                                )
+                              }
+                            />
+                          </div>
+                          <div className={styles.inputGroup}>
+                            <Input
+                              type="number"
+                              placeholder="Max"
+                              value={tier.max_price}
+                              onChange={(e) =>
+                                updateTier(
+                                  index,
+                                  "max_price",
+                                  Number(e.target.value),
+                                  true,
+                                )
+                              }
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeTier(index, true)}
+                            className="text-muted hover:text-destructive"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+
                     <div className={`${styles.formActions} mt-md`}>
                       <Button
                         variant="ghost"

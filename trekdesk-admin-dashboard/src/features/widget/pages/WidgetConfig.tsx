@@ -3,11 +3,9 @@ import {
   Code,
   Copy,
   Check,
-  Layout,
   MessageSquare,
   Sparkles,
   Palette,
-  Eye,
   Clock,
 } from "lucide-react";
 import {
@@ -39,7 +37,6 @@ const WidgetConfig: React.FC = () => {
 
   useEffect(() => {
     if (settings && !hasSynced.current) {
-      // Use a timeout to avoid cascading render warning while syncing async settings to local state
       const timer = setTimeout(() => {
         setFormData({
           primaryColor: settings.primary_color || "#10b981",
@@ -86,20 +83,6 @@ const WidgetConfig: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div className="flex items-center gap-sm">
-          <div className={styles.iconBox}>
-            <Layout size={24} color="var(--primary)" />
-          </div>
-          <div>
-            <h1 className={styles.headerTitle}>Widget Configuration</h1>
-            <p className={`text-muted ${styles.headerSubtitle}`}>
-              Customize the TrekDesk AI widget and get the installation script.
-            </p>
-          </div>
-        </div>
-      </header>
-
       {updateMutation.isSuccess && (
         <div className={`${styles.alert} ${styles.alertSuccess}`}>
           <Check size={18} />
@@ -108,7 +91,7 @@ const WidgetConfig: React.FC = () => {
       )}
 
       <div className={styles.mainLayout}>
-        {/* Left Side: Configuration */}
+        {/* Left Side: Configuration & Instructions */}
         <div className={styles.configSection}>
           <Card>
             <CardHeader>
@@ -154,8 +137,8 @@ const WidgetConfig: React.FC = () => {
                   </Button>
                   <Button
                     variant={formData.theme === "light" ? "primary" : "outline"}
-                    onClick={() => setFormData({ ...formData, theme: "light" })}
                     className="flex-1"
+                    disabled
                   >
                     Light (Coming Soon)
                   </Button>
@@ -199,22 +182,24 @@ const WidgetConfig: React.FC = () => {
               {updateMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </div>
-        </div>
 
-        {/* Right Side: Deployment */}
-        <div className={styles.previewContainer}>
           <Card className={styles.embedCard}>
             <CardHeader>
               <CardTitle className="flex items-center gap-sm">
-                <Code size={18} /> Embed Script
+                <Code size={18} color="var(--primary)" /> Embed Script
               </CardTitle>
+              <CardDescription>
+                Add this code to your website to enable the TrekDesk AI
+                Assistant
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className={styles.scriptBox}>
                 <pre className={styles.scriptCode}>{widgetScript}</pre>
                 <button
-                  className={`p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors ${styles.copyButton}`}
+                  className={styles.copyButton}
                   onClick={copyToClipboard}
+                  title="Copy to clipboard"
                 >
                   {copied ? (
                     <Check size={16} color="#10b981" />
@@ -234,38 +219,33 @@ const WidgetConfig: React.FC = () => {
                 </div>
                 <div className={styles.stepItem}>
                   <div className={styles.stepNumber}>2</div>
+
                   <p className={styles.stepText}>
                     The widget will automatically initialize with your brand
                     colors and welcome message.
                   </p>
                 </div>
-                <div className={styles.stepItem}>
-                  <div className={styles.stepNumber}>3</div>
-                  <p className={styles.stepText}>
-                    Any changes you save here will be reflected instantly on
-                    your live site.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-sm">
-                <Eye size={18} /> Live Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.previewFrameWrapper}>
-                <iframe
-                  src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}`}
-                  className={styles.previewIframe}
-                  title="Widget Preview"
-                />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Right Side: Live Preview */}
+        <div className={styles.previewSection}>
+          <div className={styles.previewLabel}>
+            <Sparkles size={14} /> Live Assistant Preview
+          </div>
+          <div className={styles.previewFrameWrapper}>
+            <iframe
+              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}`}
+              className={styles.previewIframe}
+              title="Widget Preview"
+            />
+          </div>
+          <p className={styles.previewNote}>
+            This is how your voice-enabled AI assistant will appear to your
+            customers.
+          </p>
         </div>
       </div>
     </div>

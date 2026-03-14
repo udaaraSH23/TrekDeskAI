@@ -4,7 +4,7 @@
  */
 import { query } from "../config/database";
 import { IAISettingsRepository } from "../interfaces/repositories/IAISettingsRepository";
-import { AISettingsRow, UpdateAISettingsPayload } from "../models/ai.schema";
+import { UpdatePersonaDTO, PersonaResponseDTO } from "../dtos/PersonaDTO";
 
 /**
  * Repository implementation for managing AI Persona and System Instructions configurations.
@@ -20,13 +20,13 @@ export class AISettingsRepository implements IAISettingsRepository {
    */
   public async getSettingsByTenant(
     tenantId: string,
-  ): Promise<AISettingsRow | null> {
+  ): Promise<PersonaResponseDTO | null> {
     const result = await query(
       "SELECT voice_name, system_instruction, temperature FROM ai_settings WHERE tenant_id = $1",
       [tenantId],
     );
 
-    return (result.rows[0] as AISettingsRow) || null;
+    return (result.rows[0] as PersonaResponseDTO) || null;
   }
 
   /**
@@ -37,8 +37,8 @@ export class AISettingsRepository implements IAISettingsRepository {
    * @returns A Promise resolving to the newly updated settings database row.
    */
   public async updateSettings(
-    data: UpdateAISettingsPayload,
-  ): Promise<AISettingsRow> {
+    data: UpdatePersonaDTO,
+  ): Promise<PersonaResponseDTO> {
     const result = await query(
       `INSERT INTO ai_settings (tenant_id, voice_name, system_instruction, temperature, updated_at)
        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
@@ -56,6 +56,6 @@ export class AISettingsRepository implements IAISettingsRepository {
       ],
     );
 
-    return result.rows[0] as AISettingsRow;
+    return result.rows[0] as PersonaResponseDTO;
   }
 }

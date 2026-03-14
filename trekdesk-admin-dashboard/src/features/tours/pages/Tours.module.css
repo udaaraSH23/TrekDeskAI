@@ -201,3 +201,40 @@
   gap: 10px;
   margin-top: 0.5rem;
 }
+
+.tiersSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.tierHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tierRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  align-items: flex-end;
+}
+
+@media (max-width: 480px) {
+  .tierRow {
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+}
+
+.tierActions {
+  display: flex;
+  gap: 8px;
+}
+

@@ -1,9 +1,9 @@
 import {
-  CreateTrekPayload,
-  TrekRecord,
-  UpdateTrekPayload,
-  DeleteTrekPayload,
-} from "../../models/trek.schema";
+  CreateTrekDTO,
+  UpdateTrekDTO,
+  DeleteTrekDTO,
+  TrekResponseDTO,
+} from "../../dtos/TrekDTO";
 
 /**
  * Interface representing the business logic layer for Trek operations.
@@ -14,7 +14,7 @@ export interface ITourService {
    * @param tenantId The UUID of the tenant/operator.
    * @returns Array of active treks.
    */
-  getActiveTreks(tenantId: string): Promise<TrekRecord[]>;
+  getActiveTreks(tenantId: string): Promise<TrekResponseDTO[]>;
 
   /**
    * Retrieves detailed information for a specific trek.
@@ -22,26 +22,30 @@ export interface ITourService {
    * @param tenantId The UUID of the tenant/operator.
    * @returns Trek details or null if not found.
    */
-  getTrekDetail(trekId: string, tenantId: string): Promise<TrekRecord | null>;
+  getTrekDetail(
+    trekId: string,
+    tenantId: string,
+  ): Promise<TrekResponseDTO | null>;
 
   /**
    * Creates a new trek offering.
    * @param data The structure containing trek details (tenantId, name, price, etc).
    * @returns The created trek object.
    */
-  createTrek(data: CreateTrekPayload): Promise<TrekRecord>;
+  createTrek(data: CreateTrekDTO): Promise<TrekResponseDTO>;
+
   /**
    * Modifies an existing trek's attributes.
    *
-   * @param data - The UpdateTrekPayload containing new values and target ID.
-   * @returns The updated TrekRecord.
+   * @param data - The UpdateTrekDTO containing new values and target ID.
+   * @returns The updated TrekResponseDTO.
    */
-  updateTrek(data: UpdateTrekPayload): Promise<TrekRecord>;
+  updateTrek(data: UpdateTrekDTO): Promise<TrekResponseDTO>;
 
   /**
    * Deactivates or removes a trek from the catalog.
    *
-   * @param data - The DeleteTrekPayload DTO.
+   * @param data - The DeleteTrekDTO.
    */
-  deleteTrek(data: DeleteTrekPayload): Promise<void>;
+  deleteTrek(data: DeleteTrekDTO): Promise<void>;
 }

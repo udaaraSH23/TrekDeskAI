@@ -6,8 +6,10 @@
 
 import { IBookingService } from "../interfaces/services/IBookingService";
 import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
+import { ITourRepository } from "../interfaces/repositories/ITourRepository";
 import { IGoogleCalendarService } from "../interfaces/services/IGoogleCalendarService";
-import { BookingRow, CreateBookingPayload } from "../models/booking.schema";
+import { CreateBookingDTO, BookingResponseDTO } from "../dtos/BookingDTO";
+
 import { logger } from "../utils/logger";
 
 /**
@@ -20,11 +22,13 @@ export class BookingService implements IBookingService {
    * @param tenantId - The unique identifier of the tenant context for this service instance.
    * @param bookingRepository - The injected repository instance matching IBookingRepository.
    * @param googleCalendarService - The Google Calendar service for sync and availability checks.
+   * @param tourRepository - The injected repository instance for trek detail lookups.
    */
   constructor(
     private tenantId: string,
     private bookingRepository: IBookingRepository,
     private googleCalendarService: IGoogleCalendarService,
+    private tourRepository: ITourRepository,
   ) {}
 
   /**
@@ -35,8 +39,8 @@ export class BookingService implements IBookingService {
    * @returns The generated Booking context row.
    */
   public async createBooking(
-    payload: CreateBookingPayload,
-  ): Promise<BookingRow> {
+    payload: CreateBookingDTO,
+  ): Promise<BookingResponseDTO> {
     logger.info(
       `[BookingService] Processing formal booking for ${payload.customerName} on Trek ${payload.trekId}`,
     );
@@ -81,7 +85,7 @@ export class BookingService implements IBookingService {
     // For MVP, we'll check listing events for that day.
     try {
       const events = await this.googleCalendarService.listEvents(data.date);
-      if (events.length >= 5) {
+      if (events.length >= 6) {
         // Simple logic: max 5 bookings per day
         return { status: "Fully Booked" };
       }
@@ -97,43 +101,87 @@ export class BookingService implements IBookingService {
 
   /**
    * Generates a price quote for a trek based on the number of participants and transport requirements.
+   * Leverages tiered pricing from the database and supports staged negotiation.
    *
-   * @param data - DTO containing headcount and transport flags.
+   * @param data - DTO containing trekId, headcount, transport flags, and optional negotiation stage.
    * @returns A Promise resolving to the quote amount and detailed breakdown.
-   * @note Currently using hardcoded prices. Production version will fetch rates from the database.
    */
   public async generateQuote(data: {
+    trekId: string;
     pax: number;
     transport: boolean;
-  }): Promise<{ quote: string; breakdown: string }> {
+    negotiationStage?: string;
+  }): Promise<{
+    quote: string;
+    breakdown: string;
+    fallback_required?: boolean;
+  }> {
     logger.info(
-      `[BookingService] Generating quote for ${data.pax} people, transport: ${data.transport}`,
+      `[BookingService] Generating quote for Trek ${data.trekId}, ${data.pax} people, stage: ${data.negotiationStage}`,
     );
-    // REAL implementation will involve: query('SELECT base_price_per_person, transport_fee FROM treks WHERE ...')
-    const total = data.pax * 5000 + (data.transport ? 2000 : 0);
-    return {
-      quote: `${total} LKR`,
-      breakdown: `Base: ${data.pax * 5000}, Transport: ${data.transport ? 2000 : 0}`,
-    };
-  }
 
-  /**
-   * Generates a visual asset (e.g., PDF itinerary or quote) for a specific trek.
-   *
-   * @param data - DTO containing type and trekName.
-   * @returns A Promise resolving to the asset status and a download URL.
-   */
-  public async generateVisual(data: {
-    type: string;
-    trekName: string;
-  }): Promise<{ status: string; download_url: string; message: string }> {
-    logger.info(
-      `[BookingService] Generating ${data.type} for ${data.trekName}`,
+    const trek = await this.tourRepository.getTrekByIdAndTenant(
+      data.trekId,
+      this.tenantId,
     );
+
+    if (!trek) {
+      throw new Error("Trek not found");
+    }
+
+    // Fallback if no tiered pricing is defined on the trek record
+    if (!trek.pricing_tiers || trek.pricing_tiers.length === 0) {
+      return {
+        quote: "N/A",
+        breakdown: `No structured pricing found for ${trek.name}.`,
+        fallback_required: true,
+      };
+    }
+
+    // Tier Matching Logic
+    const matchingTier = trek.pricing_tiers.find((tier) => {
+      const range = tier.pax_range;
+      if (range.includes("-")) {
+        const [min, max] = range.split("-").map(Number);
+        return data.pax >= min && data.pax <= max;
+      }
+      if (range.includes("+")) {
+        const min = Number(range.replace("+", ""));
+        return data.pax >= min;
+      }
+      return Number(range) === data.pax;
+    });
+
+    if (!matchingTier) {
+      return {
+        quote: "N/A",
+        breakdown: `We don't have a standard price for a group of ${data.pax}.`,
+        fallback_required: true,
+      };
+    }
+
+    // Negotiation Logic
+    let basePricePerPerson = matchingTier.max_price;
+    const stage = data.negotiationStage || "initial";
+
+    if (stage === "discount") {
+      // Offer a discount: max_price - 5, but not below min_price
+      basePricePerPerson = Math.max(
+        matchingTier.max_price - 5,
+        matchingTier.min_price,
+      );
+    } else if (stage === "final") {
+      // Give the lowest possible price
+      basePricePerPerson = matchingTier.min_price;
+    }
+
+    const hireTotal = data.pax * basePricePerPerson;
+    const transportTotal = data.transport ? trek.transport_fee || 0 : 0;
+    const total = hireTotal + transportTotal;
+
     return {
-      status: "success",
-      download_url: `https://storage.googleapis.com/trekdesk-assets/${data.type}/sample.pdf`,
-      message: `I've generated a downloadable ${data.type} for your trek to ${data.trekName}.`,
+      quote: `${total} USD`,
+      breakdown: `Base: ${data.pax} x ${basePricePerPerson}, Transport: ${transportTotal}`,
     };
   }
 }

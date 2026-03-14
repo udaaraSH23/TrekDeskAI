@@ -23,6 +23,26 @@ const EmbedChat: React.FC = () => {
   const [status, setStatus] = useState<string>("Ready to talk");
 
   // 3. Multimodal Voice Session Hook
+  const voiceOptions = React.useMemo(
+    () => ({
+      onStatusChange: (statusText: string) => {
+        // Map generic hook status to descriptive EmbedChat status
+        if (statusText === "Connecting...") setStatus("Hailing Assistant...");
+        else if (statusText === "Connected") setStatus("Handshaking...");
+        else if (statusText === "Listening") setStatus("Listening...");
+        else if (statusText === "Active") setStatus("Online");
+      },
+      onGreetingReceived: () => {
+        setHasGreetingStarted(true);
+        setStatus("Online");
+      },
+      onAiSpeakingStart: () => setStatus("Trek AI Speaking..."),
+      onAiSpeakingEnd: () => setStatus("Online"),
+      onError: (msg: string) => setStatus(msg),
+    }),
+    [],
+  );
+
   const {
     isActive,
     isConnecting,
@@ -32,22 +52,7 @@ const EmbedChat: React.FC = () => {
     startSession,
     endSession,
     toggleRecording,
-  } = useVoiceSession({
-    onStatusChange: (statusText: string) => {
-      // Map generic hook status to descriptive EmbedChat status
-      if (statusText === "Connecting...") setStatus("Hailing Assistant...");
-      else if (statusText === "Connected") setStatus("Handshaking...");
-      else if (statusText === "Listening") setStatus("Listening...");
-      else if (statusText === "Active") setStatus("Online");
-    },
-    onGreetingReceived: () => {
-      setHasGreetingStarted(true);
-      setStatus("Online");
-    },
-    onAiSpeakingStart: () => setStatus("Trek AI Speaking..."),
-    onAiSpeakingEnd: () => setStatus("Online"),
-    onError: (msg: string) => setStatus(msg),
-  });
+  } = useVoiceSession(voiceOptions);
 
   // Ensure session ends when component unmounts
   useEffect(() => {

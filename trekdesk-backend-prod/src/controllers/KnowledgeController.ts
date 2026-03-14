@@ -5,10 +5,7 @@ import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
 
-import {
-  KnowledgeDocument,
-  KnowledgeSearchQuery,
-} from "../models/knowledge.schema";
+import { KnowledgeIngestDTO, KnowledgeSearchDTO } from "../dtos/KnowledgeDTO";
 
 /**
  * Controller handling HTTP requests for the Vector Knowledge Base.
@@ -21,7 +18,7 @@ export class KnowledgeController {
    * POST /api/knowledge/ingest
    * Translates text payloads into vector embeddings and stores them.
    *
-   * @param req - Express request object containing the `KnowledgeDocument` payload.
+   * @param req - Express request object containing the `KnowledgeIngestDTO` payload.
    * @param res - Express response object.
    * @param next - Express next middleware function.
    */
@@ -30,7 +27,7 @@ export class KnowledgeController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const bodyObj: KnowledgeDocument = req.body;
+    const bodyObj: KnowledgeIngestDTO = req.body;
 
     if (!bodyObj.content) {
       return next(new BadRequestError("Content is required for ingestion"));
@@ -62,7 +59,7 @@ export class KnowledgeController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const queryObj: KnowledgeSearchQuery = {
+    const queryObj: KnowledgeSearchDTO = {
       q: req.query.q as string,
     };
 
@@ -84,6 +81,7 @@ export class KnowledgeController {
   }
 
   /**
+
    * PATCH /api/knowledge/:chunkId
    * Updates an existing knowledge chunk.
    */

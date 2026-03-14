@@ -22,6 +22,7 @@ import { WidgetSettingsService } from "../services/WidgetSettingsService";
 import { ChatService } from "../services/ChatService";
 import { WidgetChatService } from "../services/WidgetChatService";
 import { DevService } from "../services/DevService";
+import { DevAuthService } from "../services/DevAuthService";
 
 import { AuthController } from "../controllers/AuthController";
 import { TourController } from "../controllers/TourController";
@@ -58,7 +59,9 @@ export const bookingService = new BookingService(
   MVP_TENANT_ID,
   bookingRepository,
   googleCalendarService,
+  tourRepository,
 );
+
 export const callLogService = new CallLogService(callLogRepository);
 export const personaService = new PersonaService(aiSettingsRepository);
 export const widgetService = new WidgetSettingsService(
@@ -82,6 +85,7 @@ export const devService = new DevService(
   aiSettingsRepository,
   googleCalendarService,
 );
+export const devAuthService = new DevAuthService(authService);
 
 /**
  * Controllers (Presentation/Routes Layer)
@@ -93,5 +97,5 @@ export const callLogController = new CallLogController(callLogService);
 export const personaController = new PersonaController(personaService);
 export const widgetController = new WidgetController(widgetService);
 export const chatController = new ChatController(widgetChatService);
-export const devAuthController = new DevAuthController(authService);
+export const devAuthController = new DevAuthController(devAuthService);
 export const devController = new DevController(devService);

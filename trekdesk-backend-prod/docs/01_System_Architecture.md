@@ -6,20 +6,23 @@ The TrekDesk AI backend is built on Node.js using Express and TypeScript. The sy
 
 ## The Layered Architecture
 
-The application is structured into three distinct layers:
+The application is structured into four distinct layers following the Dependency Inversion Principle:
 
-1.  **Controllers (`src/controllers`):** Handle incoming HTTP requests, extract parameters/body payloads, validate them using middleware, and call the appropriate Service layer methodology. They should contain minimal business logic and focus entirely on RESTful HTTP semantics.
-2.  **Services (`src/services`):** The core Business Logic Layer (BLL). Services handle complex operations, orchestration, authentication verification, and data manipulation. They never touch the database directly; instead, they rely on abstract repository interfaces.
-3.  **Repositories (`src/repositories`):** The Data Access Layer (DAL). Repositories are strictly responsible for executing SQL queries against the underlying PostgreSQL database.
+1.  **Controllers (`src/controllers`):** Handle incoming HTTP requests, extract parameters, and validate them using Zod schemas. They delegate all business logic to Services.
+2.  **Services (`src/services`):** The Business Logic Layer (BLL). Services handle the core application logic, orchestration of multiple repositories, and external integrations (like Gemini or Google Calendar).
+3.  **Interfaces (`src/interfaces`):** Define the contracts for Services and Repositories. This layer allows for decoupling, as components depend on abstractions rather than concrete implementations.
+4.  **Repositories (`src/repositories`):** The Data Access Layer (DAL). Repositories are responsible for database interactions using parameterized SQL queries.
 
 ```mermaid
 flowchart TD
     Client(["Frontend Client (React)"]) --> Router
 
     subgraph Express Application
-        Router["Express Router (REST API)"] --> Controller["Controllers (Validation & HTTP)"]
-        Controller --> Service["Services (Business Logic)"]
-        Service --> Repository["Repositories (Data Access)"]
+        Router["Express Router"] --> Controller["Controllers (HTTP/Validation)"]
+        Controller --> IService["IService (Contract)"]
+        IService --> Service["Services (Business Logic)"]
+        Service --> IRepo["IRepository (Contract)"]
+        IRepo --> Repository["Repositories (Data Access)"]
     end
 
     Repository --> Database[("PostgreSQL Database")]

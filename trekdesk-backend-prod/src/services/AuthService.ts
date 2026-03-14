@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 import { GOOGLE_AUTH_WHITELIST, MVP_TENANT_ID } from "../config/constants";
 import { IUserRepository } from "../interfaces/repositories/IUserRepository";
 import { IAuthService } from "../interfaces/services/IAuthService";
-import { AuthUser } from "../models/auth.schema";
+import { UserDTO } from "../dtos/AuthDTO";
 import { env } from "../config/env";
 import { logger } from "../utils/logger";
 
@@ -38,9 +38,9 @@ export class AuthService implements IAuthService {
    * 3. Upserts the user record in the local database (UserRepository).
    *
    * @param idToken - The raw ID token string provided by Google Identity Services.
-   * @returns A Promise resolving to an AuthUser object if successful, or null if verification fails.
+   * @returns A Promise resolving to an UserDTO object if successful, or null if verification fails.
    */
-  public async verifyGoogleToken(idToken: string): Promise<AuthUser | null> {
+  public async verifyGoogleToken(idToken: string): Promise<UserDTO | null> {
     try {
       // Verify token with Google's public keys
       const ticket = await client.verifyIdToken({
@@ -99,7 +99,7 @@ export class AuthService implements IAuthService {
    * @param user - The authenticated user data to encode into the token.
    * @returns A signed JWT string.
    */
-  public generateToken(user: AuthUser): string {
+  public generateToken(user: UserDTO): string {
     return jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
   }
 
@@ -109,9 +109,9 @@ export class AuthService implements IAuthService {
    * @param token - The JWT string to verify.
    * @returns The decoded AuthUser payload if the token is valid, otherwise null.
    */
-  public verifyJWToken(token: string): AuthUser | null {
+  public verifyJWToken(token: string): UserDTO | null {
     try {
-      return jwt.verify(token, JWT_SECRET) as AuthUser;
+      return jwt.verify(token, JWT_SECRET) as UserDTO;
     } catch {
       // Return null on invalid, expired, or malformed tokens
       return null;

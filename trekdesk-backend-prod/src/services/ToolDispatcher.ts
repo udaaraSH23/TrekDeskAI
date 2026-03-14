@@ -49,15 +49,10 @@ export class ToolDispatcher {
       case "generate_quote":
         /** Calculates price quotes based on headcount and transport needs */
         return await this.bookingService.generateQuote({
+          trekId: args.trek_id as string,
           pax: args.pax as number,
           transport: args.transport as boolean,
-        });
-
-      case "generate_weather_itinerary":
-        /** Triggers generation of visual documents (itineraries/quotes) */
-        return await this.bookingService.generateVisual({
-          type: args.type as string,
-          trekName: args.trek_name as string,
+          negotiationStage: args.negotiation_stage as string,
         });
 
       case "query_knowledge_base": {

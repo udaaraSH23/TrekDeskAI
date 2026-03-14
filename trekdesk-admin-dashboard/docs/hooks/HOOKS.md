@@ -1,16 +1,10 @@
 # Hooks Reference
 
-Custom hooks in `src/hooks/` are thin wrappers around **TanStack Query** (`useQuery` / `useMutation`). They bridge the service layer and the component layer — components never call services directly.
-
-Each hook:
-
-- Defines a stable **query key** for caching
-- Delegates to a service function for the actual HTTP call
-- Returns the full TanStack Query result object (data, isLoading, error, mutate, etc.)
+Hooks are located within their respective feature folders: `src/features/[feature]/hooks/`. They are thin wrappers around **TanStack Query**.
 
 ---
 
-## useAnalytics.ts
+## conversations Feature (useAnalytics.ts)
 
 ### `useAnalyticsStats()`
 
@@ -63,7 +57,7 @@ const { data: log } = useCallLogDetails(selectedId);
 
 ---
 
-## usePersona.ts
+## persona Feature (usePersona.ts)
 
 ### `usePersonaSettings()`
 
@@ -103,7 +97,7 @@ const handleSave = (formValues: PersonaSettings) => {
 
 ---
 
-## useKnowledge.ts
+## knowledge Feature (useKnowledge.ts)
 
 ### `useKnowledgeSearch(query)`
 
@@ -145,7 +139,7 @@ ingest.mutate({
 
 ---
 
-## useTours.ts
+## tours Feature (useTours.ts)
 
 ### `useTours()`
 

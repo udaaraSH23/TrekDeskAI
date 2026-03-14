@@ -101,7 +101,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  */
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  max: 1000, // Relaxed for MVP/Dev testing. Limit each IP to 1000 requests per 15 minutes.
   message: "Too many requests from this IP, please try again after 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -109,7 +109,7 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // Limit each IP to 10 login requests per hour
+  max: 100, // Relaxed for Dev testing. Limit each IP to 100 login requests per hour
   message: "Too many login attempts, please try again after an hour",
   standardHeaders: true,
   legacyHeaders: false,

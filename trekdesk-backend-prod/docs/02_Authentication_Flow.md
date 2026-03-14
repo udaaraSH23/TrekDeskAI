@@ -48,3 +48,20 @@ The `authMiddleware` intercepts the request:
 2. Uses `AuthService.verifyJWToken` to cryptographically verify our backend signature.
 3. Decodes the payload and attaches the `AuthUser` object to the Express `req.user` property.
 4. Calls `next()` if successful, or returns a `401 Unauthorized` if the token is missing, tampered with, or expired.
+
+---
+
+## Developer Bypass Login (Dev mode only)
+
+For local development and automated testing, the backend provides a simplified secret-based login flow.
+
+**Endpoint:** `POST /api/v1/auth/dev-login`
+
+**Flow:**
+
+1. Client sends a plaintext `secret` (matching the backend's `DEVELOPMENT_WIDGET_SECRET` env var).
+2. `DevAuthService` validates the secret.
+3. If valid, an internal developer user session is generated.
+4. A standard JWT is issued to the client.
+
+> ⚠️ **Security Warning:** This flow is automatically disabled if `NODE_ENV=production` or if the `DEVELOPMENT_WIDGET_SECRET` environment variable is not set.

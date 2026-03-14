@@ -47,8 +47,8 @@ export const testConnection = async () => {
     }
   } catch (err) {
     const dbError = new Error("database is not connected");
-    // @ts-expect-error - 'cause' is not in ES2020 Error but required by lint
     dbError.cause = err;
+
     throw dbError;
   }
 };

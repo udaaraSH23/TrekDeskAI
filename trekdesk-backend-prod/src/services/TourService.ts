@@ -8,11 +8,12 @@
 import { ITourService } from "../interfaces/services/ITourService";
 import { ITourRepository } from "../interfaces/repositories/ITourRepository";
 import {
-  CreateTrekPayload,
-  TrekRecord,
-  UpdateTrekPayload,
-  DeleteTrekPayload,
-} from "../models/trek.schema";
+  CreateTrekDTO,
+  UpdateTrekDTO,
+  DeleteTrekDTO,
+  TrekResponseDTO,
+} from "../dtos/TrekDTO";
+
 import { logger } from "../utils/logger";
 
 /**
@@ -38,7 +39,7 @@ export class TourService implements ITourService {
    * @param tenantId - The unique identifier (UUID) of the tenant/tour operator.
    * @returns A promise resolving to an array of active trek objects.
    */
-  public async getActiveTreks(tenantId: string): Promise<TrekRecord[]> {
+  public async getActiveTreks(tenantId: string): Promise<TrekResponseDTO[]> {
     logger.info(`[TourService] Fetching active treks for tenant: ${tenantId}`);
     return this.tourRepository.getActiveTreksByTenant(tenantId);
   }
@@ -57,7 +58,7 @@ export class TourService implements ITourService {
   public async getTrekDetail(
     trekId: string,
     tenantId: string,
-  ): Promise<TrekRecord | null> {
+  ): Promise<TrekResponseDTO | null> {
     logger.info(
       `[TourService] Fetching trek detail for ID: ${trekId} (Tenant: ${tenantId})`,
     );
@@ -70,10 +71,10 @@ export class TourService implements ITourService {
    * Allows tour operators to expand their product catalog. Validations on the data structure
    * are expected to be handled by the controller/middleware before reaching this layer.
    *
-   * @param data - The CreateTrekPayload containing all core details, including tenantId.
+   * @param data - The CreateTrekDTO containing all core details, including tenantId.
    * @returns A promise resolving to the newly created trek object as confirmed by the database.
    */
-  public async createTrek(data: CreateTrekPayload): Promise<TrekRecord> {
+  public async createTrek(data: CreateTrekDTO): Promise<TrekResponseDTO> {
     logger.info(`[TourService] Creating new trek for tenant: ${data.tenantId}`);
     return this.tourRepository.createTrek(data);
   }
@@ -81,12 +82,12 @@ export class TourService implements ITourService {
   /**
    * Modifies an existing trek's attributes.
    */
-  public async updateTrek(data: UpdateTrekPayload): Promise<TrekRecord> {
+  public async updateTrek(data: UpdateTrekDTO): Promise<TrekResponseDTO> {
     logger.info(`[TourService] Updating trek: ${data.trekId}`);
     return this.tourRepository.updateTrek(data);
   }
 
-  public async deleteTrek(data: DeleteTrekPayload): Promise<void> {
+  public async deleteTrek(data: DeleteTrekDTO): Promise<void> {
     const { trekId, tenantId } = data;
     logger.info(`[TourService] Deleting trek: ${trekId}`);
     await this.tourRepository.deleteTrek({ trekId, tenantId });

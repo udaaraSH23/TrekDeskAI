@@ -1,10 +1,10 @@
 import {
-  InsertDocumentChunkPayload,
-  SemanticSearchPayload,
-  UpdateKnowledgeChunkPayload,
-  DeleteKnowledgePayload,
-  KnowledgeSearchResult,
-} from "../../models/knowledge.schema";
+  InsertDocumentChunkDTO,
+  SemanticSearchDTO,
+  UpdateKnowledgeChunkDTO,
+  DeleteKnowledgeDTO,
+  KnowledgeSearchResultDTO,
+} from "../../dtos/KnowledgeDTO";
 
 /**
  * Interface definition for the Vector Knowledge Base repository.
@@ -17,7 +17,7 @@ export interface IKnowledgeRepository {
    * @param data - DTO linking content, embeddings, and tenant scoping.
    * @returns A Promise resolving upon successful insertion.
    */
-  insertDocumentChunk(data: InsertDocumentChunkPayload): Promise<void>;
+  insertDocumentChunk(data: InsertDocumentChunkDTO): Promise<void>;
 
   /**
    * Queries the vector database to locate text segments semantically similar to an input vector.
@@ -25,19 +25,21 @@ export interface IKnowledgeRepository {
    * @param data - DTO housing the query vector, strict tenant limits, and result constraints.
    * @returns A Promise resolving to an array of matched text segments with metadata.
    */
-  semanticSearch(data: SemanticSearchPayload): Promise<KnowledgeSearchResult[]>;
+  semanticSearch(data: SemanticSearchDTO): Promise<KnowledgeSearchResultDTO[]>;
+
   /**
    * Updates an existing knowledge chunk and its vector representation.
    *
    * @param data - DTO containing update parameters.
    */
-  updateKnowledgeChunk(data: UpdateKnowledgeChunkPayload): Promise<void>;
+  updateKnowledgeChunk(data: UpdateKnowledgeChunkDTO): Promise<void>;
+
   /**
    * Deletes a knowledge chunk based on ID and tenant ownership.
    *
    * @param data - Target identity identity (chunkId and tenantId).
    */
-  deleteKnowledgeChunk(data: DeleteKnowledgePayload): Promise<void>;
+  deleteKnowledgeChunk(data: DeleteKnowledgeDTO): Promise<void>;
 
   /**
    * Retrieves all knowledge chunks for a specific tenant.
@@ -45,5 +47,5 @@ export interface IKnowledgeRepository {
    * @param tenantId - The UUID of the tenant.
    * @returns A Promise resolving to an array of all chunks.
    */
-  listAllChunks(tenantId: string): Promise<KnowledgeSearchResult[]>;
+  listAllChunks(tenantId: string): Promise<KnowledgeSearchResultDTO[]>;
 }

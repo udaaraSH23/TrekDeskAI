@@ -9,9 +9,4 @@
  * The actual Zod schemas are located in src/models/ai.schema.ts
  */
 
-export {
-  AISettings,
-  ToolCall,
-  ChatMessage,
-  ItineraryGenerationArgs,
-} from "../models/ai.schema";
+export { AISettings, ToolCall, ChatMessage } from "../models/ai.schema";

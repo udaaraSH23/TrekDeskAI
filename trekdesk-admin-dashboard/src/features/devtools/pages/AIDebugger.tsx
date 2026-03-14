@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Terminal,
   Send,
   Search,
   Settings,
@@ -130,23 +129,6 @@ const AIDebugger: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div className="flex items-center gap-md">
-          <div className={styles.iconBox}>
-            <Terminal size={24} color="var(--primary)" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: "1.5rem", margin: 0 }}>
-              AI Tool Diagnostic
-            </h1>
-            <p className="text-muted" style={{ fontSize: "0.9rem", margin: 0 }}>
-              Test how the AI interprets prompts and which backend tools it
-              triggers.
-            </p>
-          </div>
-        </div>
-      </header>
-
       <div className={styles.mainLayout}>
         {/* Left Side: Input & Settings */}
         <div className={styles.inputColumn}>

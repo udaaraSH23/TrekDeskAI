@@ -21,14 +21,11 @@ const SAMPLE_RATE = 24000;
  * Manages WebSocket, AudioContext, and microphone stream.
  */
 export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
-  const {
-    onAiSpeakingStart,
-    onAiSpeakingEnd,
-    onStatusChange,
-    onGreetingReceived,
-    onMessageReceived,
-    onError,
-  } = options;
+  // Use a ref to store the latest options to avoid re-triggering effects/callbacks
+  const optionsRef = useRef(options);
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   const [isActive, setIsActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -44,8 +41,10 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
 
   const cleanup = useCallback(() => {
     if (socketRef.current) {
-      socketRef.current.close();
+      // Small delay to allow any pending messages to be sent/buffered
+      const socket = socketRef.current;
       socketRef.current = null;
+      socket.close();
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -59,8 +58,8 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
     setIsRecording(false);
     setIsConnecting(false);
     setIsAiSpeaking(false);
-    onAiSpeakingEnd?.();
-  }, [onAiSpeakingEnd]);
+    optionsRef.current.onAiSpeakingEnd?.();
+  }, []);
 
   useEffect(() => {
     return () => cleanup();
@@ -88,62 +87,59 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
     return audioContextRef.current;
   }, []);
 
-  const playBinaryAudio = useCallback(
-    (base64Data: string) => {
-      const ctx = audioContextRef.current;
-      if (!ctx) return;
+  const playBinaryAudio = useCallback((base64Data: string) => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
 
-      try {
-        const binaryString = atob(base64Data);
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        const int16Data = new Int16Array(bytes.buffer);
-        const float32Data = new Float32Array(int16Data.length);
-        for (let i = 0; i < int16Data.length; i++) {
-          float32Data[i] = int16Data[i] / 32768.0;
-        }
-
-        const audioBuffer = ctx.createBuffer(
-          1,
-          float32Data.length,
-          SAMPLE_RATE,
-        );
-        audioBuffer.getChannelData(0).set(float32Data);
-
-        const source = ctx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(ctx.destination);
-
-        const startTime = Math.max(ctx.currentTime, nextStartTimeRef.current);
-        source.start(startTime);
-        nextStartTimeRef.current = startTime + audioBuffer.duration;
-
-        if (!isAiSpeaking) {
-          setIsAiSpeaking(true);
-          onAiSpeakingStart?.();
-        }
-
-        source.onended = () => {
-          if (ctx.currentTime >= nextStartTimeRef.current - 0.1) {
-            setIsAiSpeaking(false);
-            onAiSpeakingEnd?.();
-          }
-        };
-      } catch (err) {
-        console.error("Audio playback error", err);
+    try {
+      const binaryString = atob(base64Data);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
-    },
-    [isAiSpeaking, onAiSpeakingEnd, onAiSpeakingStart],
-  );
+
+      const int16Data = new Int16Array(bytes.buffer);
+      const float32Data = new Float32Array(int16Data.length);
+      for (let i = 0; i < int16Data.length; i++) {
+        float32Data[i] = int16Data[i] / 32768.0;
+      }
+
+      const audioBuffer = ctx.createBuffer(1, float32Data.length, SAMPLE_RATE);
+      audioBuffer.getChannelData(0).set(float32Data);
+
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+
+      const startTime = Math.max(ctx.currentTime, nextStartTimeRef.current);
+      source.start(startTime);
+      nextStartTimeRef.current = startTime + audioBuffer.duration;
+
+      // Use functional state update to check current isAiSpeaking
+      setIsAiSpeaking((prev) => {
+        if (!prev) {
+          optionsRef.current.onAiSpeakingStart?.();
+          return true;
+        }
+        return prev;
+      });
+
+      source.onended = () => {
+        if (ctx.currentTime >= nextStartTimeRef.current - 0.1) {
+          setIsAiSpeaking(false);
+          optionsRef.current.onAiSpeakingEnd?.();
+        }
+      };
+    } catch (err) {
+      console.error("Audio playback error", err);
+    }
+  }, []);
 
   const startSession = useCallback(async () => {
     setIsConnecting(true);
     setError(null);
-    onStatusChange?.("Connecting...");
+    optionsRef.current.onStatusChange?.("Connecting...");
 
     try {
       const audioCtx = await initAudioContext();
@@ -158,18 +154,18 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
       socket.onopen = () => {
         setIsConnecting(false);
         setIsActive(true);
-        onStatusChange?.("Connected");
+        optionsRef.current.onStatusChange?.("Connected");
       };
 
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          onMessageReceived?.(data);
+          optionsRef.current.onMessageReceived?.(data);
 
           if (data.parts) {
             for (const part of data.parts) {
               if (part.inlineData?.mimeType?.includes("audio")) {
-                onGreetingReceived?.();
+                optionsRef.current.onGreetingReceived?.();
                 playBinaryAudio(part.inlineData.data);
               }
             }
@@ -182,7 +178,7 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
       socket.onerror = () => {
         const msg = "WebSocket connection error";
         setError(msg);
-        onError?.(msg);
+        optionsRef.current.onError?.(msg);
         cleanup();
       };
 
@@ -193,19 +189,11 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
       const msg =
         err instanceof Error ? err.message : "Failed to start session";
       setError(msg);
-      onError?.(msg);
+      optionsRef.current.onError?.(msg);
       setIsConnecting(false);
       cleanup();
     }
-  }, [
-    cleanup,
-    initAudioContext,
-    onGreetingReceived,
-    onMessageReceived,
-    onStatusChange,
-    onError,
-    playBinaryAudio,
-  ]);
+  }, [cleanup, initAudioContext, playBinaryAudio]);
 
   const startRecording = useCallback(async () => {
     try {
@@ -242,14 +230,14 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
       source.connect(processor);
       processor.connect(ctx.destination);
       setIsRecording(true);
-      onStatusChange?.("Listening");
+      optionsRef.current.onStatusChange?.("Listening");
     } catch (err) {
       console.error(err);
       const msg = "Microphone access denied";
       setError(msg);
-      onError?.(msg);
+      optionsRef.current.onError?.(msg);
     }
-  }, [initAudioContext, onError, onStatusChange]);
+  }, [initAudioContext]);
 
   const stopRecording = useCallback(() => {
     if (streamRef.current) {
@@ -261,8 +249,8 @@ export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
       processorRef.current = null;
     }
     setIsRecording(false);
-    onStatusChange?.("Active");
-  }, [onStatusChange]);
+    optionsRef.current.onStatusChange?.("Active");
+  }, []);
 
   const toggleRecording = useCallback(async () => {
     if (isRecording) {

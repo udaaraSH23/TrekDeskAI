@@ -35,6 +35,11 @@ export interface Trek {
   transport_fee: number;
   difficulty_level?: DifficultyLevel;
   is_active: boolean;
+  pricing_tiers?: {
+    pax_range: string;
+    min_price: number;
+    max_price: number;
+  }[];
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +54,11 @@ export interface CreateTrekPayload {
   base_price_per_person: number;
   transport_fee?: number;
   difficulty_level?: DifficultyLevel;
+  pricing_tiers?: {
+    pax_range: string;
+    min_price: number;
+    max_price: number;
+  }[];
 }
 
 /**

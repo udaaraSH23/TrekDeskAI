@@ -55,9 +55,11 @@ sequenceDiagram
 
 When opening the connection to Google, we send a JSON configuration defining functions the AI _can_ call. For example:
 
-- `book_trek(tenantId, trekId, customerName, customerPhone, pax, targetDate)`
-- `check_guide_calendar(date: string)`
-- `query_knowledge_base(query: string)`
+- `get_available_treks()` — Lists all active tours and their IDs.
+- `check_guide_calendar(date: string)` — Checks availability for a specific date.
+- `generate_quote(trek_id, pax, transport, negotiation_stage)` — Calculates dynamic pricing.
+- `query_knowledge_base(query: string)` — Performs semantic vector search.
+- `book_trek(trek_id, pax, date, customer_name, customer_phone, customer_email)` — Commits a booking to the database.
 
 ### 2. Execution Interception
 

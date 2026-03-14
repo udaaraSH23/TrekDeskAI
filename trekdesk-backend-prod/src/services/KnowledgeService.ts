@@ -42,38 +42,56 @@ export class KnowledgeService implements IKnowledgeService {
    * @param data - The DTO containing the knowledge document payload.
    * @returns A status object indicating success and the number of chunks processed.
    *
-   * @note For the MVP, we use fixed-size chunking. Production systems should consider semantic splitting.
+   * @note Uses Recursive Character Splitting and Batch Embeddings for production readiness.
    */
   public async ingestDocument(data: KnowledgeDocument) {
-    const chunks = this.simpleChunk(data.content, 1000); // Fixed 1000 chars per chunk
+    // Production-ready defaults: 1000 chars with 200 char overlap
+    const chunks = this.recursiveCharacterSplit(data.content, 1000, 200);
 
-    logger.info(`[KnowledgeService] Ingesting ${chunks.length} chunks...`);
+    logger.info(
+      `[KnowledgeService] Ingesting ${chunks.length} chunks via batch embedding...`,
+    );
 
-    for (const chunk of chunks) {
-      try {
-        // Generate vector embedding for the current chunk
-        // Note: gemini-embedding-001 defaults to 3072, so we force 768 to match our DB schema
-        const result = await embeddingModel.embedContent({
-          content: { role: "user", parts: [{ text: chunk }] },
-          outputDimensionality: 768,
-        } as never); // Cast as never/any to bypass outdated build-in SDK typings for dimensionality
-        const embedding = result.embedding.values;
+    try {
+      // Prepare batch embedding request
+      const batchRequests = chunks.map((chunk) => ({
+        content: { role: "user", parts: [{ text: chunk }] },
+        outputDimensionality: 768,
+      }));
 
-        // Persist chunk and its embedding to the vector database via the repository
+      // Generate vector embeddings in a single batch call
+      const batchResult = await embeddingModel.batchEmbedContents({
+        requests: batchRequests,
+      } as never);
+
+      const embeddings = batchResult.embeddings;
+
+      // Persist chunks and their embeddings to the vector database
+      // We perform individual inserts for the MVP to keep the repository logic simple and reliable
+      for (let i = 0; i < chunks.length; i++) {
         await this.knowledgeRepository.insertDocumentChunk({
           tenantId: MVP_TENANT_ID,
           trekId: data.trek_id || null,
-          content: chunk,
-          embedding,
-          metadata: data.metadata || {},
+          content: chunks[i],
+          embedding: embeddings[i].values,
+          metadata: {
+            ...data.metadata,
+            chunk_index: i,
+            total_chunks: chunks.length,
+          },
         });
-      } catch (err) {
-        // Non-blocking error handling for individual chunk failures during ingestion
-        logger.error("[KnowledgeService] Embedding error:", err);
       }
-    }
 
-    return; // Returns void as per interface
+      logger.info(
+        `[KnowledgeService] Successfully ingested ${chunks.length} chunks for trek: ${data.trek_id || "global"}`,
+      );
+    } catch (error) {
+      const err = error as Error;
+      logger.error("[KnowledgeService] Batch ingestion error:", err);
+      throw new Error(`Failed to process knowledge document: ${err.message}`, {
+        cause: error,
+      });
+    }
   }
 
   /**
@@ -158,19 +176,69 @@ export class KnowledgeService implements IKnowledgeService {
   }
 
   /**
-   * Splits text into fixed-size segments.
+   * Recursive Character Text Splitter.
+   * Splits text into segments while trying to preserve semantic boundaries (paragraphs, sentences).
+   * Includes overlap to ensure context continuity.
    *
    * @param text - The full input string.
-   * @param size - The maximum character count for each chunk.
+   * @param maxSize - The maximum character count for each chunk.
+   * @param overlap - The number of characters to overlap between chunks.
    * @returns An array of string segments.
    */
-  private simpleChunk(text: string, size: number): string[] {
-    const chunks: string[] = [];
-    let start = 0;
-    while (start < text.length) {
-      chunks.push(text.substring(start, start + size));
-      start += size;
+  private recursiveCharacterSplit(
+    text: string,
+    maxSize: number,
+    overlap: number,
+  ): string[] {
+    const separators = ["\n\n", "\n", ". ", "? ", "! ", " ", ""];
+
+    const splitRecursively = (content: string, depth: number): string[] => {
+      if (content.length <= maxSize) return [content];
+      if (depth >= separators.length) return [content]; // Fallback to hard cut if no separators left
+
+      const separator = separators[depth];
+      const parts = content.split(separator);
+      const result: string[] = [];
+      let currentPart = "";
+
+      for (const part of parts) {
+        const potentialChunk =
+          currentPart + (currentPart ? separator : "") + part;
+        if (potentialChunk.length <= maxSize) {
+          currentPart = potentialChunk;
+        } else {
+          if (currentPart) {
+            result.push(currentPart);
+          }
+          // If a single part is still too big, recurse deeper
+          if (part.length > maxSize) {
+            result.push(...splitRecursively(part, depth + 1));
+            currentPart = "";
+          } else {
+            currentPart = part;
+          }
+        }
+      }
+      if (currentPart) result.push(currentPart);
+      return result;
+    };
+
+    const rawChunks = splitRecursively(text, 0);
+
+    // Apply overlap logic
+    if (overlap <= 0 || rawChunks.length <= 1) return rawChunks;
+
+    const overlappedChunks: string[] = [];
+    for (let i = 0; i < rawChunks.length; i++) {
+      let chunk = rawChunks[i];
+      if (i > 0) {
+        const prevChunk = rawChunks[i - 1];
+        const overlapText = prevChunk.slice(-overlap);
+        chunk = overlapText + chunk;
+      }
+      overlappedChunks.push(chunk);
     }
-    return chunks;
+
+    return overlappedChunks;
   }
 }

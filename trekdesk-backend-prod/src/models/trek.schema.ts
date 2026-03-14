@@ -17,6 +17,15 @@ export const TrekSchema = z.object({
   difficulty_level: z
     .enum(["easy", "moderate", "challenging", "extreme"])
     .optional(),
+  pricing_tiers: z
+    .array(
+      z.object({
+        pax_range: z.string(), // e.g. "1", "2", "3-4"
+        min_price: z.number().positive(),
+        max_price: z.number().positive(),
+      }),
+    )
+    .optional(),
 });
 
 // Export the inferred TypeScript type defining a normalized Trek across the application.

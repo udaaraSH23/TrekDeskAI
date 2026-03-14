@@ -8,6 +8,7 @@ import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
 import { ITourService } from "../interfaces/services/ITourService";
+import { CreateTrekDTO, UpdateTrekDTO, DeleteTrekDTO } from "../dtos/TrekDTO";
 
 /**
  * Controller handling HTTP requests related to the Tour/Trek catalog.
@@ -96,10 +97,11 @@ export class TourController {
   ): Promise<void> {
     try {
       // The payload has already been strictly validated by the 'validate' middleware in tourRoutes.ts
-      const newTrek = await this.tourService.createTrek({
+      const dto: CreateTrekDTO = {
         tenantId: MVP_TENANT_ID,
         ...req.body,
-      });
+      };
+      const newTrek = await this.tourService.createTrek(dto);
 
       ApiResponse.sendSuccess(
         res,
@@ -124,11 +126,12 @@ export class TourController {
     const { trekId } = req.params;
 
     try {
-      const updatedTrek = await this.tourService.updateTrek({
+      const dto: UpdateTrekDTO = {
         tenantId: MVP_TENANT_ID,
         trekId: trekId as string,
         ...req.body,
-      });
+      };
+      const updatedTrek = await this.tourService.updateTrek(dto);
 
       if (!updatedTrek) {
         throw new NotFoundError("Trek not found");
@@ -157,10 +160,11 @@ export class TourController {
     const { trekId } = req.params;
 
     try {
-      await this.tourService.deleteTrek({
+      const dto: DeleteTrekDTO = {
         trekId: trekId as string,
         tenantId: MVP_TENANT_ID,
-      });
+      };
+      await this.tourService.deleteTrek(dto);
 
       ApiResponse.sendSuccess(res, HttpStatus.OK, "Trek deleted successfully");
     } catch (err) {

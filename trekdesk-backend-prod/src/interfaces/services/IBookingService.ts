@@ -2,7 +2,7 @@
  * Interface representing the business logic layer for transactional booking operations.
  * Handles mock or real integrations for calendar availability and quote generation, as well as real bookings.
  */
-import { BookingRow, CreateBookingPayload } from "../../models/booking.schema";
+import { CreateBookingDTO, BookingResponseDTO } from "../../dtos/BookingDTO";
 
 export interface IBookingService {
   /**
@@ -11,7 +11,8 @@ export interface IBookingService {
    * @param payload - Safely parsed DTO containing the user's details and target trek.
    * @returns A Promise resolving to the finished DB row containing the unique booking ID.
    */
-  createBooking(payload: CreateBookingPayload): Promise<BookingRow>;
+  createBooking(payload: CreateBookingDTO): Promise<BookingResponseDTO>;
+
   /**
    * Checks the availability of tour guides/treks for a specific date.
    *
@@ -27,18 +28,13 @@ export interface IBookingService {
    * @returns A Promise resolving to a quote breakdown object.
    */
   generateQuote(data: {
+    trekId: string;
     pax: number;
     transport: boolean;
-  }): Promise<{ quote: string; breakdown: string }>;
-
-  /**
-   * Dispatches the generation of visual collateral (like PDFs or stylized images) for a trek.
-   *
-   * @param data - DTO identifying the collateral type and associated trek target.
-   * @returns A Promise resolving to the generated asset URL and status.
-   */
-  generateVisual(data: {
-    type: string;
-    trekName: string;
-  }): Promise<{ status: string; download_url: string; message: string }>;
+    negotiationStage?: string;
+  }): Promise<{
+    quote: string;
+    breakdown: string;
+    fallback_required?: boolean;
+  }>;
 }

@@ -3,29 +3,23 @@
   animation: fadeIn 0.4s ease-out;
 }
 
-.header {
-  margin-bottom: 2rem;
-}
-
-.iconBox {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background-color: rgba(16, 185, 129, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .mainLayout {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr 400px;
+  gap: 2.5rem;
+  align-items: start;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .mainLayout {
     grid-template-columns: 1fr;
+  }
+  
+  .previewSection {
+    position: static !important;
+    width: 100% !important;
+    max-width: 450px;
+    margin: 0 auto;
   }
 }
 
@@ -75,11 +69,51 @@
   border-radius: 8px;
   border: 2px solid white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
-.previewContainer {
+.previewSection {
   position: sticky;
-  top: 2rem;
+  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.previewLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: -0.5rem;
+}
+
+.previewFrameWrapper {
+  width: 100%;
+  height: 650px;
+  background-color: #09090b;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 8px solid #1e293b;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.previewIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.previewNote {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
 }
 
 .scriptBox {
@@ -88,11 +122,12 @@
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
+  margin-top: 0.5rem;
 }
 
 .scriptCode {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #e6edf3;
   line-height: 1.6;
   white-space: pre-wrap;
@@ -104,6 +139,17 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copyButton:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .stepsList {
@@ -116,26 +162,29 @@
 .stepItem {
   display: flex;
   gap: 12px;
+  align-items: flex-start;
 }
 
 .stepNumber {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background-color: var(--primary);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .stepText {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #94a3b8;
   line-height: 1.5;
+  margin: 0;
 }
 
 .alert {
@@ -161,23 +210,13 @@
   height: 100%;
 }
 
-.headerTitle {
-  font-size: 1.5rem;
-  margin: 0;
-  color: white;
-}
-
-.headerSubtitle {
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 .hexInput {
   max-width: 120px;
 }
 
 .welcomeTextarea {
   min-height: 100px;
+  resize: vertical;
 }
 
 .saveButton {
@@ -186,27 +225,9 @@
 }
 
 .embedCard {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-style: dashed;
-}
-
-.previewFrameWrapper {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background-color: #09090b;
-  border-radius: 12px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
-}
-
-.previewIframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px dashed var(--border);
+  margin-top: 1rem;
 }
 
 @keyframes fadeIn {
