@@ -37,33 +37,33 @@ try {
 
 ---
 
-## Centralized API Error Transformation (`src/services/api.ts`)
+## Centralized API Error Transformation & Notification (`src/services/api.ts`)
 
-The Axios **response interceptor** runs on every failed request and performs three steps:
+The Axios **monitoring interceptor** runs on every request/response lifecycle. It performs automated error cleanup and global UI feedback.
+
+### 4.1 Automatic Validation Formatting
+
+The interceptor detects raw validation strings (commonly from Zod in the backend) and converts them into clean, user-friendly strings.
+
+- **Before:** `Validation Failed: [{"message":"body.content is Content must be 10+ chars"}]`
+- **After:** `Validation Failed: Content must be 10+ chars`
+
+### 4.2 Global Notification System
+
+Most non-GET errors (POST, PATCH, DELETE) are automatically broadcast to the global toast system.
+
+1. The interceptor extracts the cleaned message.
+2. It checks for the `x-skip-toast` header (in case a component handles the error locally).
+3. It calls `useUIStore.addNotification({ type: 'error', message })`.
 
 ```mermaid
 flowchart TD
-    Fail["Non-2xx response"]
-    IsAxios{axios.isAxiosError?}
-    Extract["Extract message:\n1. response.data.message\n2. error.message\n3. Generic fallback"]
-    Is401{statusCode === 401?}
-    Clear["Clear token\nRedirect → /login?expired=true"]
-    Reject["throw new ApiError(statusCode, message)"]
-    PassThrough["re-throw as-is\n(non-Axios error)"]
-
-    Fail --> IsAxios
-    IsAxios -- yes --> Extract
-    Extract --> Is401
-    Is401 -- yes --> Clear --> Reject
-    Is401 -- no --> Reject
-    IsAxios -- no --> PassThrough
+    Fail["API Error (4xx/5xx)"] --> Extract["Clean Message\n(Parse Zod/JSON)"]
+    Extract --> Header{"x-skip-toast?"}
+    Header -- no --> Toast["Global Alert (Toast)"]
+    Header -- yes --> Silent["Reject Promise Only"]
+    Toast --> Reject["throw new ApiError(...)"]
 ```
-
-**Message resolution priority:**
-
-1. `response.data.message` — the backend's standardized envelope field
-2. `error.message` — Axios network message (e.g. `"Network Error"`)
-3. `"An unexpected error occurred. Please try again."` — generic fallback
 
 ---
 

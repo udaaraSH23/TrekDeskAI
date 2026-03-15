@@ -1,3 +1,12 @@
+/**
+ * @file IngestSection.tsx
+ * @description UI component for raw text ingestion into the RAG system.
+ * Handles user input, vectorization triggers, and displays knowledge base statistics.
+ *
+ * @module KnowledgeComponents
+ * @category Components
+ */
+
 import React, { useState } from "react";
 import { UploadCloud, Database, FileText } from "lucide-react";
 import {
@@ -8,34 +17,55 @@ import {
 } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Badge } from "../../../components/ui/Badge";
+import { useUIStore } from "../../../store/uiStore";
 import { useIngestKnowledge } from "../hooks/useKnowledge";
 import styles from "../pages/KnowledgeBase.module.css";
 
+/**
+ * Properties for the IngestSection component.
+ * @interface IngestSectionProps
+ */
 interface IngestSectionProps {
+  /** The total count of vectorized chunks currently in the database */
   allChunksCount: number;
-  onSuccess: (msg: string) => void;
+  /** Callback function triggered after successful content ingestion */
+  onSuccess?: (msg: string) => void;
 }
 
 /**
- * IngestSection
- * Handles pasting of text content and vector ingestion.
- * Includes sidebar stats for the knowledge base.
+ * IngestSection Component
+ *
+ * Provides an interface for administrators to paste unstructured text (e.g., guidebooks,
+ * tour FAQs). This text is then sent to the backend to be chunked, embedded, and
+ * stored in the vector database.
+ *
+ * @component
  */
 export const IngestSection: React.FC<IngestSectionProps> = ({
   allChunksCount,
   onSuccess,
 }) => {
   const [ingestContent, setIngestContent] = useState("");
+  const { addNotification } = useUIStore();
   const ingestMutation = useIngestKnowledge();
 
+  /**
+   * Handles the submission of new text content.
+   * Invokes the vectorization mutation and clears the form upon success.
+   */
   const handleIngest = async () => {
     if (!ingestContent.trim()) return;
+
     ingestMutation.mutate(
       { content: ingestContent },
       {
         onSuccess: () => {
           setIngestContent("");
-          onSuccess("Content ingested and vectorized successfully!");
+          addNotification({
+            type: "success",
+            message: "Content ingested and vectorized successfully!",
+          });
+          if (onSuccess) onSuccess("Content ingested successfully!");
         },
       },
     );
@@ -43,6 +73,7 @@ export const IngestSection: React.FC<IngestSectionProps> = ({
 
   return (
     <div className={styles.layoutGrid}>
+      {/* Primary Ingestion Form */}
       <Card style={{ flex: 1 }}>
         <CardHeader style={{ border: "none" }}>
           <div className="flex items-center gap-sm">
@@ -73,6 +104,7 @@ export const IngestSection: React.FC<IngestSectionProps> = ({
         </CardContent>
       </Card>
 
+      {/* Knowledge Base Statistics Sidebar */}
       <div className={styles.sidebar}>
         <Card>
           <CardContent className={styles.statMiniCard}>

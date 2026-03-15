@@ -4,13 +4,13 @@
  * This service handles the business logic for customer inquiries and booking workflows.
  */
 
-import { IBookingService } from "../interfaces/services/IBookingService";
-import { IBookingRepository } from "../interfaces/repositories/IBookingRepository";
-import { ITourRepository } from "../interfaces/repositories/ITourRepository";
-import { IGoogleCalendarService } from "../interfaces/services/IGoogleCalendarService";
-import { CreateBookingDTO, BookingResponseDTO } from "../dtos/BookingDTO";
+import { IBookingService } from "../../interfaces/services/ai/IBookingService";
+import { IBookingRepository } from "../../interfaces/repositories/IBookingRepository";
+import { ITourRepository } from "../../interfaces/repositories/ITourRepository";
+import { IGoogleCalendarService } from "../../interfaces/services/IGoogleCalendarService";
+import { CreateBookingDTO, BookingResponseDTO } from "../../dtos/BookingDTO";
 
-import { logger } from "../utils/logger";
+import { logger } from "../../utils/logger";
 
 /**
  * Service class for handling booking-related operations.
@@ -48,11 +48,26 @@ export class BookingService implements IBookingService {
     // Persist securely to PostgreSQL via the repository pipeline
     const newBooking = await this.bookingRepository.createBooking(payload);
 
+    // Fetch trek details for better calendar naming (Trek Name vs IDs)
+    const trek = await this.tourRepository.getTrekByIdAndTenant(
+      payload.trekId,
+      this.tenantId,
+    );
+
     // Sync to Google Calendar
     try {
       await this.googleCalendarService.createEvent({
-        summary: `Trek Booking: ${payload.customerName}`,
-        description: `Booking for ${payload.customerName} (Phone: ${payload.customerPhone}) on Trek ID ${payload.trekId}`,
+        summary: `Trek Booking: ${trek?.name || payload.trekId} - ${payload.customerName}`,
+        description: `
+--- Booking Details ---
+- Customer: ${payload.customerName}
+- Phone: ${payload.customerPhone}
+- Email: ${payload.customerEmail || "N/A"}
+- Trek: ${trek?.name || "Unknown Trek"} (ID: ${payload.trekId})
+- People: ${payload.pax} Pax
+- Status: Confirmed
+- Tenant ID: ${this.tenantId}
+        `.trim(),
         start: new Date(payload.targetDate).toISOString(),
         end: new Date(
           new Date(payload.targetDate).getTime() + 4 * 60 * 60 * 1000,
@@ -65,7 +80,10 @@ export class BookingService implements IBookingService {
       );
     }
 
-    return newBooking;
+    return {
+      ...newBooking,
+      trekName: trek?.name,
+    };
   }
 
   /**

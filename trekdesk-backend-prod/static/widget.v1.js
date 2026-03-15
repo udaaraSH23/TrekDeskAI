@@ -1,12 +1,15 @@
+/* eslint-env browser */
 (function() {
-  // 1. Configuration Check
-  const config = window.trekdeskConfig || {};
-  const agentId = config.agentId || "00000000-0000-0000-0000-000000000001";
-  const primaryColor = config.primaryColor || "#10b981";
-  const position = config.position || "right";
-  const initialMessage = config.initialMessage || "Hi! How can I help you today?";
+  window.TrekDeskAI = {
+    init: function(config = {}) {
+      // 1. Configuration Check
+      const agentId = config.agentId || "00000000-0000-0000-0000-000000000001";
+      const primaryColor = config.color || "#10b981";
+      const position = config.position || "right";
+      const initialMessage = config.msg || "Hi! How can I help you today?";
+      const assistantName = config.name || "TrekDesk AI";
 
-  // 2. Create Styles
+      // 2. Create Styles
   const style = document.createElement("style");
   style.textContent = `
     #trekdesk-widget-launcher {
@@ -70,7 +73,7 @@
   container.id = "trekdesk-widget-container";
   
   const iframe = document.createElement("iframe");
-  const embedUrl = `http://localhost:5173/embed/chat?agentId=${agentId}&color=${encodeURIComponent(primaryColor)}&msg=${encodeURIComponent(initialMessage)}`;
+  const embedUrl = `http://localhost:5173/embed/chat?agentId=${agentId}&color=${encodeURIComponent(primaryColor)}&msg=${encodeURIComponent(initialMessage)}&name=${encodeURIComponent(assistantName)}`;
   iframe.src = embedUrl;
   iframe.style.width = "100%";
   iframe.style.height = "100%";
@@ -89,6 +92,8 @@
       launcher.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
     } else {
       launcher.innerHTML = headsetIcon;
+    }
+  };
     }
   };
 })();

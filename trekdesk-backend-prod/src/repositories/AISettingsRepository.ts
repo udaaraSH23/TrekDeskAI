@@ -22,7 +22,7 @@ export class AISettingsRepository implements IAISettingsRepository {
     tenantId: string,
   ): Promise<PersonaResponseDTO | null> {
     const result = await query(
-      "SELECT voice_name, system_instruction, temperature FROM ai_settings WHERE tenant_id = $1",
+      "SELECT voice_name, assistant_name, welcome_message, system_instruction, temperature FROM ai_settings WHERE tenant_id = $1",
       [tenantId],
     );
 
@@ -40,10 +40,12 @@ export class AISettingsRepository implements IAISettingsRepository {
     data: UpdatePersonaDTO,
   ): Promise<PersonaResponseDTO> {
     const result = await query(
-      `INSERT INTO ai_settings (tenant_id, voice_name, system_instruction, temperature, updated_at)
-       VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+      `INSERT INTO ai_settings (tenant_id, voice_name, assistant_name, welcome_message, system_instruction, temperature, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
        ON CONFLICT (tenant_id) DO UPDATE 
        SET voice_name = EXCLUDED.voice_name,
+           assistant_name = EXCLUDED.assistant_name,
+           welcome_message = EXCLUDED.welcome_message,
            system_instruction = EXCLUDED.system_instruction,
            temperature = EXCLUDED.temperature,
            updated_at = CURRENT_TIMESTAMP
@@ -51,6 +53,8 @@ export class AISettingsRepository implements IAISettingsRepository {
       [
         data.tenant_id,
         data.voice_name,
+        data.assistant_name,
+        data.welcome_message || null,
         data.system_instruction,
         data.temperature,
       ],

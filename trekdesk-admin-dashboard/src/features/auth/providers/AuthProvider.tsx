@@ -1,69 +1,58 @@
 /**
- * @file AuthContext.tsx
+ * @file AuthProvider.tsx
  * @description Provides the AuthProvider component — the sole export of this file.
  *
  * Keeping this file to a single React component export is required for
  * Vite Fast Refresh to perform hot module replacement instead of full reloads.
  *
  * Related modules:
- *   - authContextDef.ts  → AuthContext object + AuthContextType interface
- *   - useAuth.ts         → useAuth() consumer hook
+ *   - AuthContext.ts  → Context object + interface definition
+ *   - useAuth.ts      → Consumer hook
  *
  * Authentication Flows Supported:
  * 1. Google OAuth — Standard production flow via `@react-oauth/google`
  * 2. Dev Secret Bypass — Development-only shortcut (requires `VITE_ENABLE_DEV_LOGIN=true`)
- *
- * Usage:
- * - Wrap the app in `<AuthProvider>` (done in `main.tsx`)
- * - Access state in any component via the `useAuth()` hook (from `useAuth.ts`)
  */
+
 import React, { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { AuthService } from "../services/AuthService";
+import { ApiError } from "../../../lib/errors/ApiError";
 import type { User } from "../services/AuthService";
 
 /**
- * Type-safe helper that extracts a human-readable message from an unknown error.
- * Handles Axios-style errors, generic Error objects, and plain strings.
- *
- * @param err - The unknown error object to parse.
- * @param fallback - The default message to return if parsing fails.
- * @returns A human-readable error string.
- *
- * @internal This is a private utility for the AuthProvider.
- */
-function getErrorMessage(err: unknown, fallback: string): string {
-  if (err !== null && typeof err === "object" && "response" in err) {
-    const axiosErr = err as { response?: { data?: { message?: string } } };
-    if (axiosErr.response?.data?.message) {
-      return axiosErr.response.data.message;
-    }
-  }
-  if (err instanceof Error) return err.message;
-  if (typeof err === "string") return err;
-  return fallback;
-}
-
-/**
  * AuthProvider
- * Context Provider component that owns the auth state and exposes actions.
- * Must be placed above any component that calls `useAuth()` in the component tree.
+ *
+ * The primary Context Provider that owns the authentication state for the entire
+ * application. It initializes the session on mount and provides methods for
+ * authentication actions.
+ *
+ * @param {Object} props - Component props.
+ * @param {ReactNode} props.children - The application tree to be wrapped.
+ * @returns {JSX.Element} The context provider wrapper.
  */
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  // `loading` starts as `true` to prevent flashing a login page
-  // before the initial session check completes on first render.
+
+  /**
+   * loading state
+   * Starts as `true` to prevent flickering the login page while the
+   * initial session verification is in progress.
+   */
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /**
    * initializeAuth
+   *
    * Attempts to silently restore a previous session on application load.
    * Reads the stored JWT from localStorage and verifies its validity with the backend.
-   * If invalid or expired, the token is purged to force a clean re-login.
+   *
+   * Note: 401 Unauthorized errors are handled globally by the api interceptor,
+   * which will clear the token and redirect to login.
    */
   const initializeAuth = async () => {
     const token = AuthService.getToken();
@@ -72,19 +61,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const userData = await AuthService.verifySession();
         setUser(userData);
       } catch (err) {
-        // Token is expired, tampered, or the server rejected it — clean slate
-        console.error("Session verification failed", err);
-        AuthService.clearToken();
+        // We catch here primarily to ensure loading is set to false.
+        // Specialized cleanup (like clearToken) is already handled by the interceptor.
+        console.error("Session initialization skipped or failed", err);
         setUser(null);
       }
     }
-    // Always mark loading as done, even if no token was found
     setLoading(false);
   };
 
   /**
-   * On mount, synchronously attempt to restore session.
-   * The empty dependency array ensures this runs exactly once per provider mount.
+   * Session Initialization Effect
+   * Runs exactly once when the provider is first mounted at the root of the app.
    */
   useEffect(() => {
     initializeAuth();
@@ -92,9 +80,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * login
+   *
    * Exchanges a Google ID Token for a backend-issued JWT.
-   * Persists the session token for use in subsequent API requests.
-   * Re-throws errors so the `Login` page can surface them in the UI.
+   * Persists the session token for use in subsequent authenticated API requests.
+   *
+   * @param {string} idToken - The ID token from Google.
+   * @throws {ApiError} Re-throws the standardized error for UI consumption.
    */
   const login = async (idToken: string) => {
     setLoading(true);
@@ -105,9 +96,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       AuthService.setToken(token);
       setUser(userData);
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to login with Google");
+      const message =
+        err instanceof ApiError ? err.message : "Authentication failed";
       setError(message);
-      throw new Error(message);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -115,11 +107,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * devLogin
-   * Exchanges a plaintext development secret for a real backend JWT.
-   * This enables rapid local testing without going through the full Google OAuth flow.
    *
-   * Security: This bypass is completely disabled in production at the backend level.
-   * Re-throws errors to allow the Login page to surface the failure message.
+   * Exchanges a plaintext development secret for a backend JWT.
+   * This enables rapid local testing without requiring real Google OAuth.
+   *
+   * @param {string} secret - The dev secret.
+   * @throws {ApiError} Re-throws standardized error for UI display.
    */
   const devLogin = async (secret: string) => {
     setLoading(true);
@@ -130,9 +123,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       AuthService.setToken(token);
       setUser(userData);
     } catch (err: unknown) {
-      const message = getErrorMessage(err, "Failed to login with Dev Secret");
+      const message =
+        err instanceof ApiError ? err.message : "Dev bypass failed";
       setError(message);
-      throw new Error(message);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -140,9 +134,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * logout
+   *
    * Synchronously destroys the local session.
-   * The `ProtectedRoute` component will detect the null user and redirect to `/login`.
-   * Note: This does NOT invalidate the JWT on the backend server.
+   * Clears the JWT from storage and resets the user state to null.
    */
   const logout = () => {
     AuthService.clearToken();

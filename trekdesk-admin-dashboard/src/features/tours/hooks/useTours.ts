@@ -1,9 +1,17 @@
+/**
+ * @file useTours.ts
+ * @description custom hooks for Trek/Tour operations using TanStack Query.
+ * Handles server state synchronization, cache invalidation, and optimistic updates.
+ */
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TourService, type Trek } from "../services/TourService";
 
 /**
- * Custom hook to fetch all treks for the authenticated tenant.
- * @returns {UseQueryResult} TanStack Query result containing an array of treks.
+ * Hook: useTours
+ * Fetches the complete list of treks for the current tenant.
+ *
+ * @returns {UseQueryResult} Array of Trek entities.
  */
 export const useTours = () => {
   return useQuery({
@@ -13,22 +21,26 @@ export const useTours = () => {
 };
 
 /**
- * Custom hook to fetch a single trek by its ID.
- * @param id - The UUID of the trek.
- * @returns {UseQueryResult} TanStack Query result containing the trek entity.
+ * Hook: useTour
+ * Fetches a specific trek detail by its unique UUID.
+ *
+ * @param id - The UUID of the trek to retrieve.
+ * @returns {UseQueryResult} Single Trek entity.
  */
 export const useTour = (id: string) => {
   return useQuery({
     queryKey: ["tours", id],
     queryFn: () => TourService.getTourById(id),
-    enabled: !!id,
+    enabled: !!id, // Only run if ID is valid
   });
 };
 
 /**
- * Custom hook to create a new trek offering.
- * Invalidates the "tours" list cache on success.
- * @returns {UseMutationResult} TanStack Query mutation result.
+ * Hook: useCreateTour
+ * Mutation to create a new trek.
+ * Automatically invalidates the "tours" list to trigger a refetch.
+ *
+ * @returns {UseMutationResult}
  */
 export const useCreateTour = () => {
   const queryClient = useQueryClient();
@@ -36,15 +48,18 @@ export const useCreateTour = () => {
   return useMutation({
     mutationFn: TourService.createTour,
     onSuccess: () => {
+      // Refresh the list immediately
       queryClient.invalidateQueries({ queryKey: ["tours"] });
     },
   });
 };
 
 /**
- * Custom hook to update an existing trek.
- * Invalidates the "tours" list and sets the individual trek data on success.
- * @returns {UseMutationResult} TanStack Query mutation result.
+ * Hook: useUpdateTour
+ * Mutation to update an existing trek's properties.
+ * Updates both the collection list and the individual entity cache.
+ *
+ * @returns {UseMutationResult}
  */
 export const useUpdateTour = () => {
   const queryClient = useQueryClient();
@@ -53,16 +68,20 @@ export const useUpdateTour = () => {
     mutationFn: ({ id, tour }: { id: string; tour: Partial<Trek> }) =>
       TourService.updateTour(id, tour),
     onSuccess: (updatedTour) => {
+      // Invalidate list to ensure consistency across the app
       queryClient.invalidateQueries({ queryKey: ["tours"] });
+      // Optistically/Directly update the single item cache
       queryClient.setQueryData(["tours", updatedTour.id], updatedTour);
     },
   });
 };
 
 /**
- * Custom hook to delete a trek permanently.
- * Invalidates the "tours" list on success.
- * @returns {UseMutationResult} TanStack Query mutation result.
+ * Hook: useDeleteTour
+ * Mutation to permanently remove a trek.
+ * Invalidates the master list on success.
+ *
+ * @returns {UseMutationResult}
  */
 export const useDeleteTour = () => {
   const queryClient = useQueryClient();

@@ -3,32 +3,43 @@
   animation: fadeIn 0.4s ease-out;
 }
 
-.header {
-  margin-bottom: 2rem;
-}
-
-.iconBox {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background-color: rgba(16, 185, 129, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* 
+  Page structure: Uses a 2-column grid.
+  Identity config on left, live preview on right.
+*/
 .mainLayout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 2rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
 }
 
 @media (max-width: 1024px) {
   .mainLayout {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 }
 
+/* Left Column Styling */
+.configColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 
+  Right Column Styling 
+  Sticky positioning keeps the preview visible while editing long instructions.
+*/
+.previewColumn {
+  position: sticky;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the phone preview horizontally */
+}
+
+/* Input Group Styles */
 .inputField {
   display: flex;
   flex-direction: column;
@@ -56,11 +67,71 @@
 .input:focus {
   border-color: var(--primary);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.select:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.select option {
+  background-color: #1e293b; /* Card-like dark background */
+  color: white;
 }
 
 .textarea {
-  min-height: 200px;
+  min-height: 250px;
   resize: vertical;
+}
+
+/* Range Input Styling */
+.rangeInput {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  outline: none;
+  margin: 1rem 0;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.rangeInput::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.rangeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rangeValue {
+  font-family: monospace;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .saveSection {
@@ -69,20 +140,19 @@
   margin-top: 1rem;
 }
 
-.previewContainer {
-  position: sticky;
-  top: 2rem;
-}
-
+/* 
+  Device Mockup: 
+  Simulates a mobile phone display for the chat widget.
+*/
 .previewDevice {
   width: 100%;
   max-width: 380px;
-  margin: 0 auto;
   border-radius: 32px;
   border: 12px solid #1e1e1e;
   overflow: hidden;
   box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5);
   aspect-ratio: 9/19;
+  background-color: #0f172a;
 }
 
 .previewFrame {
@@ -91,6 +161,15 @@
   border: none;
 }
 
+/* Loading & Hydration Utils */
+.loaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+/* Alert Notifications */
 .alert {
   display: flex;
   align-items: center;
@@ -99,12 +178,6 @@
   border-radius: 12px;
   font-size: 0.9rem;
   margin-bottom: 2rem;
-}
-
-.alertInfo {
-  background-color: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: var(--primary);
 }
 
 .alertSuccess {
@@ -117,4 +190,9 @@
   background-color: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
   color: #f87171;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

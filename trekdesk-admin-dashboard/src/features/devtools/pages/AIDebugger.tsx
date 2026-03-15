@@ -1,3 +1,13 @@
+/**
+ * @file AIDebugger.tsx
+ * @description Diagnostic sandbox for the TrekDesk AI system.
+ * Allows developers to test prompt engineering, verify tool-calling logic,
+ * and inspect real-time guide availability without making a live call.
+ *
+ * @module DevTools
+ * @category Components
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Send,
@@ -27,20 +37,45 @@ import {
 } from "../services/DevService";
 import styles from "./AIDebugger.module.css";
 
+/**
+ * AIDebugger Component
+ *
+ * This component provides a comprehensive 'sandbox' for testing the Multi-modal
+ * Live AI engine. It features:
+ * 1. An Execution Sandbox for running natural language prompts.
+ * 2. A Logic Trace timeline showing exactly which tools Gemini decided to call.
+ * 3. An Availability Preview of the underlying Google Calendar data.
+ * 4. A Dynamic Registry of all backend-exposed AI tools and their schemas.
+ *
+ * @component
+ */
 const AIDebugger: React.FC = () => {
+  /** The natural language string to be sent for AI evaluation */
   const [prompt, setPrompt] = useState("");
+  /** UI flag used to trigger loading animations during backend orchestration */
   const [isLoading, setIsLoading] = useState(false);
+  /** The full data package returned after a successful diagnostic run */
   const [result, setResult] = useState<DebugResult | null>(null);
+  /** Connection or logic error string captured during the test */
   const [error, setError] = useState<string | null>(null);
+  /** Catalog of tools the AI is currently authorized to use */
   const [availableTools, setAvailableTools] = useState<ToolInfo[]>([]);
+  /** Tracking state for tool inspector expansion */
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
+  /** Raw data from the guide's Google Calendar sync */
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
+  /**
+   * Initial data sync when the component mounts.
+   */
   useEffect(() => {
     fetchTools();
     fetchCalendar();
   }, []);
 
+  /**
+   * Retrieves the latest tool registry from the backend.
+   */
   const fetchTools = async () => {
     try {
       const allTools = await DevService.getTools();
@@ -50,6 +85,9 @@ const AIDebugger: React.FC = () => {
     }
   };
 
+  /**
+   * Refreshes the calendar availability preview.
+   */
   const fetchCalendar = async () => {
     try {
       const events = await DevService.getCalendar();
@@ -59,6 +97,10 @@ const AIDebugger: React.FC = () => {
     }
   };
 
+  /**
+   * Orchestrates the test execution.
+   * Sends the prompt to the backend and handles the resulting trace data.
+   */
   const runTest = async () => {
     if (!prompt.trim()) return;
 
@@ -80,7 +122,11 @@ const AIDebugger: React.FC = () => {
     }
   };
 
-  // Helper to check if a date is busy
+  /**
+   * Filters the raw calendar event list for a specific day string.
+   * @param dateStr ISO date string (YYYY-MM-DD)
+   * @returns Array of events occurring on that day.
+   */
   const getEventsForDay = (dateStr: string) => {
     return calendarEvents.filter((event) => {
       const start = event.start.dateTime || event.start.date;
@@ -88,7 +134,11 @@ const AIDebugger: React.FC = () => {
     });
   };
 
-  // Generate a simple 7-day preview from today
+  /**
+   * Generates a 7-day visual availability forecast.
+   * Helps developers verify that the AI's 'is_busy' logic matches reality.
+   * @returns JSX element containing the 7-day grid.
+   */
   const renderCalendarPreview = () => {
     const days = [];
     const today = new Date();

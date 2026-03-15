@@ -29,6 +29,11 @@ export const updatePersonaSchema = z.object({
     .string("System instruction is required")
     .max(10000, "System instruction is too long (max 10,000 characters)"),
 
+  welcome_message: z
+    .string()
+    .max(2000, "Welcome message is too long (max 2,000 characters)")
+    .optional(),
+
   temperature: z
     .number("Temperature must be a number")
     .min(0, "Temperature must be at least 0")

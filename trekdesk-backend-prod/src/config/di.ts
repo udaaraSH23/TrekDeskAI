@@ -14,15 +14,17 @@ import { AuthService } from "../services/AuthService";
 import { TourService } from "../services/TourService";
 import { KnowledgeService } from "../services/KnowledgeService";
 import { GoogleCalendarService } from "../services/GoogleCalendarService";
-import { BookingService } from "../services/BookingService";
-import { ToolDispatcher } from "../services/ToolDispatcher";
 import { CallLogService } from "../services/CallLogService";
 import { PersonaService } from "../services/PersonaService";
 import { WidgetSettingsService } from "../services/WidgetSettingsService";
-import { ChatService } from "../services/ChatService";
 import { WidgetChatService } from "../services/WidgetChatService";
 import { DevService } from "../services/DevService";
 import { DevAuthService } from "../services/DevAuthService";
+
+// AI and Tool-related services
+import { BookingService } from "../services/ai/BookingService";
+import { ToolDispatcher } from "../services/ai/ToolDispatcher";
+import { ChatService } from "../services/ai/ChatService";
 
 import { AuthController } from "../controllers/AuthController";
 import { TourController } from "../controllers/TourController";

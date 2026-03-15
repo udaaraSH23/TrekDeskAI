@@ -1,16 +1,23 @@
 /**
  * @file tools.ts
  * @description Gemini Multimodal Live API tool and function declarations.
+ * This file serves as the manifest for all local capabilities exposed to the AI model,
+ * enabling it to interact with the backend services, databases, and external APIs.
+ *
+ * @module Config/Tools
+ * @category AI
  */
+
 import { ToolDeclaration } from "../types/gemini";
 
 /**
  * TrekDesk AI - Gemini Tool Declarations
  *
- * This file defines the function declarations (tools) that the Google Gemini
- * Multimodal Live API can invoke. These tools extend the AI's capabilities,
- * allowing it to perform real-world actions like checking calendars,
- * generating quotes, and searching the RAG-enabled knowledge base.
+ * This constant defines the set of tools (functions) that the Google Gemini
+ * Multimodal Live API is authorized to invoke during a session.
+ * These declarations follow the Google AI function calling schema.
+ *
+ * Each tool corresponds to a specific service operation handled by the ToolDispatcher.
  */
 export const tools: ToolDeclaration[] = [
   {
@@ -18,6 +25,7 @@ export const tools: ToolDeclaration[] = [
       /**
        * Tool: check_guide_calendar
        * Purpose: Enables the AI to verify tour guide availability in real-time.
+       * Logic: Queries the Google Calendar API via the BookingService.
        */
       {
         name: "check_guide_calendar",
@@ -36,7 +44,8 @@ export const tools: ToolDeclaration[] = [
 
       /**
        * Tool: generate_quote
-       * Purpose: Provides immediate pricing estimates for trekking packages.
+       * Purpose: Provides immediate pricing estimates for trekking packages based on tiered data.
+       * Negotiation Strategy: Controlled via the 'negotiation_stage' parameter to model realistic sales behavior.
        */
       {
         name: "generate_quote",
@@ -71,7 +80,8 @@ export const tools: ToolDeclaration[] = [
 
       /**
        * Tool: query_knowledge_base
-       * Purpose: Connects the AI to the RAG pipeline.
+       * Purpose: Connects the AI to the vector database (RAG pipeline) for semantic factual retrieval.
+       * Logic: Triggers a pgvector semantic search via KnowledgeService.
        */
       {
         name: "query_knowledge_base",
@@ -92,7 +102,8 @@ export const tools: ToolDeclaration[] = [
 
       /**
        * Tool: book_trek
-       * Purpose: Formalizes a reservation and commits it to the database.
+       * Purpose: Formalizes a reservation and commits it to the PostgreSQL database.
+       * Requirement: This tool is sensitive; it requires prior collection of customer contact details.
        */
       {
         name: "book_trek",
@@ -139,6 +150,7 @@ export const tools: ToolDeclaration[] = [
       /**
        * Tool: get_available_treks
        * Purpose: Provides the AI with the list of treks offered by the operator.
+       * Utility: Prevents hallucination of package names and ensures valid IDs are used in follow-up calls.
        */
       {
         name: "get_available_treks",

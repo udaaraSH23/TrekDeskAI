@@ -97,11 +97,11 @@ export class CallLogController {
         HttpStatus.OK,
         "Call log stats retrieved successfully",
         {
-          totalCalls: stats.totalCalls,
-          hotLeads: stats.hotLeads,
-          leadsCount: stats.leadsCount,
-          conversionRate: "N/A", // Future: Calculate based on bookings
-          revenue: "N/A", // Future: Calculate based on booked total_price
+          total_calls: stats.totalCalls,
+          hot_leads: stats.hotLeads,
+          leads_count: stats.leadsCount,
+          conversion_rate: "N/A",
+          revenue: "N/A",
         },
       );
     } catch (err) {

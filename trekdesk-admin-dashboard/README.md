@@ -107,7 +107,7 @@ trekdesk-admin-dashboard/
 ├── docs/                         # Architecture & reference documentation
 │   ├── ARCHITECTURE.md
 │   ├── STATE_MANAGEMENT.md
-│   ├── AUTH_FLOW.md
+│   ├── AUTHENTICATION.md
 │   ├── ERROR_HANDLING.md
 │   ├── VALIDATION.md
 │   ├── TESTING.md
@@ -172,7 +172,7 @@ The app supports two login flows:
 
 The JWT is persisted in `localStorage` under the key `trekdesk_token` and automatically attached to every API request via an Axios request interceptor. On a 401 response, the interceptor clears the token and redirects to `/login?expired=true`.
 
-See [docs/AUTH_FLOW.md](docs/AUTH_FLOW.md) for the full sequence diagram.
+See [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md) for the full sequence diagram.
 
 ---
 
@@ -258,10 +258,12 @@ Hand-written reference docs are in the `docs/` folder:
 | ----------------------------------------------------------------------- | ----------------------------------------------- |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md)                                 | System architecture, folder guide, routing map  |
 | [STATE_MANAGEMENT.md](docs/STATE_MANAGEMENT.md)                         | Zustand + TanStack Query state model            |
-| [AUTH_FLOW.md](docs/AUTH_FLOW.md)                                       | Auth sequence diagrams, token lifecycle         |
+| [AUTHENTICATION.md](docs/AUTHENTICATION.md)                             | Auth sequence diagrams, token lifecycle         |
 | [ERROR_HANDLING.md](docs/ERROR_HANDLING.md)                             | Centralized error handling strategy             |
 | [VALIDATION.md](docs/VALIDATION.md)                                     | Zod schema catalogue and usage patterns         |
 | [TESTING.md](docs/TESTING.md)                                           | Test setup, patterns, and coverage guide        |
+| [AI_PERSONA.md](docs/AI_PERSONA.md)                                     | AI Persona & Voice identity configuration docs  |
+| [Conversations.md](docs/Conversations.md)                               | Call records and transcript reviewing guide     |
 | [components/UI_COMPONENTS.md](docs/components/UI_COMPONENTS.md)         | Button, Input, Card, Badge props reference      |
 | [components/LAYOUT_COMPONENTS.md](docs/components/LAYOUT_COMPONENTS.md) | Header, Sidebar, ProtectedRoute                 |
 | [pages/PAGES.md](docs/pages/PAGES.md)                                   | Per-page route, data, and interaction reference |

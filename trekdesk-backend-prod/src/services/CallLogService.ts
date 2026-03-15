@@ -104,7 +104,8 @@ export class CallLogService implements ICallLogService {
     await this.callLogRepository.updateLog({
       sessionId: payload.sessionId,
       tenantId: payload.tenantId,
-      transcript: { full_text: payload.transcriptText },
+      // Label as 'ai' since liveTranscript captures the Assistant's responses
+      transcript: [{ role: "ai", text: payload.transcriptText }],
       summary,
       sentimentScore,
       durationSeconds: payload.durationSeconds,

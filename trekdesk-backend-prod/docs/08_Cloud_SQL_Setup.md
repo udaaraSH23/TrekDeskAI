@@ -1,4 +1,4 @@
-# 07 Cloud SQL Setup & Connection Guide
+# 08 Cloud SQL Setup & Connection Guide
 
 This document outlines the steps required to connect the local development environment to the **Google Cloud SQL (PostgreSQL)** instance.
 

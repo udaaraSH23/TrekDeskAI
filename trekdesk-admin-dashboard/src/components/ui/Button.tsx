@@ -1,13 +1,52 @@
+/**
+ * @file Button.tsx
+ * @description A highly configurable button component with support for multiple variants,
+ * sizes, loading states, and icon integration.
+ *
+ * @module UIComponents
+ * @category Components
+ */
+
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import styles from "./Button.module.css";
 
+/**
+ * Props for the Button component.
+ * Extends standard HTML button attributes for full compatibility.
+ */
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * The visual style variant.
+   * @default "primary"
+   */
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+
+  /**
+   * The physical size of the button.
+   * @default "md"
+   */
   size?: "sm" | "md" | "lg" | "icon";
+
+  /**
+   * If true, displays a spinning loader and disables interaction.
+   */
   isLoading?: boolean;
+
+  /**
+   * An optional icon to display before the button text.
+   */
   icon?: React.ReactNode;
 }
 
+/**
+ * Button Component
+ *
+ * The primary interaction element used throughout the dashboard.
+ * Implements a design system that provides clear affordances and
+ * feedback (loading spinners, hover effects).
+ *
+ * @component
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -22,7 +61,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    // Combine base styles with variant and size classes
+    // Combine base styles with variant and size classes for CSS Module compatibility
     const classNames = [styles.button, styles[variant], styles[size], className]
       .filter(Boolean)
       .join(" ");

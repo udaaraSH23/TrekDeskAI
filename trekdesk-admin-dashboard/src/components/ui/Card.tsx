@@ -1,11 +1,40 @@
+/**
+ * @file Card.tsx
+ * @description A flexible container system used for grouping related content and actions.
+ * Supports standard and glassmorphic variants with optional hover effects.
+ *
+ * @module UIComponents
+ * @category Components
+ */
+
 import { forwardRef, type HTMLAttributes } from "react";
 import styles from "./Card.module.css";
 
+/**
+ * Props for the main Card component.
+ */
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * The visual theme of the card.
+   * @default "default"
+   */
   variant?: "default" | "glass";
+
+  /**
+   * If true, applies a subtle lift animation and shadow on hover.
+   * @default false
+   */
   hoverable?: boolean;
 }
 
+/**
+ * Card Component
+ *
+ * The primary layout building block for dashboard widgets and sections.
+ * Designed to be used with CardHeader, CardContent, and CardFooter sub-components.
+ *
+ * @component
+ */
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   (
     {
@@ -35,6 +64,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
 );
 Card.displayName = "Card";
 
+/**
+ * CardHeader sub-component for titles and descriptive introductions.
+ */
 export const CardHeader = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>
@@ -43,6 +75,9 @@ export const CardHeader = forwardRef<
 ));
 CardHeader.displayName = "CardHeader";
 
+/**
+ * CardTitle sub-component rendered as an H3 with theme-aligned typography.
+ */
 export const CardTitle = forwardRef<
   HTMLHeadingElement,
   HTMLAttributes<HTMLHeadingElement>
@@ -51,6 +86,9 @@ export const CardTitle = forwardRef<
 ));
 CardTitle.displayName = "CardTitle";
 
+/**
+ * CardDescription for supplemental context within the header.
+ */
 export const CardDescription = forwardRef<
   HTMLParagraphElement,
   HTMLAttributes<HTMLParagraphElement>
@@ -59,6 +97,9 @@ export const CardDescription = forwardRef<
 ));
 CardDescription.displayName = "CardDescription";
 
+/**
+ * CardContent - The main body container for the card's payload.
+ */
 export const CardContent = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>
@@ -67,6 +108,9 @@ export const CardContent = forwardRef<
 ));
 CardContent.displayName = "CardContent";
 
+/**
+ * CardFooter for secondary actions or supplemental links at the bottom.
+ */
 export const CardFooter = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>

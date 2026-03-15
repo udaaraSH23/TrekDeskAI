@@ -41,6 +41,8 @@ export const AISettingsRowSchema = z.object({
   id: z.string().uuid(),
   tenant_id: z.string().uuid(),
   voice_name: z.string().min(1).max(100),
+  assistant_name: z.string().min(1).max(100).default("TrekDesk Assistant"),
+  welcome_message: z.string().max(2000).optional().nullable(),
   system_instruction: z.string().max(10000),
   temperature: z.number().min(0).max(2),
   created_at: z.date(),
@@ -54,6 +56,8 @@ export type AISettingsRow = z.infer<typeof AISettingsRowSchema>;
 export const UpdateAISettingsPayloadSchema = z.object({
   tenant_id: z.string().uuid(),
   voice_name: z.string().min(1).max(100),
+  assistant_name: z.string().min(1).max(100),
+  welcome_message: z.string().max(2000).optional(),
   system_instruction: z.string().max(10000),
   temperature: z.number().min(0).max(2),
 });

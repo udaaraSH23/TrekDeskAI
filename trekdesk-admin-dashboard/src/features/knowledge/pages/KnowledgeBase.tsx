@@ -1,3 +1,12 @@
+/**
+ * @file KnowledgeBase.tsx
+ * @description Root orchestration page for the Knowledge Base feature.
+ * Manages tab-based navigation between Ingestion, Management, and Semantic Search testing.
+ *
+ * @module KnowledgePages
+ * @category Pages
+ */
+
 import React, { useState } from "react";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { useAllKnowledge } from "../hooks/useKnowledge";
@@ -10,9 +19,13 @@ import { SemanticSearch } from "../components/SemanticSearch";
 import styles from "./KnowledgeBase.module.css";
 
 /**
- * KnowledgeBase Page
- * Orchestrates the different features of the knowledge system.
- * Transitioned to feature-based architecture with atomized components.
+ * KnowledgeBase Page Component
+ *
+ * This is the primary control center for the RAG (Retrieval Augmented Generation)
+ * system. It allows administrators to feed information to the AI, curate
+ * existing indices, and verify retrieval logic via a semantic playground.
+ *
+ * @component
  */
 const KnowledgeBase: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"documents" | "search" | "manage">(
@@ -20,6 +33,9 @@ const KnowledgeBase: React.FC = () => {
   );
   const [successMessage, setSuccessMessage] = useState("");
 
+  /**
+   * Data fetching hook for the dashboard-wide knowledge statistics.
+   */
   const {
     data: allChunks = [],
     isLoading: listLoading,
@@ -30,6 +46,7 @@ const KnowledgeBase: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Dynamic Error Banner for Backend Connectivity Issues */}
       {error && (
         <div className={styles.errorBanner}>
           <AlertCircle size={18} style={{ marginRight: "8px" }} />
@@ -37,6 +54,7 @@ const KnowledgeBase: React.FC = () => {
         </div>
       )}
 
+      {/* Ephemeral Success Notifications */}
       {successMessage && (
         <Badge
           variant="success"
@@ -53,6 +71,7 @@ const KnowledgeBase: React.FC = () => {
         </Badge>
       )}
 
+      {/* Feature Navigation Tabs */}
       <div className={styles.tabContainer}>
         <button
           className={`${styles.tab} ${activeTab === "documents" ? styles.activeTab : ""}`}
@@ -74,6 +93,7 @@ const KnowledgeBase: React.FC = () => {
         </button>
       </div>
 
+      {/* Atomized Feature Rendering */}
       <main style={{ marginTop: "2rem" }}>
         {activeTab === "documents" && (
           <IngestSection

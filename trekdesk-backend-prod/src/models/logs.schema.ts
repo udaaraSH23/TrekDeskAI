@@ -17,6 +17,14 @@ export const CallLogStatsSchema = z.object({
 export type CallLogStats = z.infer<typeof CallLogStatsSchema>;
 
 /**
+ * A single conversational turn, aligned with Geminis role-based history.
+ */
+const TranscriptMessageSchema = z.object({
+  role: z.enum(["user", "ai", "system"]),
+  text: z.string(),
+});
+
+/**
  * Zod mapping to the `call_logs` table schema structure.
  * Represents an individual trace of a specific AI-to-User interaction session, detailing sentiment and length.
  */
@@ -24,7 +32,8 @@ export const CallLogSchema = z.object({
   id: z.string().uuid("Invalid Call Log ID format"),
   tenant_id: z.string().uuid(),
   session_id: z.string(),
-  transcript: z.string().nullable().optional(),
+  /** Structured transcript array for JSONB storage/retrieval */
+  transcript: z.array(TranscriptMessageSchema).nullable().optional(),
   summary: z.string().nullable().optional(),
   sentiment_score: z.number().nullable().optional(),
   duration_seconds: z.number().nullable().optional(),
@@ -50,7 +59,7 @@ export type CreateCallLogPayload = z.infer<typeof CreateCallLogPayloadSchema>;
 export const UpdateCallLogPayloadSchema = z.object({
   tenantId: z.string().uuid(),
   sessionId: z.string().min(5),
-  transcript: z.record(z.string(), z.unknown()),
+  transcript: z.array(TranscriptMessageSchema),
   summary: z.string(),
   sentimentScore: z.number().min(0).max(1),
   durationSeconds: z.number().nonnegative(),

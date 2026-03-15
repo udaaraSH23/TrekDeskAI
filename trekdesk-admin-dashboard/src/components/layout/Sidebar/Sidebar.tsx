@@ -14,7 +14,8 @@ import { useUIStore } from "../../../store/uiStore";
 import styles from "./Sidebar.module.css";
 
 const Sidebar: React.FC = () => {
-  const { isSidebarOpen, toggleSidebar } = useUIStore();
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar);
 
   const navItems = [
     { icon: <LayoutDashboard size={20} />, label: "Overview", path: "/" },

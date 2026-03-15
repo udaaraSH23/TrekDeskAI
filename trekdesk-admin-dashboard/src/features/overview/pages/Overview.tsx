@@ -1,9 +1,16 @@
+/**
+ * @file Overview.tsx
+ * @description Central administrative dashboard offering high-level visibility into AI operations.
+ * Displays Key Performance Indicators (KPIs) and provides access to the real-time AI Voice Playground.
+ *
+ * @module Overview
+ * @category Components
+ */
+
 import React, { useState } from "react";
 import {
   Users,
   MessageSquare,
-  TrendingUp,
-  DollarSign,
   Play,
   ArrowUpRight,
   Activity,
@@ -21,10 +28,34 @@ import { VoicePlayground } from "../../../features/voice/components/VoicePlaygro
 
 import styles from "./Overview.module.css";
 
+/**
+ * Overview Component
+ *
+ * This is the primary landing page after dashboard login.
+ * Its mission is to capture the 'pulse' of the tour operator's AI agency
+ * by highlighting call volume and lead conversion metrics.
+ *
+ * Features:
+ * - Real-time KPI Widgets (Total Calls & Qualified Leads)
+ * - Error state handling for analytic data fetch
+ * - Direct portal into the 'Voice Playground' for real-time AI testing
+ *
+ * @component
+ */
 const Overview: React.FC = () => {
+  /** Controls the visibility of the full-screen Voice AI testing sandbox */
   const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
+
+  /**
+   * Retrieves aggregated analytic data via React Query.
+   * This data is scoped to the current active tenant identifier.
+   */
   const { data: stats, isLoading: loading, error } = useAnalyticsStats();
 
+  /**
+   * Configuration for the primary KPI metric grid.
+   * Maps backend data fields to visual icon and label representations.
+   */
   const statsConfig = [
     {
       label: "Total AI Calls",
@@ -40,22 +71,9 @@ const Overview: React.FC = () => {
       icon: <Users color="#10b981" />,
       color: "#10b981",
     },
-    {
-      label: "Conversion Rate",
-      value: stats?.conversion_rate ?? "N/A",
-      change: "0%",
-      icon: <TrendingUp color="#f59e0b" />,
-      color: "#f59e0b",
-    },
-    {
-      label: "Est. Revenue",
-      value: stats?.revenue ?? "N/A",
-      change: "0%",
-      icon: <DollarSign color="#8b5cf6" />,
-      color: "#8b5cf6",
-    },
   ];
 
+  // Initial loading state while waiting for the first chunk of analytic data
   if (loading && !stats) {
     return (
       <div className="flex-center" style={{ height: "100%" }}>
@@ -66,6 +84,7 @@ const Overview: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Dynamic error display if the analytics pipeline fails */}
       {error && (
         <div className={styles.errorBanner}>
           Error loading dashboard stats:{" "}
@@ -73,6 +92,7 @@ const Overview: React.FC = () => {
         </div>
       )}
 
+      {/* Primary KPI Grid Section */}
       <section className={styles.statsGrid}>
         {statsConfig.map((stat, i) => (
           <Card key={i} hoverable>
@@ -96,6 +116,7 @@ const Overview: React.FC = () => {
         ))}
       </section>
 
+      {/* Main Feature Exploration Section */}
       <div className={styles.mainGrid}>
         <Card style={{ flex: 1 }}>
           <CardHeader style={{ border: "none" }}>
@@ -133,7 +154,7 @@ const Overview: React.FC = () => {
         </Card>
       </div>
 
-      {/* Voice Playground Modal */}
+      {/* Voice Playground Modal Integration */}
       <VoicePlayground
         isOpen={isPlaygroundOpen}
         onClose={() => setIsPlaygroundOpen(false)}

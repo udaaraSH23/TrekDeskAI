@@ -6,10 +6,14 @@
 
 import WebSocket from "ws";
 import dotenv from "dotenv";
-import { AISettings } from "../types/ai";
-import { IGeminiService } from "../interfaces/services/IGeminiService";
-import { logger } from "../utils/logger";
-import { GeminiResponse, ToolDeclaration } from "../types/gemini";
+import { AISettings } from "../../types/ai";
+import { IGeminiService } from "../../interfaces/services/ai/IGeminiService";
+import { logger } from "../../utils/logger";
+import {
+  GeminiResponse,
+  ToolDeclaration,
+  GeminiFunctionCall,
+} from "../../types/gemini";
 
 dotenv.config();
 
@@ -19,12 +23,28 @@ dotenv.config();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /**
+ * The base WebSocket URL for Gemini's Generative Service.
+ * Defaults to the v1alpha endpoint if not specified in .env.
+ */
+const GEMINI_WS_URL =
+  process.env.GEMINI_WS_URL ||
+  "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent";
+
+/**
+ * The specific AI model identifier to use for the session.
+ * Defaults to the multimodal native audio preview.
+ */
+const GEMINI_MODEL_NAME =
+  process.env.GEMINI_MODEL_NAME ||
+  "models/gemini-2.5-flash-native-audio-preview-12-2025";
+
+/**
  * Service class for managing bidirectional communication with the Gemini API.
  * Uses WebSockets to provide low-latency multimodal interactions.
  */
 export class GeminiService implements IGeminiService {
-  /** The WebSocket URL for Gemini's Generative Service BidiGenerateContent endpoint */
-  private wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${GEMINI_API_KEY}`;
+  /** The full WebSocket URL with authentication key */
+  private wsUrl = `${GEMINI_WS_URL}?key=${GEMINI_API_KEY}`;
 
   /**
    * Creates an instance of GeminiService.
@@ -67,12 +87,13 @@ export class GeminiService implements IGeminiService {
          */
         const setupMessage = {
           setup: {
-            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
+            model: GEMINI_MODEL_NAME,
             systemInstruction: {
               parts: [{ text: settings.systemInstruction }],
             },
             tools: this.tools,
             generationConfig: {
+              temperature: settings.temperature,
               responseModalities: ["AUDIO"],
               speechConfig: {
                 voiceConfig: {
@@ -92,6 +113,13 @@ export class GeminiService implements IGeminiService {
         try {
           const raw = data.toString();
           const response = JSON.parse(raw);
+
+          if (response.toolCall) {
+            const names = response.toolCall.functionCalls
+              .map((c: GeminiFunctionCall) => c.name)
+              .join(", ");
+            logger.info(`[GeminiService] INCOMING ToolCall: ${names}`);
+          }
 
           /**
            * Wait for 'setupComplete: true' before resolving the connection.
@@ -157,6 +185,12 @@ export class GeminiService implements IGeminiService {
           functionResponses: functionResponses,
         },
       };
+
+      const ids = functionResponses.map((r) => r.id).join(", ");
+      logger.info(
+        `[GeminiService] OUTGOING ToolResponses finished (IDs: ${ids})`,
+      );
+
       geminiWs.send(JSON.stringify(message));
     }
   }

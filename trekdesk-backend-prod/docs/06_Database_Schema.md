@@ -1,4 +1,4 @@
-# 05 Database Schema
+# 06 Database Schema
 
 ## Overview
 
@@ -41,10 +41,12 @@ erDiagram
     }
 
     AI_SETTINGS {
-        uuid id PK
-        varchar tenant_id FK
-        text system_instruction "AI Persona Prompt"
+        uuid tenant_id PK, FK
+        varchar assistant_name
         varchar voice_name
+        text system_instruction "AI Persona Prompt"
+        float temperature
+        timestamp updated_at
     }
 
     WIDGET_SETTINGS {
@@ -132,12 +134,11 @@ Stores vectorized knowledge base entries for the RAG pipeline. This table utiliz
 
 Stores the prompt engineering parameters tailored for a specific tenant's voice agent.
 
-- `id` (UUID, Primary Key)
-- `tenant_id` (VARCHAR, Unique)
-- `persona_name` (VARCHAR)
-- `system_instruction` (TEXT) - The massive prompt dictating the AI's behavior.
-- `voice_name` (VARCHAR) - e.g., "Aoede", "Puck"
-- `created_at` (TIMESTAMP)
+- `tenant_id` (UUID, Primary Key, Foreign Key)
+- `assistant_name` (VARCHAR) - Custom display name for the AI
+- `system_instruction` (TEXT) - The core prompt dictating the AI's behavior
+- `voice_name` (VARCHAR) - Gemini Voice engine ID (e.g., 'Aoede', 'Puck')
+- `temperature` (FLOAT) - Controls response creativity (0.0 to 2.0)
 - `updated_at` (TIMESTAMP)
 
 ### `call_logs`

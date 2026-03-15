@@ -17,21 +17,6 @@
   }
 }
 
-.searchBox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
-  border-radius: 8px;
-  width: 300px;
-  transition: border-color 0.2s;
-}
-
-.searchBox:focus-within {
-  border-color: var(--primary);
-}
 
 .mainGrid {
   display: grid;
@@ -75,6 +60,7 @@
   margin-bottom: 1.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   height: 4.5em;
@@ -125,12 +111,6 @@
 }
 
 /* Form Styles */
-.editCard {
-  grid-column: 1 / -1;
-  max-width: 600px;
-  margin: 0 auto 1rem;
-  width: 100%;
-}
 
 .form {
   display: flex;

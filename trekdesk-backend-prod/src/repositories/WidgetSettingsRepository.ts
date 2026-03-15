@@ -1,3 +1,8 @@
+/**
+ * @module WidgetRepositories
+ * @category Repositories
+ */
+
 import { query } from "../config/database";
 import { IWidgetSettingsRepository } from "../interfaces/repositories/IWidgetSettingsRepository";
 import {
@@ -5,7 +10,20 @@ import {
   UpdateWidgetSettingsPayload,
 } from "../models/widget.schema";
 
+/**
+ * Repository for managing Widget Settings in the PostgreSQL database.
+ * Handles the low-level SQL operations for widget configuration.
+ *
+ * @class
+ * @implements {IWidgetSettingsRepository}
+ */
 export class WidgetSettingsRepository implements IWidgetSettingsRepository {
+  /**
+   * Fetches a single widget settings record using the tenant UUID.
+   *
+   * @param tenantId The UUID of the tenant.
+   * @returns {Promise<WidgetSettingsRow | null>} The settings row or null.
+   */
   public async getSettingsByTenant(
     tenantId: string,
   ): Promise<WidgetSettingsRow | null> {
@@ -17,6 +35,14 @@ export class WidgetSettingsRepository implements IWidgetSettingsRepository {
     return (result.rows[0] as WidgetSettingsRow) || null;
   }
 
+  /**
+   * Performs an UPSERT operation on the widget settings.
+   * If the record doesn't exist for the tenant, it is created.
+   * If it exists, fields are updated using COALESCE to preserve existing data for optional fields.
+   *
+   * @param data The payload containing fields to update.
+   * @returns {Promise<WidgetSettingsRow>} The resulting record after the upsert.
+   */
   public async updateSettings(
     data: UpdateWidgetSettingsPayload,
   ): Promise<WidgetSettingsRow> {

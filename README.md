@@ -97,14 +97,21 @@ Detailed documentation is available within each sub-directory:
 
 - [Architecture & Features](./trekdesk-admin-dashboard/docs/ARCHITECTURE.md)
 - [Authentication Flow](./trekdesk-admin-dashboard/docs/AUTH_FLOW.md)
+- [AI Persona Feature](./trekdesk-admin-dashboard/docs/AI_PERSONA.md)
+- [Conversations Feature](./trekdesk-admin-dashboard/docs/Conversations.md)
 - [Hooks Reference](./trekdesk-admin-dashboard/docs/hooks/HOOKS.md)
 
 ### Backend Docs
 
-- [System Architecture](./trekdesk-backend-prod/docs/01_System_Architecture.md)
-- [Database Schema](./trekdesk-backend-prod/docs/05_Database_Schema.md)
-- [Real-time Voice AI](./trekdesk-backend-prod/docs/03_Realtime_Voice_AI.md)
-- [API Reference](./trekdesk-backend-prod/docs/08_API_Reference.md)
+- [01 System Architecture](./trekdesk-backend-prod/docs/01_System_Architecture.md)
+- [02 Authentication Flow](./trekdesk-backend-prod/docs/02_Authentication_Flow.md)
+- [03 Real-time Voice AI](./trekdesk-backend-prod/docs/03_Realtime_Voice_AI.md)
+- [04 Conversation & Call Log Flow](./trekdesk-backend-prod/docs/04_Conversation_and_Call_Log_Flow.md)
+- [05 RAG Pipeline](./trekdesk-backend-prod/docs/05_RAG_Pipeline.md)
+- [06 Database Schema](./trekdesk-backend-prod/docs/06_Database_Schema.md)
+- [07 Development Workflow](./trekdesk-backend-prod/docs/07_Development_Workflow.md)
+- [08 Cloud SQL Setup](./trekdesk-backend-prod/docs/08_Cloud_SQL_Setup.md)
+- [09 API Reference](./trekdesk-backend-prod/docs/09_API_Reference.md)
 
 ---
 

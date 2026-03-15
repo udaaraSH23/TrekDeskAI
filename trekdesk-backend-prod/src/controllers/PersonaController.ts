@@ -59,12 +59,20 @@ export class PersonaController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const { voice_name, system_instruction, temperature } = req.body;
+    const {
+      voice_name,
+      assistant_name,
+      welcome_message,
+      system_instruction,
+      temperature,
+    } = req.body;
 
     try {
       const dto: UpdatePersonaDTO = {
         tenant_id: MVP_TENANT_ID,
         voice_name,
+        assistant_name,
+        welcome_message,
         system_instruction,
         temperature,
       };

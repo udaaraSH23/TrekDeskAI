@@ -1,3 +1,12 @@
+/**
+ * @file KnowledgeController.ts
+ * @description Controller handling HTTP requests for the Vector Knowledge Base.
+ * Enables uploading proprietary documents and executing context-aware semantic searches.
+ *
+ * @module KnowledgeBase
+ * @category Controllers
+ */
+
 import { Request, Response, NextFunction } from "express";
 import { IKnowledgeService } from "../interfaces/services/IKnowledgeService";
 import { BadRequestError } from "../utils/errors/CustomErrors";
@@ -8,19 +17,21 @@ import { MVP_TENANT_ID } from "../config/constants";
 import { KnowledgeIngestDTO, KnowledgeSearchDTO } from "../dtos/KnowledgeDTO";
 
 /**
- * Controller handling HTTP requests for the Vector Knowledge Base.
- * Enables uploading proprietary documents and executing context-aware semantic searches.
+ * KnowledgeController
+ *
+ * Orchestrates the RESTful API for the Retrieval-Augmented Generation (RAG) system.
+ * Acts as the entry point for ingesting raw text and performing vector similarity searches.
  */
 export class KnowledgeController {
   constructor(private knowledgeService: IKnowledgeService) {}
 
   /**
-   * POST /api/knowledge/ingest
    * Translates text payloads into vector embeddings and stores them.
    *
    * @param req - Express request object containing the `KnowledgeIngestDTO` payload.
    * @param res - Express response object.
    * @param next - Express next middleware function.
+   * @returns A Promise resolving when ingestion is initiated.
    */
   public async ingest(
     req: Request,
@@ -47,12 +58,12 @@ export class KnowledgeController {
   }
 
   /**
-   * GET /api/knowledge/search
    * Uses cosine distance in pgvector to retrieve the most semantically relevant text chunks.
    *
    * @param req - Express request object holding the `q` query string parameter.
    * @param res - Express response object.
    * @param next - Express next middleware function.
+   * @returns A Promise resolving to search results.
    */
   public async search(
     req: Request,
@@ -81,9 +92,12 @@ export class KnowledgeController {
   }
 
   /**
-
-   * PATCH /api/knowledge/:chunkId
    * Updates an existing knowledge chunk.
+   * Triggers a recalculation of embeddings on the service layer.
+   *
+   * @param req - Express request object.
+   * @param res - Express response object.
+   * @param next - Express next middleware function.
    */
   public async updateKnowledge(
     req: Request,
@@ -114,8 +128,11 @@ export class KnowledgeController {
   }
 
   /**
-   * DELETE /api/knowledge/:chunkId
    * Removes a knowledge chunk from the vector store.
+   *
+   * @param req - Express request object.
+   * @param res - Express response object.
+   * @param next - Express next middleware function.
    */
   public async deleteKnowledge(
     req: Request,
@@ -140,8 +157,11 @@ export class KnowledgeController {
   }
 
   /**
-   * GET /api/v1/knowledge
    * Retrieves all knowledge chunks for the current tenant.
+   *
+   * @param req - Express request object.
+   * @param res - Express response object.
+   * @param next - Express next middleware function.
    */
   public async list(
     req: Request,

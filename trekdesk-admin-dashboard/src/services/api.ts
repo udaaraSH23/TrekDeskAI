@@ -19,6 +19,7 @@
 
 import axios from "axios";
 import { ApiError } from "../lib/errors/ApiError";
+import { useUIStore } from "../store/uiStore";
 import type { ApiErrorResponse } from "../types/api.types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
@@ -44,17 +45,8 @@ api.interceptors.request.use((config) => {
 
 /**
  * Response Interceptor:
- * Transforms every non-2xx Axios error into a typed `ApiError`.
- *
- * Error resolution priority:
- *  1. Backend envelope message → `response.data.message` (standardized field)
- *  2. Axios network error message (e.g. "Network Error" for no connection)
- *  3. Generic fallback
- *
- * The resulting `ApiError` has:
- *  - `.message`    → human-readable, safe to display directly in the UI
- *  - `.statusCode` → HTTP status code for conditional handling
- *  - `.isOperational` → true for 4xx (user error), false for 5xx (server bug)
+ * Transforms every non-2xx Axios error into a typed `ApiError` and
+ * triggers a global UI notification.
  */
 api.interceptors.response.use(
   (response) => response,
@@ -64,11 +56,46 @@ api.interceptors.response.use(
       const statusCode = error.response?.status ?? 500;
       const data = error.response?.data as ApiErrorResponse | undefined;
 
-      // Extract the human-readable message from the backend's error envelope
-      const message =
-        data?.message ??
-        error.message ??
-        "An unexpected error occurred. Please try again.";
+      /**
+       * Helper: Attempts to extract a clean string from the backend's message field.
+       * If the message is a stringified JSON array (common for Zod validation),
+       * it extracts the first error message.
+       */
+      const formatErrorMessage = (rawMessage: string): string => {
+        try {
+          // Check if it's a "Validation Failed: [...]" string
+          if (rawMessage.startsWith("Validation Failed: ")) {
+            const jsonPart = rawMessage.replace("Validation Failed: ", "");
+            const parsed = JSON.parse(jsonPart);
+            if (Array.isArray(parsed) && parsed[0]?.message) {
+              return parsed[0].message.replace(
+                /^body\.|^query\.|^params\./,
+                "",
+              );
+            }
+          }
+          // Check if the message itself is a JSON array string
+          if (rawMessage.startsWith("[")) {
+            const parsed = JSON.parse(rawMessage);
+            if (Array.isArray(parsed) && parsed[0]?.message) {
+              return parsed[0].message.replace(
+                /^body\.|^query\.|^params\./,
+                "",
+              );
+            }
+          }
+        } catch {
+          // If parsing fails, just fall back to the raw message
+        }
+        return rawMessage;
+      };
+
+      // Extract and clean the human-readable message
+      const message = formatErrorMessage(
+        data?.message ||
+          error.message ||
+          "An unexpected error occurred. Please try again.",
+      );
 
       // Handle 401 globally: clear token and redirect to login
       if (statusCode === 401) {
@@ -76,12 +103,21 @@ api.interceptors.response.use(
         if (!window.location.pathname.includes("/login")) {
           window.location.href = "/login?expired=true";
         }
+      } else {
+        const skipToast = error.config?.headers?.["x-skip-toast"] === "true";
+
+        if (!skipToast) {
+          useUIStore.getState().addNotification({
+            message,
+            type: "error",
+          });
+        }
       }
 
       return Promise.reject(new ApiError(statusCode, message));
     }
 
-    // Non-Axios error (e.g. a bug in a request interceptor) — re-throw as-is
+    // Non-Axios error (e.g. a bug in a request interceptor)
     return Promise.reject(error);
   },
 );

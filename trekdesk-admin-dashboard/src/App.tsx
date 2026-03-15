@@ -14,6 +14,10 @@ import {
 import Layout from "./layouts/Layout";
 import ProtectedRoute from "./features/auth/components/ProtectedRoute";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { ToastContainer } from "./components/shared/ToastContainer";
+import { ConfirmModal } from "./components/shared/ConfirmModal";
+import { GlobalLoading } from "./components/shared/GlobalLoading";
+
 import { Loader2 } from "lucide-react";
 
 /**
@@ -46,6 +50,9 @@ const PageLoader = () => (
 function App() {
   return (
     <ErrorBoundary>
+      <ToastContainer />
+      <ConfirmModal />
+      <GlobalLoading />
       <Router>
         <Suspense fallback={<PageLoader />}>
           <Routes>

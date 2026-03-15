@@ -1,6 +1,6 @@
 import WebSocket from "ws";
-import { AISettings } from "../../types/ai";
-import { GeminiResponse } from "../../types/gemini";
+import { AISettings } from "../../../types/ai";
+import { GeminiResponse } from "../../../types/gemini";
 
 /**
  * Interface representing the integration logic with the Google Gemini Realtime API.

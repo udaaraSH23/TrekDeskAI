@@ -12,7 +12,8 @@
  */
 
 import { WebSocket } from "ws";
-import { GeminiService } from "../services/GeminiService";
+import { GeminiService } from "../services/ai/GeminiService";
+import { GeminiResponse } from "../types/gemini";
 import { logger } from "../utils/logger";
 import {
   toolDispatcher,
@@ -56,13 +57,14 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      */
     const settingsRes =
       await aiSettingsRepository.getSettingsByTenant(MVP_TENANT_ID);
+    const assistantName = settingsRes?.assistant_name || "Trek Assistant";
 
     const settings: AISettings = {
       voiceName: settingsRes?.voice_name || "Aoede",
       systemInstruction:
         settingsRes?.system_instruction ||
-        "You are a helpful guide for Kandy Treks.",
-      temperature: 0.7,
+        "You are a helpful guide for a Tour Agency.",
+      temperature: settingsRes?.temperature ?? 0.7,
     };
 
     /**
@@ -71,7 +73,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      * coming back from the AI model in real-time.
      */
     const geminiWs = await geminiService.connectToGemini(
-      async (response) => {
+      async (response: GeminiResponse) => {
         /**
          * Scenario 1: AI generates media (Audio/Text)
          * Forward the raw model turn (e.g., PCM audio chunks) to the client.
@@ -93,7 +95,6 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
          * so it can incorporate the facts into its next response.
          */
         if (response.toolCall) {
-          logger.info("[Server] Tool Calls Received", response.toolCall);
           const functionCalls = response.toolCall.functionCalls;
           const functionResponses = [];
 
@@ -101,8 +102,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
             const result = await toolDispatcher.dispatch(call);
             functionResponses.push({
               id: call.id,
-              name: call.name,
-              response: result,
+              response: { result },
             });
           }
 
@@ -120,10 +120,16 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      * Automatically asks Gemini to greet the user once the session is active.
      */
     logger.info("[Server] Triggering initial voice greeting...");
-    geminiService.sendText(
-      geminiWs,
-      "Please greet the user with a warm, professional welcome message. Introduce yourself as their Trek Assistant and let them know you're ready to help with their Sri Lankan adventure.",
-    );
+
+    /**
+     * Use natural language prompts to guide the AI's greeting.
+     * If a custom message exists, we ask the AI to naturally incorporate it as 'points'.
+     */
+    const welcomeMessage = settingsRes?.welcome_message
+      ? `(SYSTEM: Please initiate the conversation following your core instructions. Introduce yourself as ${assistantName} and use this direction for your first greeting: "${settingsRes.welcome_message}")`
+      : `(SYSTEM: Please initiate the conversation with a warm greeting as ${assistantName}, following your core instructions.)`;
+
+    geminiService.sendText(geminiWs, welcomeMessage);
 
     /**
      * Handle Incoming Client Messages
@@ -156,8 +162,8 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
           transcriptText: liveTranscript,
           durationSeconds: durationSecs,
         });
-      } catch {
-        logger.error("[Server] Error saving call log:");
+      } catch (err) {
+        logger.error(err as Error);
       }
       logger.info(
         "[Server] Voice session closed. Duration: " + durationSecs + "s",

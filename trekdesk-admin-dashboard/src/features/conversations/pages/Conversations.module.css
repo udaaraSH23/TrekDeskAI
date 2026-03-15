@@ -119,9 +119,39 @@
   opacity: 0.9;
 }
 
+.transcriptSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sectionHeader {
+  padding: 1.5rem 2rem 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.badgeLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.2), transparent);
+}
+
 .transcriptContainer {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem 2rem 2rem 2rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

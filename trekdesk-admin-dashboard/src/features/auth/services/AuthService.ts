@@ -22,7 +22,11 @@ export const AuthService = {
    * @throws {ApiError} If the authentication fails.
    */
   loginWithGoogle: async (idToken: string): Promise<AuthResponse["data"]> => {
-    const response = await api.post<AuthResponse>("/auth/google", { idToken });
+    const response = await api.post<AuthResponse>(
+      "/auth/google",
+      { idToken },
+      { headers: { "x-skip-toast": "true" } },
+    );
     return response.data.data;
   },
 
@@ -34,9 +38,11 @@ export const AuthService = {
    * @throws {ApiError} If the authentication fails or is disabled.
    */
   loginWithDevSecret: async (secret: string): Promise<AuthResponse["data"]> => {
-    const response = await api.post<AuthResponse>("/auth/dev-login", {
-      secret,
-    });
+    const response = await api.post<AuthResponse>(
+      "/auth/dev-login",
+      { secret },
+      { headers: { "x-skip-toast": "true" } },
+    );
     return response.data.data;
   },
 
@@ -46,7 +52,9 @@ export const AuthService = {
    * @throws {ApiError} If the token is invalid or expired.
    */
   verifySession: async (): Promise<User> => {
-    const response = await api.get<AuthResponse>("/auth/verify");
+    const response = await api.get<AuthResponse>("/auth/verify", {
+      headers: { "x-skip-toast": "true" },
+    });
     return response.data.data.user;
   },
 

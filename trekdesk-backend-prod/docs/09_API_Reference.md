@@ -1,4 +1,4 @@
-# 08 API Reference
+# 09 API Reference
 
 ## Authentication
 
@@ -34,6 +34,24 @@
 | ------- | -------- | ---------------------------------------------- | ------------- |
 | `GET`   | `/`      | Get AI behavior settings (instructions, voice) | Yes           |
 | `PATCH` | `/`      | Update AI persona and instructions             | Yes           |
+
+### PATCH Payload Specification
+
+```json
+{
+  "voice_name": "Aoede",
+  "assistant_name": "TrekDesk AI",
+  "system_instruction": "You are a helpful trekking guide...",
+  "temperature": 1.0
+}
+```
+
+| Field                | Type   | Description                           |
+| :------------------- | :----- | :------------------------------------ |
+| `voice_name`         | string | Gemini Voice ID (Aoede, Puck, etc.)   |
+| `assistant_name`     | string | Custom display name for the assistant |
+| `system_instruction` | string | Detailed behavioral prompt            |
+| `temperature`        | number | Creativity setting (0.0 to 2.0)       |
 
 ## Widget Settings (/api/v1/widget)
 

@@ -1,3 +1,11 @@
+/**
+ * @module WidgetConfig
+ * @category Components
+ *
+ * Provides the administrative interface for managing the AI Chat Widget settings.
+ * Includes branding, messaging, security, and integration script generation.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Code,
@@ -7,6 +15,7 @@ import {
   Sparkles,
   Palette,
   Clock,
+  Shield,
 } from "lucide-react";
 import {
   Card,
@@ -20,21 +29,62 @@ import {
   useWidgetSettings,
   useUpdateWidgetSettings,
 } from "../hooks/useWidgetSettings";
+import { usePersonaSettings } from "../../persona/hooks/usePersona";
 
 import styles from "./WidgetConfig.module.css";
 
+/**
+ * WidgetConfig Component
+ *
+ * The primary administrative interface for configuring the TrekDesk AI chat widget.
+ * Allows tenants to customize visual branding, messaging, security (CORS),
+ * and provides the generated script for website embedding.
+ *
+ * Features:
+ * - Real-time preview of the widget in an iframe.
+ * - Reactive form state for appearance and messaging.
+ * - Domain-based security configuration.
+ * - One-click clipboard copying for the integration script.
+ *
+ * @component
+ */
+
 const WidgetConfig: React.FC = () => {
+  // --- 1. DATA FETCHING ---
+  /** Fetch the current widget settings (color, greeting, etc.) */
   const { data: settings, isLoading } = useWidgetSettings();
+  /** Fetch the Persona settings to get the Assistant Name */
+  const { data: personaSettings } = usePersonaSettings();
+  /** Mutation hook for updating widget settings */
   const updateMutation = useUpdateWidgetSettings();
 
-  const [copied, setCopied] = useState(false);
+  // --- 2. LOCAL STATE ---
+  /** Feedback state for the 'Copy to Clipboard' action. Triggers a check icon for 2s. */
+  const [copied, setCopied] = useState<boolean>(false);
+
+  /**
+   * Local form state holds the transient edits before saving.
+   * Initialized with defaults that match the server schema.
+   */
   const [formData, setFormData] = useState({
     primaryColor: "#10b981",
     welcomeMessage: "Hi! How can I help you today?",
     theme: "dark",
+    position: "right",
+    allowedOrigins: "",
   });
-  const hasSynced = React.useRef(false);
 
+  /**
+   * Ref used to ensure we only sync server data to local form once on initial load.
+   * This prevents overwriting user's unsaved changes if the background query refetches.
+   * @internal
+   */
+  const hasSynced = React.useRef<boolean>(false);
+
+  /**
+   * Sync initial data from the backend into the local form.
+   * We use a timeout 0/useEffect pattern to ensure smooth transition from loading state.
+   */
   useEffect(() => {
     if (settings && !hasSynced.current) {
       const timer = setTimeout(() => {
@@ -43,6 +93,10 @@ const WidgetConfig: React.FC = () => {
           welcomeMessage:
             settings.initial_message || "Hi! How can I help you today?",
           theme: "dark",
+          position: settings.position || "right",
+          allowedOrigins: settings.allowed_origins
+            ? settings.allowed_origins.join(", ")
+            : "",
         });
         hasSynced.current = true;
       }, 0);
@@ -50,30 +104,58 @@ const WidgetConfig: React.FC = () => {
     }
   }, [settings]);
 
-  const handleSave = () => {
+  /**
+   * Persists the local form state to the database via the update mutation.
+   * Converts the comma-separated domains string back into a sanitized array of strings.
+   *
+   * @internal
+   */
+  const handleSave = (): void => {
     updateMutation.mutate({
       primary_color: formData.primaryColor,
       initial_message: formData.welcomeMessage,
+      position: formData.position as "left" | "right",
+      allowed_origins: formData.allowedOrigins
+        .split(",")
+        .map((o) => o.trim())
+        .filter(Boolean),
     });
   };
 
-  const widgetScript = `
+  /** Helper to get Persona name for the script preview, fallback to TrekDesk AI */
+  const assistantName: string =
+    personaSettings?.assistant_name || "TrekDesk AI";
+
+  /**
+   * The actual <script> snippet the user needs to paste on their site.
+   * Dynamically generated based on current (unsaved) form selections for instant preview.
+   *
+   * @internal
+   */
+  const widgetScript: string = `
 <!-- TrekDesk AI Widget -->
 <script src="${(import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1").replace("/api/v1", "")}/static/widget.v1.js"></script>
 <script>
   window.TrekDeskAI.init({
     color: "${formData.primaryColor}",
-    msg: "${formData.welcomeMessage}"
+    msg: "${formData.welcomeMessage}",
+    position: "${formData.position}",
+    name: "${assistantName}"
   });
 </script>
   `.trim();
 
-  const copyToClipboard = () => {
+  /**
+   * Copies the generated script to the system clipboard and triggers visual feedback.
+   * @internal
+   */
+  const copyToClipboard = (): void => {
     navigator.clipboard.writeText(widgetScript);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Full-page loading state with animated spinner
   if (isLoading)
     return (
       <div className={styles.loadingContainer}>
@@ -83,6 +165,7 @@ const WidgetConfig: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Toast-style Success Feedback bar positioned at the top of the viewport */}
       {updateMutation.isSuccess && (
         <div className={`${styles.alert} ${styles.alertSuccess}`}>
           <Check size={18} />
@@ -91,8 +174,9 @@ const WidgetConfig: React.FC = () => {
       )}
 
       <div className={styles.mainLayout}>
-        {/* Left Side: Configuration & Instructions */}
+        {/* LEFT PANEL: Form Configuration & Embedding Instructions */}
         <div className={styles.configSection}>
+          {/* Section: Visual Appearance (Color, Theme, Position) */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-sm">
@@ -103,6 +187,7 @@ const WidgetConfig: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-col gap-lg">
+              {/* Color Picker with matched HEX text input */}
               <div className={styles.inputField}>
                 <label className={styles.label}>Primary Brand Color</label>
                 <div className={styles.colorPicker}>
@@ -125,6 +210,7 @@ const WidgetConfig: React.FC = () => {
                 </div>
               </div>
 
+              {/* Theme Selector (Currently restricted to Dark / Glassmorphism) */}
               <div className={styles.inputField}>
                 <label className={styles.label}>Widget Theme</label>
                 <div className="flex gap-sm">
@@ -144,9 +230,39 @@ const WidgetConfig: React.FC = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Launcher Position Toggle: Controls where the chat button sits */}
+              <div className={styles.inputField}>
+                <label className={styles.label}>Widget Position</label>
+                <div className="flex gap-sm">
+                  <Button
+                    variant={
+                      formData.position === "left" ? "primary" : "outline"
+                    }
+                    onClick={() =>
+                      setFormData({ ...formData, position: "left" })
+                    }
+                    className="flex-1"
+                  >
+                    Bottom Left
+                  </Button>
+                  <Button
+                    variant={
+                      formData.position === "right" ? "primary" : "outline"
+                    }
+                    onClick={() =>
+                      setFormData({ ...formData, position: "right" })
+                    }
+                    className="flex-1"
+                  >
+                    Bottom Right
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
+          {/* Section: Messaging Content (Welcome greeting) */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-sm">
@@ -171,6 +287,40 @@ const WidgetConfig: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Section: Security/CORS Settings (Domain restriction) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-sm">
+                <Shield size={18} color="var(--primary)" /> Security
+              </CardTitle>
+              <CardDescription>
+                Restrict where your widget can be embedded
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={styles.inputField}>
+                <label className={styles.label}>Allowed Domains</label>
+                <textarea
+                  value={formData.allowedOrigins}
+                  onChange={(e) =>
+                    setFormData({ ...formData, allowedOrigins: e.target.value })
+                  }
+                  className={`${styles.input} ${styles.welcomeTextarea}`}
+                  placeholder="e.g. https://example.com, https://app.example.com"
+                />
+                <p
+                  className="text-muted text-sm"
+                  style={{ fontSize: "0.8rem", marginTop: "8px" }}
+                >
+                  Enter comma-separated URLs starting with http:// or https://.
+                  Leave blank to allow any domain, though this is not
+                  recommended for production.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Save Action Bar */}
           <div className="flex justify-end">
             <Button
               variant="primary"
@@ -183,6 +333,7 @@ const WidgetConfig: React.FC = () => {
             </Button>
           </div>
 
+          {/* Integration Guide: Copy script and instructions */}
           <Card className={styles.embedCard}>
             <CardHeader>
               <CardTitle className="flex items-center gap-sm">
@@ -230,14 +381,18 @@ const WidgetConfig: React.FC = () => {
           </Card>
         </div>
 
-        {/* Right Side: Live Preview */}
+        {/* RIGHT PANEL: LIVE PREVIEW IFRAME */}
         <div className={styles.previewSection}>
           <div className={styles.previewLabel}>
             <Sparkles size={14} /> Live Assistant Preview
           </div>
           <div className={styles.previewFrameWrapper}>
+            {/* 
+                The iframe points to the internal /embed/chat route with configuration passed
+                as query parameters. This ensures the preview is always in sync with unsaved edits.
+            */}
             <iframe
-              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}`}
+              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}&position=${formData.position}&name=${encodeURIComponent(assistantName)}`}
               className={styles.previewIframe}
               title="Widget Preview"
             />

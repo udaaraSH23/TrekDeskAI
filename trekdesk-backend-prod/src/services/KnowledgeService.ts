@@ -17,9 +17,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 /**
  * Specifically uses the gemini-embedding-001 model for creating vector representations of text.
+ * The model name is retrieved from the environment for production flexibility.
  */
+const GEMINI_EMBEDDING_MODEL =
+  process.env.GEMINI_EMBEDDING_MODEL || "models/gemini-embedding-001";
+
 const embeddingModel = genAI.getGenerativeModel({
-  model: "gemini-embedding-001",
+  model: GEMINI_EMBEDDING_MODEL,
 });
 
 import {

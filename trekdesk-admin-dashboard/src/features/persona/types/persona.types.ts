@@ -21,8 +21,12 @@ import type { ApiSuccessResponse } from "../../../types/api.types";
 export interface PersonaSettings {
   /** Display/voice name for the AI assistant (max 100 chars) */
   voice_name: string;
+  /** Human-readable name for the assistant */
+  assistant_name: string;
   /** The system prompt that shapes AI behavior (max 10,000 chars) */
   system_instruction: string;
+  /** Optional custom greeting message (max 2,000 chars) */
+  welcome_message?: string;
   /** Controls randomness in AI responses. Range: 0.0 (deterministic) – 2.0 (creative) */
   temperature: number;
 }

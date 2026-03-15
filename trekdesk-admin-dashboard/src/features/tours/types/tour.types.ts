@@ -1,52 +1,62 @@
 /**
  * @file tour.types.ts
- * @description Frontend trek/tour types aligned with the backend's `TrekSchema`.
+ * @description Type definitions for the Tours/Treks feature.
+ * Strictly aligned with the backend's `Treks` table schema.
  *
- * Source of truth: `trekdesk-backend-prod/src/models/trek.schema.ts → TrekSchema`
- *
- * IMPORTANT — Field name alignment:
- * The previous local `Trek` interface in TourService.ts used the wrong casing:
- *   ❌ `basePrice`   → ✅ `base_price_per_person`
- *   ❌ `durationDays` → removed (not in backend schema)
- *   ❌ `difficulty`  → ✅ `difficulty_level`
- *   ❌ `isActive`    → ✅ `is_active`
- *
- * These are the actual column names from the Postgres `treks` table.
+ * Source of truth: `trekdesk-backend-prod/src/models/trek.schema.ts`
  */
 
 import type { ApiSuccessResponse } from "../../../types/api.types";
 
 /**
- * The difficulty levels accepted by the backend.
- * Mirrors the Zod enum in TrekSchema.
+ * Valid difficulty levels accepted by the backend validator.
  */
 export type DifficultyLevel = "easy" | "moderate" | "challenging" | "extreme";
 
 /**
- * A trek entity as returned by the backend.
- * Aligned with the Postgres `treks` table columns.
+ * Representation of a pax-based pricing bracket.
+ */
+export interface PricingTier {
+  /** The group size range string (e.g. "1", "2-3", "4+"). */
+  pax_range: string;
+  /** The minimum per-person price for this bracket. */
+  min_price: number;
+  /** The maximum per-person price for this bracket. */
+  max_price: number;
+}
+
+/**
+ * The core Trek entity interface.
+ * Mirrors the Postgres `treks` table columns (snake_case).
  */
 export interface Trek {
+  /** UUID of the trek record. */
   id: string;
+  /** UUID of the tenant owner. */
   tenant_id: string;
+  /** Public name of the tour. */
   name: string;
+  /** Long-form description for AI reasoning and customer display. */
   description?: string;
+  /** The starting price point per person. */
   base_price_per_person: number;
+  /** Fixed cost for transportation. */
   transport_fee: number;
+  /** Complexity indicator. */
   difficulty_level?: DifficultyLevel;
+  /** Publication status. */
   is_active: boolean;
-  pricing_tiers?: {
-    pax_range: string;
-    min_price: number;
-    max_price: number;
-  }[];
+  /** Optional collection of volume-based pricing discounts. */
+  pricing_tiers?: PricingTier[];
+  /** Audit: ISO 8601 creation timestamp. */
   created_at: string;
+  /** Audit: ISO 8601 update timestamp. */
   updated_at: string;
 }
 
 /**
- * The payload sent to POST /tours to create a new trek.
- * Matches `CreateTrekPayloadSchema` on the backend.
+ * Payload requirements for creating a new trek.
+ * Omits auto-generated fields like `id` and `tenant_id`.
  */
 export interface CreateTrekPayload {
   name: string;
@@ -54,20 +64,15 @@ export interface CreateTrekPayload {
   base_price_per_person: number;
   transport_fee?: number;
   difficulty_level?: DifficultyLevel;
-  pricing_tiers?: {
-    pax_range: string;
-    min_price: number;
-    max_price: number;
-  }[];
+  pricing_tiers?: PricingTier[];
 }
 
 /**
- * The payload for PATCH/PUT /tours/:id.
- * All fields are optional for partial updates.
+ * Payload for partial trek updates.
  */
 export type UpdateTrekPayload = Partial<CreateTrekPayload>;
 
-/** Typed success response for list endpoint */
+/** Standard API response envelope for a list of treks. */
 export type TrekListResponse = ApiSuccessResponse<Trek[]>;
-/** Typed success response for single entity endpoints */
+/** Standard API response envelope for a single trek. */
 export type TrekResponse = ApiSuccessResponse<Trek>;

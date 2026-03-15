@@ -13,4 +13,6 @@ export type CreateBookingDTO = CreateBookingPayload;
 /**
  * Result structure for a booking as returned from the system.
  */
-export type BookingResponseDTO = BookingRow;
+export type BookingResponseDTO = BookingRow & {
+  trekName?: string;
+};

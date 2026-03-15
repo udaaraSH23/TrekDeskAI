@@ -2,7 +2,7 @@
  * Interface representing the business logic layer for transactional booking operations.
  * Handles mock or real integrations for calendar availability and quote generation, as well as real bookings.
  */
-import { CreateBookingDTO, BookingResponseDTO } from "../../dtos/BookingDTO";
+import { CreateBookingDTO, BookingResponseDTO } from "../../../dtos/BookingDTO";
 
 export interface IBookingService {
   /**

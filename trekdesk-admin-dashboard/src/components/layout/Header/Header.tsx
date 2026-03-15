@@ -10,7 +10,8 @@ import styles from "./Header.module.css";
  * for the current route, as well as the sidebar toggle when hidden.
  */
 const Header = () => {
-  const { isSidebarOpen, toggleSidebar } = useUIStore();
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar);
   const location = useLocation();
 
   // Map of routes to their titles and descriptions
