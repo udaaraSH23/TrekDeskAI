@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from "react";
-import { Database, Save, X, Edit2, Trash2 } from "lucide-react";
+import { Database, Save, X, Edit2, Trash2, Loader2 } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -118,7 +118,14 @@ export const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({
       <CardContent>
         <div className={styles.resultsContainer}>
           {isLoading ? (
-            <p className={styles.emptyState}>Loading items...</p>
+            <div className={styles.emptyState}>
+              <Loader2
+                className="animate-spin"
+                size={24}
+                color="var(--primary)"
+              />
+              <p>Loading items...</p>
+            </div>
           ) : chunks.length > 0 ? (
             chunks.map((chunk) => (
               <div key={chunk.id} className={styles.resultItem}>

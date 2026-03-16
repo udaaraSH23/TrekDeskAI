@@ -13,7 +13,7 @@
  */
 
 import React, { useState } from "react";
-import { Clock, Trash2, MessageSquare } from "lucide-react";
+import { Clock, Trash2, MessageSquare, Loader2 } from "lucide-react";
 import {
   useCallLogs,
   useCallLogDetails,
@@ -120,7 +120,14 @@ const Conversations: React.FC = () => {
         <Card className={styles.listPanel}>
           <div className={styles.list}>
             {loading && logs.length === 0 ? (
-              <div className={styles.emptyState}>Loading conversations...</div>
+              <div className={styles.emptyState}>
+                <Loader2
+                  className="animate-spin"
+                  size={24}
+                  color="var(--primary)"
+                />
+                <p>Loading conversations...</p>
+              </div>
             ) : logs.length === 0 ? (
               <div className={styles.emptyState}>No session records found.</div>
             ) : (
@@ -205,7 +212,14 @@ const Conversations: React.FC = () => {
         <Card className={styles.detailPanel}>
           {selectedLogId ? (
             detailLoading ? (
-              <div className={styles.emptyState}>Syncing transcript...</div>
+              <div className={styles.emptyState}>
+                <Loader2
+                  className="animate-spin"
+                  size={32}
+                  color="var(--primary)"
+                />
+                <p>Syncing transcript...</p>
+              </div>
             ) : detailLog ? (
               <>
                 {/* Header: Session ID & Quick Actions */}

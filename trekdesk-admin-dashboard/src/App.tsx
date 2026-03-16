@@ -42,7 +42,10 @@ const EmbedChat = lazy(() => import("./features/widget/pages/EmbedChat"));
  * Global Intermediate Loader
  */
 const PageLoader = () => (
-  <div className="flex-center h-full">
+  <div
+    className="flex-center"
+    style={{ minHeight: "100vh", width: "100%", flex: 1 }}
+  >
     <Loader2 className="animate-spin" size={32} color="var(--primary)" />
   </div>
 );

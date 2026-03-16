@@ -2,14 +2,26 @@ import React from "react";
 import { Headphones, MessageSquare } from "lucide-react";
 import styles from "../VoicePlayground.module.css";
 
+/**
+ * Props for the VoiceStatusSettings component.
+ * @interface VoiceStatusSettingsProps
+ */
 interface VoiceStatusSettingsProps {
+  /** The descriptive name of the AI's vocal avatar (e.g., 'Aoede', 'Puck'). */
   voiceName?: string;
+  /** The creativity threshold configured for the interaction model. */
   temperature?: number;
 }
 
 /**
- * Displays the current persona settings (voice name, temperature)
- * that are active in the session.
+ * VoiceStatusSettings
+ *
+ * Displays the current persona configuration parameters that are actively
+ * driving the voice session. This provides the admin with quick context
+ * regarding what 'personality' they are currently testing.
+ *
+ * @component
+ * @category Voice UI
  */
 export const VoiceStatusSettings: React.FC<VoiceStatusSettingsProps> = ({
   voiceName,

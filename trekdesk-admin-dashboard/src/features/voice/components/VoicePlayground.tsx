@@ -41,7 +41,6 @@ export const VoicePlayground: React.FC<VoicePlaygroundProps> = ({
 }) => {
   // --- Data & State ---
   const { data: settings } = usePersonaSettings();
-  const [hasGreeted, setHasGreeted] = useState(false);
   const [transcript, setTranscript] = useState<
     { type: "user" | "ai"; text: string }[]
   >([]);
@@ -58,6 +57,7 @@ export const VoicePlayground: React.FC<VoicePlaygroundProps> = ({
     isAiSpeaking,
     isVADLoading,
     isThinking,
+    hasFinishedInitialGreeting,
     error,
     startSession,
     endSession,
@@ -66,12 +66,15 @@ export const VoicePlayground: React.FC<VoicePlaygroundProps> = ({
     onStatusChange: (status) => {
       // Log connection events to the transcript area for clarity
       if (status === "Connected") {
-        setTranscript([
+        setTranscript((prev) => [
+          ...prev,
           { type: "ai", text: "Secure link established. Assistant is ready." },
         ]);
       }
     },
-    onGreetingReceived: () => setHasGreeted(true),
+    onGreetingReceived: () => {
+      // Hook handles greeting finished state internally
+    },
     // Map backend server turns back to the visual transcript
     onMessageReceived: (data: Record<string, unknown>) => {
       if (data?.parts && Array.isArray(data.parts)) {
@@ -139,7 +142,7 @@ export const VoicePlayground: React.FC<VoicePlaygroundProps> = ({
             isAiSpeaking={isAiSpeaking}
             isVADLoading={isVADLoading}
             isThinking={isThinking}
-            hasGreeted={hasGreeted}
+            hasGreeted={hasFinishedInitialGreeting}
             startSession={startSession}
             endSession={endSession}
             toggleRecording={toggleRecording}

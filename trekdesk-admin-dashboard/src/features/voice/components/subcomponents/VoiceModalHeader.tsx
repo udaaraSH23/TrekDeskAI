@@ -2,15 +2,28 @@ import React from "react";
 import { X, Sparkles } from "lucide-react";
 import styles from "../VoicePlayground.module.css";
 
+/**
+ * Props for the VoiceModalHeader component.
+ * @interface VoiceModalHeaderProps
+ */
 interface VoiceModalHeaderProps {
+  /** True if the WebSocket and VAD are actively linked and ready. */
   isActive: boolean;
+  /** Human-readable string representing the current state machine phase (e.g., 'connecting', 'active', 'error'). */
   status: string;
+  /** Callback triggered when the 'X' button is clicked to close the playground modal. */
   onClose: () => void;
 }
 
 /**
- * Header component for the Voice Studio modal.
- * Displays the title, an animated spark icon, and connection status.
+ * VoiceModalHeader
+ *
+ * Renders the top bar of the Voice Studio playground modal.
+ * Features title branding, an animated spark, and a dynamic status indicator
+ * dot that changes color based on real-time connection telemetry.
+ *
+ * @component
+ * @category Voice UI
  */
 export const VoiceModalHeader: React.FC<VoiceModalHeaderProps> = ({
   isActive,

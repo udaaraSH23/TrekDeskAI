@@ -14,7 +14,7 @@ import {
   MessageSquare,
   Sparkles,
   Palette,
-  Clock,
+  Loader2,
   Shield,
 } from "lucide-react";
 import {
@@ -159,7 +159,7 @@ const WidgetConfig: React.FC = () => {
   if (isLoading)
     return (
       <div className={styles.loadingContainer}>
-        <Clock className="animate-spin" size={32} color="var(--primary)" />
+        <Loader2 className="animate-spin" size={32} color="var(--primary)" />
       </div>
     );
 

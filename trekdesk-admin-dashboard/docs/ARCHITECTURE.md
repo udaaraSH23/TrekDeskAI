@@ -154,3 +154,11 @@ sequenceDiagram
     end
     H-->>C: data re-renders component
 ```
+
+---
+
+## Feature Architecture Guides
+
+For more in-depth technical breakdowns of specific complex systems, see:
+
+- [Voice Interaction System (VAD, Full-Duplex WebSockets)](./VOICE_ARCHITECTURE.md)

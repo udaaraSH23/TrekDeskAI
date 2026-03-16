@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Info, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { Info, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import {
   usePersonaSettings,
   useUpdatePersonaSettings,
@@ -80,7 +80,7 @@ const Persona: React.FC = () => {
   if (loading)
     return (
       <div className={styles.loaderContainer}>
-        <Clock className="animate-spin" size={32} color="var(--primary)" />
+        <Loader2 className="animate-spin" size={32} color="var(--primary)" />
       </div>
     );
 

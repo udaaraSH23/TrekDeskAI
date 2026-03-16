@@ -6,7 +6,7 @@
  * It is intended to be loaded within an iframe on third-party websites.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Mic,
   MicOff,
@@ -60,64 +60,43 @@ const EmbedChat: React.FC = () => {
   const assistantName: string = params.get("name") || "TrekDesk AI";
 
   // --- 2. UI STATE ---
-  const [hasGreetingStarted, setHasGreetingStarted] = useState<boolean>(false);
-  const [isInitialGreetingFinished, setIsInitialGreetingFinished] =
-    useState<boolean>(false);
-
-  /**
-   * Human-readable status text displayed below the central sphere.
-   * Managed locally to provide immediate feedback on connection states.
-   */
-  const [status, setStatus] = useState<string>("Ready to talk");
+  // --- 2. UI STATE ---
+  // Note: hasFinishedInitialGreeting is managed by useVoiceSession
 
   // --- 3. VOICE SESSION LOGIC ---
-  /**
-   * Memoized event handlers for the multimodal voice hook.
-   * Maps technical session events to user-friendly UI updates.
-   *
-   * @internal
-   */
   const voiceOptions = React.useMemo(
     () => ({
       /** Updates the status text based on the connection phase. */
-      onStatusChange: (statusText: string) => {
-        if (statusText === "Connecting...") setStatus("Hailing Assistant...");
-        else if (statusText === "Connected") setStatus("Handshaking...");
-        else if (statusText === "Listening") setStatus("Listening...");
-        else if (statusText === "Active") setStatus("Online");
-      },
-      /** Enables the microphone controls once the AI speaks. */
-      onGreetingReceived: () => {
-        setHasGreetingStarted(true);
-        setStatus("Online");
+      onStatusChange: () => {
+        // Status is handled via reactive hooks in the UI
       },
       /** Triggers the wave animation. */
-      onAiSpeakingStart: () => setStatus("Trek AI Speaking..."),
-      /** Stops the wave animation and finalizes greeting state. */
+      onAiSpeakingStart: () => {
+        // Handled via isAiSpeaking
+      },
+      /** Stops the wave animation. */
       onAiSpeakingEnd: () => {
-        setStatus("Online");
-        setIsInitialGreetingFinished(true);
+        // Handled via isAiSpeaking
       },
       /** Displays fatal errors to the user. */
-      onError: (msg: string) => setStatus(msg),
+      onError: () => {
+        // Handled via error state
+      },
     }),
     [],
   );
 
-  /**
-   * Core logic for handling WebRTC/WebSocket communication with the AI.
-   * Abstracts away the complexity of media streaming.
-   */
   const {
-    isActive, // Whether a session is currently running
-    isConnecting, // Whether we are in the handshake phase
-    isRecording, // Whether the user's mic is currently active
-    isAiSpeaking, // Whether the AI is currently streaming audio output
-    isThinking, // Whether the AI is processing input
-    error, // Any fatal connection or permission errors
-    startSession, // Initializes the voice stream
-    endSession, // Gracefully closes the connection
-    toggleRecording, // Mutes/Unmutes the user's microphone
+    isActive,
+    isConnecting,
+    isRecording,
+    isAiSpeaking,
+    isThinking,
+    hasFinishedInitialGreeting,
+    error,
+    startSession,
+    endSession,
+    toggleRecording,
   } = useVoiceSession(voiceOptions);
 
   /**
@@ -194,7 +173,7 @@ const EmbedChat: React.FC = () => {
           </div>
 
           <p className={styles.statusText}>
-            {isThinking ? "Assistant is thinking..." : status}
+            {isConnecting ? "Stabilizing Link..." : "Online"}
           </p>
 
           {isThinking && (
@@ -236,40 +215,79 @@ const EmbedChat: React.FC = () => {
       */}
       <footer className={styles.footer}>
         {isActive && (
-          <div className={styles.controlsRow}>
-            {/* Mic Toggle Button */}
-            <button
-              onClick={toggleRecording}
-              disabled={!hasGreetingStarted || !isInitialGreetingFinished}
-              className={`${styles.micButton} ${isRecording ? styles.micButtonActive : styles.micButtonInactive}`}
-              style={{
-                backgroundColor: isRecording
-                  ? primaryColor
-                  : "rgba(255,255,255,0.1)",
-                boxShadow: isRecording ? `0 0 20px ${primaryColor}` : "none",
-                opacity:
-                  hasGreetingStarted && isInitialGreetingFinished ? 1 : 0.5,
-                cursor:
-                  hasGreetingStarted && isInitialGreetingFinished
-                    ? "pointer"
-                    : "not-allowed",
-              }}
-            >
-              {isRecording ? (
-                <Mic size={24} color="white" />
-              ) : (
-                <MicOff size={24} color="#6b7280" />
-              )}
-            </button>
+          <div className={styles.activeControlsGroup}>
+            <div className={styles.controlsRow}>
+              {/* Mic Toggle Button */}
+              <button
+                onClick={toggleRecording}
+                disabled={!hasFinishedInitialGreeting}
+                className={`${styles.micButton} ${
+                  !hasFinishedInitialGreeting
+                    ? styles.micButtonDisabled
+                    : isRecording
+                      ? styles.micButtonRecording
+                      : styles.micButtonActive
+                }`}
+                style={{
+                  backgroundColor:
+                    isRecording && hasFinishedInitialGreeting
+                      ? "#ef4444"
+                      : hasFinishedInitialGreeting
+                        ? primaryColor
+                        : "rgba(255,255,255,0.1)",
+                  boxShadow:
+                    isRecording && hasFinishedInitialGreeting
+                      ? "0 0 20px #ef4444"
+                      : "none",
+                }}
+                title={
+                  !hasFinishedInitialGreeting
+                    ? "Waiting for greeting..."
+                    : isRecording
+                      ? "Stop Recording"
+                      : "Start Recording"
+                }
+              >
+                {isRecording && hasFinishedInitialGreeting ? (
+                  <MicOff size={24} color="white" />
+                ) : (
+                  <Mic
+                    size={24}
+                    color={hasFinishedInitialGreeting ? "white" : "#4b5563"}
+                  />
+                )}
+              </button>
 
-            {/* Reset/End Session Button */}
-            <button
-              onClick={endSession}
-              className={styles.resetButton}
-              title="End Session"
+              {/* Reset/End Session Button */}
+              <button
+                onClick={endSession}
+                className={styles.resetButton}
+                title="End Session"
+              >
+                <RefreshCw size={24} />
+              </button>
+            </div>
+
+            {/* Status Feedback below the Mic */}
+            <div
+              className={`${styles.footerStatus} ${
+                isRecording
+                  ? styles.statusRecording
+                  : !hasFinishedInitialGreeting || isAiSpeaking || isThinking
+                    ? styles.statusSpeaking
+                    : styles.statusOnline
+              }`}
             >
-              <RefreshCw size={18} />
-            </button>
+              {isThinking
+                ? "Thinking..."
+                : isAiSpeaking
+                  ? "Trek AI Speaking..."
+                  : !hasFinishedInitialGreeting
+                    ? "Waiting for greeting..."
+                    : isRecording
+                      ? "I'm Listening..."
+                      : "Tap to Speak"}
+            </div>
           </div>
         )}
 

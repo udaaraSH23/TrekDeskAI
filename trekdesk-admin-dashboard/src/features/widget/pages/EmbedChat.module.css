@@ -5,7 +5,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .waveBackground {
@@ -90,8 +90,13 @@
 }
 
 @keyframes wavePulse {
-  0%, 100% { transform: scaleY(0.5); }
-  50% { transform: scaleY(1.5); }
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
 }
 
 .contentWrapper {
@@ -143,7 +148,9 @@
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -168,15 +175,15 @@
 .controlsRow {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.5rem; /* More space between buttons */
 }
 
 .resetButton {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
-  width: 40px;
-  height: 40px;
+  width: 64px; /* Same as micButton */
+  height: 64px; /* Same as micButton */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -209,6 +216,7 @@
 }
 
 .micButtonActive {
+  background-color: white; /* Will be overridden by inline brand color if needed, but white is the base for active/unlocked */
   border: 2px solid white;
 }
 
@@ -217,18 +225,39 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.micButtonRecording {
+  background-color: #ef4444 !important;
+  border: 2px solid white;
+}
+
+.micButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
 .spin {
   animation: spin 1.5s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fadeIn {
@@ -255,6 +284,37 @@
 }
 
 @keyframes pulseOpacity {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.footerStatus {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.statusOnline {
+  color: #10b981;
+}
+
+.statusOffline {
+  color: #9ca3af;
+}
+
+.statusSpeaking {
+  color: #3b82f6;
+  animation: pulseOpacity 1.5s ease-in-out infinite;
+}
+
+.statusRecording {
+  color: #ef4444;
 }
