@@ -1,120 +1,192 @@
-# TrekDesk AI - Full Stack Tour Intelligence
+# TrekDesk AI — Full Stack Tour Intelligence
 
-TrekDesk AI is an enterprise-grade platform for B2B tour operators. It combines a real-time **Multimodal Voice AI agent** with a powerful **Administrative Dashboard** to streamline bookings, automate customer service, and manage proprietary knowledge.
+TrekDesk AI is a full-stack platform for trekking tour operators: an admin dashboard for configuration and analytics, plus a real-time voice AI system (Gemini Multimodal Live over WebSockets) with RAG (pgvector) and Google Calendar availability checks.
+
+## System Overview
 
 ```mermaid
-graph TD
-    Client(["👤 Admin / Customer"])
-
-    subgraph Frontend [React Admin Dashboard]
-        Vite["Vite + React 19"]
-        TanStack["TanStack Query (State)"]
-        Auth["Google OAuth2"]
-    end
-
-    subgraph Backend [Node.js Intelligence Proxy]
-        Express["Express API"]
-        Gemini["Gemini Multimodal Live (WS)"]
-        RAG["pgvector RAG Pipeline"]
-    end
-
-    DB[("PostgreSQL")]
-
-    Client <--> Frontend
-    Frontend <--> Express
-    Express <--> DB
-    Express <--> Gemini
+flowchart TD
+  Admin[Admin Dashboard] -->|HTTPS REST| Backend[Backend API]
+  Widget[Embedded Widget] -->|HTTPS REST| Backend
+  Widget -->|WebSocket voice| Backend
+  Backend --> DB[(PostgreSQL + pgvector)]
+  Backend --> Gemini[Gemini Multimodal Live API]
+  Backend --> Cal[Google Calendar API]
 ```
 
----
+## Repository Layout
 
-## 🏗️ Project Structure
+- `trekdesk-admin-dashboard/` — React admin dashboard (Vite) + voice playground (VAD + playback)
+- `trekdesk-backend-prod/` — Node.js/Express backend (REST + WebSockets), tool calling, RAG, Calendar integration
+- `setup.ps1`, `setup.sh` — one-time setup helpers (install deps + create `.env` from `.env.example`)
 
-The repository is organized into two primary sub-projects:
+## Quick Start (Local Development)
 
-- **[trekdesk-admin-dashboard/](./trekdesk-admin-dashboard)**: A high-performance React SPA for managing treks, viewing call logs, and configuring AI settings.
-- **[trekdesk-backend-prod/](./trekdesk-backend-prod)**: The core intelligence layer handling REST APIs, WebSocket voice sessions, and vector search.
+### 1) One-time setup
 
----
+Windows:
 
-## 🚀 Quick Start (Development)
+- `npm run setup` (runs `setup.ps1`)
 
-To run the full stack locally, you will need two terminal instances.
+macOS/Linux:
 
-### 1. Prerequisites
+- `bash setup.sh`
 
-- **Node.js** (v20+)
-- **PostgreSQL** with the `pgvector` extension.
-- **Google AI Studio API Key** (for Gemini 2.0).
-- **Google Cloud Console Credentials** (for OAuth).
+Then edit:
 
-### 2. Backend Setup
+- `trekdesk-backend-prod/.env`
+- `trekdesk-admin-dashboard/.env`
+
+### 2) Database
+
+- PostgreSQL with `pgvector` enabled.
+- Run migrations: `cd trekdesk-backend-prod; npm run migrate:up`
+- Cloud SQL Proxy guide: `trekdesk-backend-prod/docs/CLOUD_SQL_SETUP.md`
+
+### 3) Run backend
 
 ```bash
 cd trekdesk-backend-prod
-npm install
-cp .env.example .env  # Update variables (DB_URL, GEMINI_KEY, etc.)
-npm run migrate:up    # Scaffold database
-npm run dev           # Port 3001
+npm run dev
 ```
 
-### 3. Frontend Setup
+### 4) Run frontend
 
 ```bash
 cd trekdesk-admin-dashboard
 npm install
-cp .env.example .env  # Update VITE_API_URL and GOOGLE_CLIENT_ID
-npm run dev           # Port 5173
+node scripts/sync-vad-assets.js
+npm run dev
 ```
 
----
+### Local Ports (defaults)
 
-## 🛠️ Tech Stack
+- Backend: `http://localhost:3500` (from `trekdesk-backend-prod/.env.example` `PORT=3500`)
+- Frontend dev server: `http://localhost:5173` (Vite default)
+- Frontend → Backend API: `VITE_API_URL=http://localhost:3500/api/v1` (from `trekdesk-admin-dashboard/.env.example`)
 
-### Frontend
+## Major Functionality
 
-- **Framework**: React 19 + Vite
-- **Architecture**: Feature-based Vertical Slices
-- **State**: TanStack Query (Server), Zustand (UI), Context (Auth)
-- **Styling**: Vanilla CSS + PostCSS
-- **Validation**: Zod
+- **Admin authentication:** Google OAuth on frontend; backend verifies Google ID token and issues JWT (MVP can restrict by whitelist).
+- **Tours:** CRUD trekking itineraries and tiered pricing.
+- **Knowledge Base (RAG):** ingest content → embeddings → pgvector search used during tool calls.
+- **Real-time voice:** full-duplex streaming via backend WebSocket proxy to Gemini Live API.
+- **Tool calling:** Gemini requests backend tools during a live session (quote generation, knowledge search, booking, calendar checks).
+- **Calendar availability:** Google Calendar API integration used by tool calls to answer date availability.
+- **Widget embedding:** static loader + backend embed wrapper URL + origin/domain locking.
+- **Analytics:** call logs, transcripts, summaries, and dashboard KPIs.
+- **Diagnostics:** dev-only sandbox and tool trace viewer.
 
-### Backend
+## Models & Voice Stack
 
-- **Framework**: Node.js + Express
-- **Architecture**: Layered Dependency Inversion (Controller -> Service -> Repository)
-- **AI**: Google Gemini Multimodal Live API (WebSockets)
-- **Vector DB**: PostgreSQL + `pgvector`
-- **Validation**: Zod DTOs
+Backend models are configured in `trekdesk-backend-prod/.env` (see `trekdesk-backend-prod/.env.example`):
 
----
+- **Realtime voice model:** `GEMINI_MODEL_NAME=models/gemini-2.5-flash-native-audio-preview-12-2025`
+- **Embeddings model:** `GEMINI_EMBEDDING_MODEL=models/gemini-embedding-001`
 
-## 📚 Documentation
+Frontend voice stack:
 
-Detailed documentation is available within each sub-directory:
+- VAD: `@ricky0123/vad-web`
+- Runtime: `onnxruntime-web`
+- Assets: `trekdesk-admin-dashboard/scripts/sync-vad-assets.js` syncs ONNX + worklet files into `trekdesk-admin-dashboard/public/vad`
 
-### Frontend Docs
+## Google Services & Packages
 
-- [Architecture & Features](./trekdesk-admin-dashboard/docs/ARCHITECTURE.md)
-- [Authentication Flow](./trekdesk-admin-dashboard/docs/AUTH_FLOW.md)
-- [AI Persona Feature](./trekdesk-admin-dashboard/docs/AI_PERSONA.md)
-- [Conversations Feature](./trekdesk-admin-dashboard/docs/Conversations.md)
-- [Hooks Reference](./trekdesk-admin-dashboard/docs/hooks/HOOKS.md)
+Frontend:
 
-### Backend Docs
+- Google Identity/OAuth: `@react-oauth/google`
 
-- [01 System Architecture](./trekdesk-backend-prod/docs/01_System_Architecture.md)
-- [02 Authentication Flow](./trekdesk-backend-prod/docs/02_Authentication_Flow.md)
-- [03 Real-time Voice AI](./trekdesk-backend-prod/docs/03_Realtime_Voice_AI.md)
-- [04 Conversation & Call Log Flow](./trekdesk-backend-prod/docs/04_Conversation_and_Call_Log_Flow.md)
-- [05 RAG Pipeline](./trekdesk-backend-prod/docs/05_RAG_Pipeline.md)
-- [06 Database Schema](./trekdesk-backend-prod/docs/06_Database_Schema.md)
-- [07 Development Workflow](./trekdesk-backend-prod/docs/07_Development_Workflow.md)
-- [08 Cloud SQL Setup](./trekdesk-backend-prod/docs/08_Cloud_SQL_Setup.md)
-- [09 API Reference](./trekdesk-backend-prod/docs/09_API_Reference.md)
+Backend:
 
----
+- Gemini SDKs: `@google/genai`, `@google/generative-ai`
+- Google OAuth verification: `google-auth-library`
+- Google Calendar: `@googleapis/calendar`
+- Swagger/OpenAPI: `swagger-jsdoc`, `swagger-ui-express` (served at `/api-docs`)
 
-## 🔒 Security & Environment
+## Where to Find Docs
 
-Ensure your `.env` files are never committed. Both layers verify origin headers and enforce strict JWT-based session security for all administrative actions.
+Start with the docs indexes:
+
+- Frontend docs: `trekdesk-admin-dashboard/docs/README.md`
+- Backend docs: `trekdesk-backend-prod/docs/README.md`
+
+High-value entrypoints:
+
+- Frontend architecture: `trekdesk-admin-dashboard/docs/ARCHITECTURE.md`
+- Frontend voice: `trekdesk-admin-dashboard/docs/VOICE_ARCHITECTURE.md`
+- Backend architecture: `trekdesk-backend-prod/docs/ARCHITECTURE.md`
+- Backend voice: `trekdesk-backend-prod/docs/REALTIME_VOICE_AI.md`
+- Backend RAG: `trekdesk-backend-prod/docs/RAG_PIPELINE.md`
+- Backend API docs: `trekdesk-backend-prod/docs/API_REFERENCE.md` (Swagger UI)
+
+## Dev vs Prod Notes
+
+- Backend:
+  - `NODE_ENV=development` enables developer endpoints under `/api/v1/dev`.
+  - Widget embed wrapper uses `FRONTEND_URL` in production, and defaults to `http://localhost:5173` in development.
+  - Rate limiting is enabled for `/api` and stricter limits for `/api/v1/auth` (see `trekdesk-backend-prod/src/app.ts`).
+- Frontend:
+  - Dev uses Vite dev server; production is a static build deployed to Firebase Hosting.
+  - VAD requires assets synced into `trekdesk-admin-dashboard/public/vad` via `node scripts/sync-vad-assets.js`.
+
+## Cloud SQL Connection
+
+- Use Cloud SQL Auth Proxy + ADC (step-by-step): `trekdesk-backend-prod/docs/CLOUD_SQL_SETUP.md`
+
+## Firebase Deployment (Admin Dashboard)
+
+Frontend is configured for Firebase Hosting:
+
+- Config: `trekdesk-admin-dashboard/firebase.json`, `trekdesk-admin-dashboard/.firebaserc`
+- Build: `cd trekdesk-admin-dashboard; npm run build`
+- Deploy: `firebase deploy` (requires Firebase CLI + login)
+
+## Live URLs (Production)
+
+- Frontend (Firebase Hosting): `https://trekdesk.web.app/`
+- Backend (Cloud Run): `https://trekdesk-backend-1525120942.us-central1.run.app`
+
+## Docker (Backend)
+
+- Dockerfile: `trekdesk-backend-prod/Dockerfile` (multi-stage TypeScript build → Node.js runtime; serves `dist/` and `static/`)
+
+## Production Topology (Typical)
+
+```mermaid
+flowchart LR
+  User[Admin or Customer] --> Firebase[Firebase Hosting - Admin SPA]
+  User --> HostSite[Operator Website]
+  HostSite --> Widget[Widget script + iframe]
+  Firebase --> Backend[Backend - Cloud Run or VM]
+  Widget --> Backend
+  Backend --> CloudSQL[(Cloud SQL Postgres + pgvector)]
+  Backend --> Gemini[Gemini Live API]
+  Backend --> Calendar[Google Calendar API]
+```
+
+## End-to-End Request (Widget Voice)
+
+```mermaid
+sequenceDiagram
+  participant Guest as Guest (Widget)
+  participant BE as Backend (WS proxy)
+  participant GM as Gemini Live
+  participant TD as ToolDispatcher
+  participant DB as Postgres/pgvector
+  participant Cal as Google Calendar
+
+  Guest->>BE: WebSocket connect + audio stream
+  BE->>GM: forward audio
+  GM-->>BE: toolCall(query_knowledge_base)
+  BE->>TD: dispatch tool
+  TD->>DB: pgvector search
+  DB-->>TD: top-k chunks
+  TD-->>GM: functionResponse
+  GM-->>BE: toolCall(check_guide_calendar)
+  BE->>TD: dispatch tool
+  TD->>Cal: availability check
+  Cal-->>TD: free/busy
+  TD-->>GM: functionResponse
+  GM-->>BE: audio/text response
+  BE-->>Guest: stream audio back
+```

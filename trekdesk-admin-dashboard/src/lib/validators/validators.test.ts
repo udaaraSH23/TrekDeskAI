@@ -309,7 +309,7 @@ describe("personaValidators — updatePersonaSchema", () => {
   const validPersona = {
     voice_name: "Aria",
     system_instruction:
-      "You are a friendly trekking guide assistant for Kandy Treks.",
+      "You are a friendly trekking guide assistant for GuideTours.",
     temperature: 0.7,
   };
 

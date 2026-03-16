@@ -35,7 +35,7 @@ const router = Router();
  *             properties:
  *               content:
  *                 type: string
- *                 example: "Kandy Treks cancellation policy: Full refund if canceled 48 hours in advance."
+ *                 example: "guidetours cancellation policy: Full refund if canceled 48 hours in advance."
  *               trek_id:
  *                 type: string
  *                 nullable: true
@@ -53,7 +53,7 @@ const router = Router();
  *               message: "Knowledge chunk ingested successfully"
  *               data:
  *                 id: "999e4567-e89b-12d3-a456"
- *                 content_snippet: "Kandy Treks cancellation policy..."
+ *                 content_snippet: "guidetours cancellation policy..."
  *       400:
  *         description: Bad Request (Missing content or invalid formatting)
  *       401:

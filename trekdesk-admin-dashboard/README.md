@@ -1,6 +1,6 @@
 # TrekDesk AI — Admin Dashboard
 
-> Production administration dashboard for the **TrekDesk AI** platform — an AI-powered voice assistant for trekking tour operators. Manage AI persona settings, tour knowledge bases, widget configuration, and monitor call analytics from a single, secure interface.
+Production administration dashboard for the TrekDesk AI platform (AI-powered voice assistant for trekking tour operators). Manage AI persona settings, tour knowledge bases, widget configuration, and monitor call analytics from a single, secure interface.
 
 ---
 
@@ -14,25 +14,27 @@
 - [Architecture Overview](#architecture-overview)
 - [Available Scripts](#available-scripts)
 - [Testing](#testing)
-- [API Documentation](#api-documentation)
+- [Documentation](#documentation)
+- [Deployment & Hosting](#deployment--hosting)
 
 ---
 
 ## Tech Stack
 
-| Category       | Technology                   | Version |
-| -------------- | ---------------------------- | ------- |
-| UI Framework   | React                        | 19      |
-| Language       | TypeScript                   | ~5.9    |
-| Build Tool     | Vite                         | 7       |
-| Routing        | React Router DOM             | 7       |
-| Server State   | TanStack Query (React Query) | 5       |
-| Client State   | Zustand                      | 5       |
-| HTTP Client    | Axios                        | 1       |
-| Validation     | Zod                          | 4       |
-| Authentication | @react-oauth/google          | 0.13    |
-| Icons          | Lucide React                 | Latest  |
-| Testing        | Vitest + Testing Library     | Latest  |
+| Category       | Technology                                  | Version       |
+| -------------- | ------------------------------------------- | ------------- |
+| UI Framework   | React                                       | 19            |
+| Language       | TypeScript                                  | ~5.9          |
+| Build Tool     | Vite                                        | 7             |
+| Routing        | React Router DOM                            | 7             |
+| Server State   | TanStack Query (React Query)                | 5             |
+| Client State   | Zustand                                     | 5             |
+| HTTP Client    | Axios                                       | 1             |
+| Validation     | Zod                                         | 4             |
+| Authentication | Google Identity SDK (`@react-oauth/google`) | 0.13          |
+| Voice / VAD    | `@ricky0123/vad-web` + `onnxruntime-web`    | 0.0.30 / 1.24 |
+| Icons          | Lucide React                                | Latest        |
+| Testing        | Vitest + Testing Library                    | Latest        |
 
 ---
 
@@ -40,87 +42,38 @@
 
 ```
 trekdesk-admin-dashboard/
-├── src/
-│   ├── main.tsx                  # App bootstrap + provider tree
-│   ├── App.tsx                   # Root router config (lazy loaded routes)
-│   │
-│   ├── pages/                    # Route-level page components
-│   │   ├── Login.tsx             # Google OAuth + dev-login entry
-│   │   ├── Overview.tsx          # Dashboard home with analytics
-│   │   ├── Conversations.tsx     # Call log viewer and transcript
-│   │   ├── Persona.tsx           # AI persona/prompt configuration
-│   │   ├── KnowledgeBase.tsx     # RAG doc ingestion + search
-│   │   └── WidgetConfig.tsx      # Embeddable widget customizer
-│   │
-│   ├── components/
-│   │   ├── Header.tsx            # Top bar with search + profile
-│   │   ├── Sidebar.tsx           # Navigation sidebar
-│   │   ├── ProtectedRoute.tsx    # Auth guard component
-│   │   ├── ui/                   # Reusable design-system components
-│   │   │   ├── Button.tsx
-│   │   │   ├── Card.tsx          # Card + CardHeader/Content/Footer
-│   │   │   ├── Input.tsx
-│   │   │   └── Badge.tsx
-│   │   └── shared/
-│   │       └── ErrorBoundary.tsx
-│   │
-│   ├── context/
-│   │   └── AuthContext.tsx       # Auth state Provider
-│   │
-│   ├── hooks/                    # TanStack Query data hooks
-│   │   ├── useAnalytics.ts
-│   │   ├── useKnowledge.ts
-│   │   ├── usePersona.ts
-│   │   └── useTours.ts
-│   │
-│   ├── services/                 # API communication layer
-│   │   ├── api.ts                # Axios instance + interceptors
-│   │   ├── AuthService.ts
-│   │   ├── AnalyticsService.ts
-│   │   ├── KnowledgeService.ts
-│   │   ├── PersonaService.ts
-│   │   └── TourService.ts
-│   │
-│   ├── store/
-│   │   └── uiStore.ts            # Zustand: sidebar + theme state
-│   │
-│   ├── lib/
-│   │   ├── queryClient.ts        # Singleton TanStack Query client
-│   │   ├── errors/
-│   │   │   └── ApiError.ts       # Typed error class for API failures
-│   │   └── validators/           # Client-side Zod schemas
-│   │       ├── knowledgeValidators.ts
-│   │       ├── personaValidators.ts
-│   │       └── tourValidators.ts
-│   │
-│   ├── types/                    # TypeScript type definitions
-│   │   ├── api.types.ts          # Shared API envelope types
-│   │   ├── auth.types.ts
-│   │   ├── analytics.types.ts
-│   │   ├── knowledge.types.ts
-│   │   ├── persona.types.ts
-│   │   └── tour.types.ts
-│   │
-│   └── layouts/
-│       └── Layout.tsx            # Shell: Sidebar + Header + <Outlet>
-│
-├── docs/                         # Architecture & reference documentation
-│   ├── ARCHITECTURE.md
-│   ├── STATE_MANAGEMENT.md
-│   ├── AUTHENTICATION.md
-│   ├── ERROR_HANDLING.md
-│   ├── VALIDATION.md
-│   ├── TESTING.md
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   ├── hooks/
-│   └── api/                      # TypeDoc-generated HTML reference
-│
-├── typedoc.json                  # TypeDoc config
-├── vite.config.ts
-├── tsconfig.app.json
-└── package.json
+├─ src/
+│  ├─ assets/
+│  ├─ components/          # layout, shared, ui primitives
+│  ├─ features/            # auth, conversations, devtools, knowledge, overview, persona, shared, tours, voice, widget
+│  ├─ layouts/
+│  ├─ lib/                 # queryClient, errors, validators
+│  ├─ services/            # api.ts
+│  ├─ store/               # Zustand stores
+│  ├─ types/
+│  ├─ App.tsx, main.tsx, index.css, setupTests.ts
+├─ public/
+│  └─ vad/                 # VAD/ONNX assets (synced by script)
+├─ scripts/
+│  └─ sync-vad-assets.js   # copies VAD + ONNX runtime into public/vad
+├─ docs/                   # architecture, feature, and reference docs
+│  ├─ README.md
+│  ├─ ARCHITECTURE.md
+│  ├─ STATE_MANAGEMENT.md
+│  ├─ ERROR_HANDLING.md
+│  ├─ VALIDATION.md
+│  ├─ TESTING.md
+│  ├─ VOICE_ARCHITECTURE.md
+│  ├─ components/
+│  ├─ services/
+│  └─ features/            # FEATURE_*.md per domain
+├─ Dockerfile
+├─ firebase.json / .firebaserc
+├─ typedoc.json
+├─ vite.config.ts
+├─ tsconfig*.json
+├─ package.json / package-lock.json
+└─ .env, .gitignore, LICENSE
 ```
 
 ---
@@ -129,18 +82,15 @@ trekdesk-admin-dashboard/
 
 ### Prerequisites
 
-- **Node.js** ≥ 18
-- **npm** ≥ 9
-- A Google OAuth Client ID (for login)
-- The TrekDesk backend running (see `trekdesk-backend-prod`)
+- Node.js ≥ 18
+- npm ≥ 9
+- Google OAuth Client ID
+- TrekDesk backend running
 
 ### Installation
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Copy the example env file and fill in your values
 cp .env.example .env
 ```
 
@@ -165,14 +115,14 @@ npm run dev
 
 ## Authentication
 
-The app supports two login flows:
+Two login flows:
 
-1. **Google OAuth** (production) — Uses `@react-oauth/google`. The Google ID Token is exchanged for a backend-issued JWT via `POST /auth/google`.
-2. **Dev Secret Bypass** (development only) — A plaintext secret exchanged via `POST /auth/dev-login`. Only visible when `VITE_ENABLE_DEV_LOGIN=true`. Completely disabled at the backend in production.
+1. **Google OAuth** (production) — `POST /auth/google` exchanges Google ID Token for JWT.
+2. **Dev Secret** (development) — `POST /auth/dev-login`, shown only when `VITE_ENABLE_DEV_LOGIN=true`.
 
-The JWT is persisted in `localStorage` under the key `trekdesk_token` and automatically attached to every API request via an Axios request interceptor. On a 401 response, the interceptor clears the token and redirects to `/login?expired=true`.
+JWT stored in `localStorage` (`trekdesk_token`) and attached via Axios interceptor. On 401, token is cleared and user is redirected to `/login?expired=true`.
 
-See [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md) for the full sequence diagram.
+Auth diagrams and flows: `docs/features/FEATURE_AUTH.md`.
 
 ---
 
@@ -180,92 +130,68 @@ See [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md) for the full sequence diagr
 
 ```
 Browser
-  └── React SPA (Vite)
-        ├── AuthProvider (AuthContext)   → session state
-        ├── QueryClientProvider          → server-state cache
-        ├── GoogleOAuthProvider          → OAuth identity
-        └── App (React Router)
-              ├── /login                → Login page (public)
-              └── /*  [ProtectedRoute]
-                    └── Layout
-                          ├── Sidebar
-                          ├── Header
-                          └── <Page>
-                                └── useFoo() hook
-                                      └── FooService
-                                            └── api.ts (Axios)
-                                                  └── Backend API
+  └─ React SPA (Vite)
+       ├─ AuthProvider (AuthContext)    → session state
+       ├─ QueryClientProvider           → server-state cache
+       ├─ GoogleOAuthProvider           → OAuth identity
+       └─ App (React Router)
+            ├─ /login                   → Login page (public)
+            └─ /* [ProtectedRoute]
+                 └─ Layout (Sidebar + Header + <Outlet>)
+                      └─ <Page> → useXxx hook → XxxService → api.ts → Backend API
 ```
 
-**State is split into two tiers:**
+State tiers:
 
-- **Server state** (API data) → TanStack Query cache, managed via hooks in `src/hooks/`
-- **Client/UI state** (sidebar, theme) → Zustand store in `src/store/uiStore.ts`
+- **Server state**: TanStack Query hooks (features/\*/hooks/).
+- **Client/UI state**: Zustand `uiStore` for sidebar/theme.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full architecture doc with Mermaid diagrams.
+See `docs/ARCHITECTURE.md` for diagrams; voice system details in `docs/VOICE_ARCHITECTURE.md`.
 
 ---
 
 ## Available Scripts
 
-| Script     | Command            | Description                                 |
-| ---------- | ------------------ | ------------------------------------------- |
-| Dev Server | `npm run dev`      | Start Vite HMR dev server on port 5173      |
-| Build      | `npm run build`    | TypeScript compile + Vite production bundle |
-| Preview    | `npm run preview`  | Serve the production build locally          |
-| Lint       | `npm run lint`     | Run ESLint over the entire `src/`           |
-| Test       | `npm test`         | Run Vitest in watch mode                    |
-| Test (CI)  | `npx vitest --run` | Single-pass test run (for CI pipelines)     |
-| API Docs   | `npm run docs:api` | Generate TypeDoc HTML into `docs/api/`      |
+| Script          | Command                           | Description                                                               |
+| --------------- | --------------------------------- | ------------------------------------------------------------------------- |
+| Dev Server      | `npm run dev`                     | Start Vite HMR dev server on port 5173                                    |
+| Build           | `npm run build`                   | TypeScript compile + Vite production bundle                               |
+| Preview         | `npm run preview`                 | Serve the production build locally                                        |
+| Lint            | `npm run lint`                    | Run ESLint over the entire `src/`                                         |
+| Test            | `npm test`                        | Run Vitest in watch mode                                                  |
+| Test (CI)       | `npx vitest --run`                | Single-pass test run (for CI pipelines)                                   |
+| Sync VAD assets | `node scripts/sync-vad-assets.js` | Copy VAD + ONNX runtime assets into `public/vad` (post-install/pre-build) |
 
 ---
 
 ## Testing
 
-The test suite uses **Vitest** + **@testing-library/react** + **jsdom**.
+Uses **Vitest** + **@testing-library/react** + **jsdom**.
 
 ```bash
-# Watch mode (during development)
-npm test
-
-# Single-pass run (CI / pre-commit)
-npx vitest --run
+npm test             # watch mode
+npx vitest --run     # single-pass (CI/pre-commit)
 ```
 
-Test files sit alongside source files (`*.test.ts` / `*.test.tsx`). Coverage areas:
-
-- **UI Components**: `Button`, `Input`, `Card`, `Badge`
-- **Zustand store**: `uiStore`
-- **Validators**: all Zod schemas in `lib/validators/`
-- **ApiError class**: `lib/errors/ApiError.test.ts`
-
-See [docs/TESTING.md](docs/TESTING.md) for full testing guide and patterns.
+Full guidance: `docs/TESTING.md`.
 
 ---
 
-## API Documentation
+## Documentation
 
-Auto-generated TypeDoc reference from all `src/` modules.
+- **Docs index:** `docs/README.md`
+- **Architecture:** `docs/ARCHITECTURE.md`
+- **State model:** `docs/STATE_MANAGEMENT.md`
+- **Validation:** `docs/VALIDATION.md`
+- **Testing:** `docs/TESTING.md`
+- **Voice system:** `docs/VOICE_ARCHITECTURE.md`
+- **Feature guides:** `docs/features/FEATURE_*.md` (tours, knowledge/RAG, persona, widget, auth, conversations, diagnostics, overview, voice, shared)
+- **Supporting references:** `docs/components/UI_COMPONENTS.md`, `docs/services/SERVICES.md`, `docs/ERROR_HANDLING.md`
 
-```bash
-npm run docs:api
-# → Open docs/api/index.html in your browser
-```
+---
 
-Hand-written reference docs are in the `docs/` folder:
+## Deployment & Hosting
 
-| Document                                                                | Description                                     |
-| ----------------------------------------------------------------------- | ----------------------------------------------- |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md)                                 | System architecture, folder guide, routing map  |
-| [STATE_MANAGEMENT.md](docs/STATE_MANAGEMENT.md)                         | Zustand + TanStack Query state model            |
-| [AUTHENTICATION.md](docs/AUTHENTICATION.md)                             | Auth sequence diagrams, token lifecycle         |
-| [ERROR_HANDLING.md](docs/ERROR_HANDLING.md)                             | Centralized error handling strategy             |
-| [VALIDATION.md](docs/VALIDATION.md)                                     | Zod schema catalogue and usage patterns         |
-| [TESTING.md](docs/TESTING.md)                                           | Test setup, patterns, and coverage guide        |
-| [AI_PERSONA.md](docs/AI_PERSONA.md)                                     | AI Persona & Voice identity configuration docs  |
-| [Conversations.md](docs/Conversations.md)                               | Call records and transcript reviewing guide     |
-| [components/UI_COMPONENTS.md](docs/components/UI_COMPONENTS.md)         | Button, Input, Card, Badge props reference      |
-| [components/LAYOUT_COMPONENTS.md](docs/components/LAYOUT_COMPONENTS.md) | Header, Sidebar, ProtectedRoute                 |
-| [pages/PAGES.md](docs/pages/PAGES.md)                                   | Per-page route, data, and interaction reference |
-| [services/SERVICES.md](docs/services/SERVICES.md)                       | Per-service method and endpoint table           |
-| [hooks/HOOKS.md](docs/hooks/HOOKS.md)                                   | Hook purpose, query keys, return shape          |
+- **Firebase Hosting:** `firebase.json` serves `dist/` with SPA rewrites to `index.html`. Run `npm run build` before deploy.
+- **Docker:** Multi-stage Dockerfile (Node build → unprivileged Nginx). Build image; default port 8080.
+- **Voice assets:** Run `node scripts/sync-vad-assets.js` after install to copy VAD/ONNX artifacts into `public/vad` (required for VAD-powered voice sessions).

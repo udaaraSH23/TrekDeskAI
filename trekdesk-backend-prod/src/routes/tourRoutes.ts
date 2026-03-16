@@ -51,7 +51,7 @@ router.get("/:tenantId", tourController.getTreks.bind(tourController));
  * /api/v1/tours:
  *   get:
  *     summary: Get all active treks (MVP Default)
- *     description: Defaults to returning all tours for Kandy Treks (the MVP default tenant).
+ *     description: Defaults to returning all tours for guidetours (the MVP default tenant).
  *     tags: [Tours]
  *     responses:
  *       200:

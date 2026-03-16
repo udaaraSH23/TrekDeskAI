@@ -15,7 +15,7 @@ export const MVP_TENANT_ID = "00000000-0000-0000-0000-000000000001";
  * to authenticate past the Controller tier.
  */
 export const GOOGLE_AUTH_WHITELIST = [
-  "admin@kandytreks.com",
+  "admin@guidetours.com",
   "developer@axiolonlabs.com",
   "rosalovershop@gmail.com",
   "udarasenarath875@gmail.com", // Primary developer access,

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
+    "setup": "powershell ./setup.ps1",
     "lint:frontend": "cd trekdesk-admin-dashboard && npm run lint",
     "lint:backend": "cd trekdesk-backend-prod && npm run lint",
     "format": "npx prettier --write ."

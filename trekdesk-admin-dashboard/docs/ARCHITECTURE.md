@@ -6,7 +6,7 @@ TrekDesk AI Admin Dashboard is a **single-page React application** built with Vi
 
 ```mermaid
 graph TD
-    User["👤 Admin User (Browser)"]
+    User["dY` Admin User (Browser)"]
     SPA["React SPA (Vite)"]
     Axios["Axios (api.ts)\nRequest/Response Interceptors"]
     Backend["TrekDesk Backend\n(Node + Express + PostgreSQL)"]
@@ -18,6 +18,16 @@ graph TD
     SPA -->|"Google ID Token"| Google
     Google -->|"ID Token"| SPA
 ```
+
+---
+
+## Reference Map
+
+- State model: `STATE_MANAGEMENT.md`
+- Validation patterns: `VALIDATION.md`
+- Testing stack: `TESTING.md`
+- Feature guides: `features/FEATURE_*.md`
+- Voice subsystem: `VOICE_ARCHITECTURE.md`
 
 ---
 
@@ -36,9 +46,9 @@ graph TB
     Root --> G --> A --> Q --> App
 ```
 
-1. **GoogleOAuthProvider** — must be outermost; `AuthProvider` calls Google hooks.
-2. **AuthProvider** — must wrap `QueryClientProvider` (so auth state is available to query hooks).
-3. **QueryClientProvider** — injected with the shared singleton `queryClient` from `lib/queryClient.ts`.
+1. **GoogleOAuthProvider** ƒ?" must be outermost; `AuthProvider` calls Google hooks.
+2. **AuthProvider** ƒ?" must wrap `QueryClientProvider` (so auth state is available to query hooks).
+3. **QueryClientProvider** ƒ?" injected with the shared singleton `queryClient` from `lib/queryClient.ts`.
 
 ---
 
@@ -49,15 +59,15 @@ All routes are defined in `App.tsx` using React Router v7. Pages are **lazy-load
 ```mermaid
 graph LR
     Router["BrowserRouter"]
-    Login["/login → Login.tsx\n(Public)"]
-    Protected["/* → ProtectedRoute"]
+    Login["/login ƒ+' Login.tsx\n(Public)"]
+    Protected["/* ƒ+' ProtectedRoute"]
     Layout["Layout (Sidebar + Header)"]
-    Home["/ → Overview.tsx"]
-    Conv["/conversations → Conversations.tsx"]
-    KB["/knowledge → KnowledgeBase.tsx"]
-    Persona["/persona → Persona.tsx"]
-    Widget["/widget → WidgetConfig.tsx"]
-    Fallback["* → Redirect /"]
+    Home["/ ƒ+' Overview.tsx"]
+    Conv["/conversations ƒ+' Conversations.tsx"]
+    KB["/knowledge ƒ+' KnowledgeBase.tsx"]
+    Persona["/persona ƒ+' Persona.tsx"]
+    Widget["/widget ƒ+' WidgetConfig.tsx"]
+    Fallback["* ƒ+' Redirect /"]
 
     Router --> Login
     Router --> Protected
@@ -138,7 +148,7 @@ sequenceDiagram
     participant A as api.ts (Axios)
     participant B as Backend /analytics/calls
 
-    C->>H: mount → useCallLogs()
+    C->>H: mount ƒ+' useCallLogs()
     H->>Q: check cache ["analytics","logs"]
     alt cache miss or stale
         Q->>S: getCallLogs()
@@ -159,6 +169,5 @@ sequenceDiagram
 
 ## Feature Architecture Guides
 
-For more in-depth technical breakdowns of specific complex systems, see:
-
-- [Voice Interaction System (VAD, Full-Duplex WebSockets)](./VOICE_ARCHITECTURE.md)
+- Voice interaction system: `VOICE_ARCHITECTURE.md`
+- Feature guides: `features/FEATURE_TOURS.md`, `features/FEATURE_KNOWLEDGE.md`, `features/FEATURE_PERSONA.md`, `features/FEATURE_WIDGET.md`, `features/FEATURE_AUTH.md`, `features/FEATURE_CONVERSATIONS.md`, `features/FEATURE_DIAGNOSTICS.md`

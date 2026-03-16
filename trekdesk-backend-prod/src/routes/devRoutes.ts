@@ -32,7 +32,7 @@ const router = Router();
  *             properties:
  *               prompt:
  *                 type: string
- *                 example: "What is the weather in Kandy today?"
+ *                 example: "What is the weather in the mountains today?"
  *     responses:
  *       200:
  *         description: Diagnostic turn completed successfully

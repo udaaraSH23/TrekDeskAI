@@ -77,7 +77,7 @@ if (env.NODE_ENV === "development" && env.ENABLE_DEVELOPMENT_LOGIN) {
  *               data:
  *                 user:
  *                   id: "123e4567-e89b-12d3-a456-426614174000"
- *                   email: "guide@kandytreks.com"
+ *                   email: "guide@guidetours.com"
  *                   fullName: "Jane Doe"
  *                   pictureUrl: "https://lh3.googleusercontent.com/a/..."
  *                   tenantId: "00000000-0000-0000-0000-000000000001"
@@ -119,7 +119,7 @@ router.post("/google", authController.googleLogin.bind(authController));
  *               data:
  *                 user:
  *                   id: "123e4567-e89b-12d3-a456-426614174000"
- *                   email: "guide@kandytreks.com"
+ *                   email: "guide@guidetours.com"
  *                   tenantId: "00000000-0000-0000-0000-000000000001"
  *       401:
  *         description: Unauthorized (Token expired or missing)

@@ -7,7 +7,7 @@ module.exports.up = (pgm) => {
         tenant_id UUID PRIMARY KEY REFERENCES tenants(id) ON DELETE CASCADE,
         primary_color VARCHAR(7) DEFAULT '#10b981',
         position VARCHAR(10) DEFAULT 'right',
-        initial_message TEXT DEFAULT 'Hi! Ready for a Kandy adventure?',
+        initial_message TEXT DEFAULT 'Hi! Ready for a GuideTours adventure?',
         allowed_origins TEXT[] DEFAULT '{}',
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );

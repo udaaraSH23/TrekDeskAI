@@ -1,10 +1,26 @@
 # Testing
 
+## Flow
+
+```mermaid
+sequenceDiagram
+    participant Dev as Dev
+    participant VT as Vitest
+    participant UI as Components/Hooks
+    participant API as API (mocked)
+
+    Dev->>VT: npm test / npx vitest --run
+    VT->>UI: Render with RTL + user-event
+    UI->>API: Mocked HTTP calls / Query client
+    API-->>UI: Stubbed responses
+    UI-->>VT: Assertions pass/fail
+```
+
 ## Test Stack
 
 | Tool                            | Role                                                       |
 | ------------------------------- | ---------------------------------------------------------- |
-| **Vitest**                      | Test runner (Vite-native, fast, Jest-compatible API)       |
+| **Vitest**                      | Test runner (Vite-native, Jest-compatible API)             |
 | **@testing-library/react**      | Renders components and queries the DOM                     |
 | **@testing-library/user-event** | Simulates real user interactions (typing, clicking)        |
 | **@testing-library/jest-dom**   | Custom matchers (`toBeInTheDocument`, `toHaveValue`, etc.) |
@@ -15,10 +31,10 @@
 ## Running Tests
 
 ```bash
-# Watch mode — runs affected tests on file change (use during development)
+# Watch mode — runs affected tests on file change
 npm test
 
-# Single-pass — runs all tests once and exits (use in CI or before committing)
+# Single-pass — runs all tests once (CI / pre-commit)
 npx vitest --run
 
 # Run a specific file
@@ -32,20 +48,20 @@ npx vitest --run -t "renders with primary variant"
 
 ## Test File Conventions
 
-- Test files sit **next to the source file** they test
-- Naming: `[ComponentName].test.tsx` for React components, `[module].test.ts` for plain TypeScript
-- Tests use `describe` → `it` structure (no bare `test()` calls)
+- Tests live **next to the source file** they cover.
+- Naming: `[ComponentName].test.tsx` for React, `[module].test.ts` for utilities.
+- Use `describe` + `it` (no bare `test()`).
 
 ```
 src/
   components/ui/
     Button.tsx
-    Button.test.tsx       ← co-located
+    Button.test.tsx
   lib/errors/
     ApiError.ts
-    ApiError.test.ts      ← co-located
+    ApiError.test.ts
   lib/validators/
-    validators.test.ts    ← aggregated validator tests
+    validators.test.ts
   store/
     uiStore.ts
     uiStore.test.ts
@@ -53,7 +69,7 @@ src/
 
 ---
 
-## Coverage Areas
+## Coverage Areas (global)
 
 ### UI Components (`src/components/ui/*.test.tsx`)
 
@@ -66,12 +82,12 @@ src/
 
 ### Zustand Store (`src/store/uiStore.test.ts`)
 
-| Feature         | What's Tested                             |
-| --------------- | ----------------------------------------- |
-| Initial state   | `isSidebarOpen: true`, `theme: "dark"`    |
-| `toggleSidebar` | Toggles from open → closed, closed → open |
-| `setTheme`      | Sets theme to "light" and back to "dark"  |
-| Store isolation | Each test gets a fresh store state        |
+| Feature         | What's Tested                            |
+| --------------- | ---------------------------------------- |
+| Initial state   | `isSidebarOpen: true`, `theme: "dark"`   |
+| `toggleSidebar` | Toggles from open ↔ closed               |
+| `setTheme`      | Sets theme to "light" and back to "dark" |
+| Store isolation | Each test gets a fresh store state       |
 
 ### ApiError (`src/lib/errors/ApiError.test.ts`)
 
@@ -89,7 +105,7 @@ src/
 | ----------------------- | ---------------------------------------------------------------- |
 | `ingestKnowledgeSchema` | Valid input, min/max content, UUID trek_id, metadata shape       |
 | `knowledgeSearchSchema` | Min 3 chars, max 500 chars, empty string rejection               |
-| `updatePersonaSchema`   | All valid fields, temperature boundaries (0–2), empty voice_name |
+| `updatePersonaSchema`   | Temperature boundaries (0–2), empty voice_name, long instruction |
 | `createTrekSchema`      | Valid trek, name min, price positive, difficulty enum values     |
 | `updateTrekSchema`      | All fields optional (partial), combined partial update           |
 
@@ -98,7 +114,6 @@ src/
 ## Writing a New Test
 
 ```tsx
-// src/components/ui/MyComponent.test.tsx
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MyComponent } from "./MyComponent";
@@ -150,12 +165,22 @@ it("returns loading state initially", () => {
 
 ---
 
-## CI Integration
+## Feature-Level Coverage (see feature docs)
 
-The test script for CI pipelines (GitHub Actions, etc.) is:
+- Auth: token exchange/verify flows, ProtectedRoute gating (`features/FEATURE_AUTH.md`).
+- Persona: temperature bounds, preview bridge, optimistic updates (`features/FEATURE_PERSONA.md`).
+- Knowledge: ingest/search validators, search caching by query (`features/FEATURE_KNOWLEDGE.md`).
+- Tours: create/update/delete, pricing tiers, cache invalidation (`features/FEATURE_TOURS.md`).
+- Widget: settings save, embed snippet generation, origin validation (`features/FEATURE_WIDGET.md`).
+- Conversations: list/detail fetch enabled flags, legacy transcript rendering (`features/FEATURE_CONVERSATIONS.md`).
+- Diagnostics: prompt submit + trace rendering (`features/FEATURE_DIAGNOSTICS.md`).
+
+---
+
+## CI Integration
 
 ```bash
 npx vitest --run
 ```
 
-Exits with code `0` on all-pass, non-zero on any failure. No watch mode, no interactive prompts.
+Exits `0` on all-pass, non-zero on any failure.

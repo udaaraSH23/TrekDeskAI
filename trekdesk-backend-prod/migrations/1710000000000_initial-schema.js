@@ -72,11 +72,11 @@ module.exports.up = (pgm) => {
 
     -- Seed Initial Tenant (Kandy Treks) for the MVP
     INSERT INTO tenants (id, name, domain) 
-    VALUES ('00000000-0000-0000-0000-000000000001', 'Kandy Treks', 'kandytreks.com')
+    VALUES ('00000000-0000-0000-0000-000000000001', 'GuideTours', 'guidetours.com')
     ON CONFLICT (id) DO NOTHING;
 
     INSERT INTO ai_settings (tenant_id, system_instruction) 
-    VALUES ('00000000-0000-0000-0000-000000000001', 'You are a helpful trekking guide for Kandy Treks.')
+    VALUES ('00000000-0000-0000-0000-000000000001', 'You are a helpful trekking guide for GuideTours.')
     ON CONFLICT (tenant_id) DO NOTHING;
   `);
 };

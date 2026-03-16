@@ -19,7 +19,7 @@ const Header = () => {
     "/": {
       title: "Command Center",
       description:
-        "Welcome back, Kandy Treks. Here's your AI's performance today.",
+        "Welcome back, GuideTours. Here's your AI's performance today.",
     },
     "/conversations": {
       title: "Conversations",

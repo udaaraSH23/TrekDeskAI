@@ -29,7 +29,7 @@ const router = Router();
  *               data:
  *                 tenant_id: "00000000-0000-0000-0000-000000000001"
  *                 voice_name: "Aoede"
- *                 system_instruction: "You are a helpful trekking guide for Kandy Treks."
+ *                 system_instruction: "You are a helpful trekking guide for guidetours."
  *                 temperature: 0.7
  *       401:
  *         description: Unauthorized. Missing or invalid Bearer token.

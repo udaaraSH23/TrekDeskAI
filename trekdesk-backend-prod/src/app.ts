@@ -119,7 +119,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  */
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Production Grade: 100 requests per 15 mins
+  max: 1000, // Production Grade: 1000 requests per 15 mins
   message: {
     status: "error",
     statusCode: 429,
@@ -132,7 +132,7 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Production Grade: 100 login attempts per 15 mins
+  max: 20, // Production Grade: 20 login attempts per 15 mins
   message: {
     status: "error",
     statusCode: 429,

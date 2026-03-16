@@ -40,6 +40,8 @@ All data that comes from the backend API is owned by TanStack Query. It handles:
 | All tours        | `["tours"]`                      | All tours       |
 | Single tour      | `["tours", id]`                  | Per ID          |
 
+Feature-specific breakdowns: `features/FEATURE_KNOWLEDGE.md`, `features/FEATURE_TOURS.md`, `features/FEATURE_PERSONA.md`, `features/FEATURE_WIDGET.md`, `features/FEATURE_CONVERSATIONS.md`, `features/FEATURE_AUTH.md`.
+
 ### Hook → Service → API Flow
 
 ```mermaid

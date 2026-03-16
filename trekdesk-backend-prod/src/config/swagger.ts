@@ -1,5 +1,7 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
+import path from "path";
+
 /**
  * @file swagger.ts
  * @description Swagger/OpenAPI documentation configuration and specification generation.
@@ -30,6 +32,10 @@ const options: swaggerJsdoc.Options = {
         url: "https://api.trekdesk.ai",
         description: "Production Server",
       },
+      {
+        url: "https://trekdesk-backend-1525120942.us-central1.run.app",
+        description: "Google Cloud Run (Staging/Production Instance)",
+      },
     ],
     components: {
       /**
@@ -48,7 +54,9 @@ const options: swaggerJsdoc.Options = {
     },
   },
   // Tells Swagger where to look for JSDoc documentation decorators.
-  apis: ["./src/routes/*.ts"],
+  // We look in both .ts and .js files to support both development (ts-node)
+  // and production (compiled dist/ folder) environments.
+  apis: [path.join(__dirname, "../routes/*.{ts,js}")],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
