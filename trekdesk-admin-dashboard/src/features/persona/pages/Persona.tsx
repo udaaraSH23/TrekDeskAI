@@ -153,7 +153,7 @@ const Persona: React.FC = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Welcome users and mention we have new tours in Ella!"
+                  placeholder="e.g. Welcome users warmly and mention the 10% discount on Ella tours!"
                   value={formData.welcome_message}
                   onChange={(e) =>
                     setFormData({
@@ -163,17 +163,19 @@ const Persona: React.FC = () => {
                   }
                   className={styles.input}
                 />
-                <span
+                <p
                   className="text-muted"
                   style={{
                     fontSize: "0.75rem",
                     marginTop: "4px",
-                    display: "block",
+                    lineHeight: "1.4",
                   }}
                 >
-                  Provide key points or a tone (e.g., 'Be very energetic') for
-                  the AI's first greeting.
-                </span>
+                  <strong>How it works:</strong> Instead of a fixed script, this
+                  gives the AI "themes" to follow. It will naturally combine
+                  your instructions here with its official identity for its
+                  first message.
+                </p>
               </div>
 
               {/* Gemini Voice Picker */}
@@ -265,6 +267,53 @@ const Persona: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Educational Insight Card */}
+          <Card
+            style={{
+              marginTop: "1rem",
+              background: "var(--card-alt)",
+              border: "1px dashed var(--border)",
+            }}
+          >
+            <CardContent style={{ paddingTop: "1.5rem" }}>
+              <h4
+                style={{
+                  fontSize: "0.9rem",
+                  fontWeight: "600",
+                  marginBottom: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <Info size={16} className="text-secondary" />
+                Architecture of Personality
+              </h4>
+              <ul
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--text-muted)",
+                  paddingLeft: "1.2rem",
+                  lineHeight: "1.6",
+                }}
+              >
+                <li>
+                  <strong>Assistant Name:</strong> Injected as the primary
+                  identity in all conversations.
+                </li>
+                <li>
+                  <strong>Greeting Themes:</strong> A powerful directive used{" "}
+                  <em>only</em> for the very first message to set a thematic
+                  hook.
+                </li>
+                <li>
+                  <strong>System Instructions:</strong> The permanent rules,
+                  knowledge, and style the AI follows for the entire session.
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
           {/* Specialized Voice Configuration Playground */}
           <div style={{ marginTop: "2rem" }}>
             <Button
@@ -296,9 +345,10 @@ const Persona: React.FC = () => {
               the preview to feel 'live' before saving.
             */}
             <iframe
-              src={`/embed/chat?color=${encodeURIComponent(widgetSettings?.primary_color || "#10b981")}&msg=${encodeURIComponent(widgetSettings?.initial_message || "Hi! How can I help you today?")}&name=${encodeURIComponent(formData.assistant_name)}`}
+              src={`/embed/chat?color=${encodeURIComponent(widgetSettings?.primary_color || "#10b981")}&msg=${encodeURIComponent(widgetSettings?.initial_message || "Hi! How can I help you today?")}&name=${encodeURIComponent(formData.assistant_name)}&apiUrl=${encodeURIComponent(import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1")}`}
               className={styles.previewFrame}
               title="Widget Preview"
+              allow="microphone; autoplay"
             />
           </div>
         </div>

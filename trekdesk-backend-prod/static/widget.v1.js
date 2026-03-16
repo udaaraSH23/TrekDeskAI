@@ -1,7 +1,7 @@
 /* eslint-env browser */
-(function() {
+(function () {
   window.TrekDeskAI = {
-    init: function(config = {}) {
+    init: function (config = {}) {
       // 1. Configuration Check
       const agentId = config.agentId || "00000000-0000-0000-0000-000000000001";
       const primaryColor = config.color || "#10b981";
@@ -9,9 +9,35 @@
       const initialMessage = config.msg || "Hi! How can I help you today?";
       const assistantName = config.name || "TrekDesk AI";
 
+      // 1.1 Dynamic URL Detection
+      const scriptSrc = document.currentScript ? document.currentScript.src : "";
+      const isLocal = window.location.hostname === "localhost" || 
+                      window.location.hostname === "127.0.0.1" ||
+                      scriptSrc.includes("localhost") || 
+                      scriptSrc.includes("127.0.0.1");
+
+      // Priority: 1. config.apiUrl, 2. Derived from script tag, 3. Default based on env
+      let apiBaseUrl = config.apiUrl;
+      
+      if (!apiBaseUrl) {
+        if (scriptSrc && scriptSrc.includes("/static/")) {
+          // If loaded from our backend, derive base URL from script tag
+          apiBaseUrl = scriptSrc.split("/static/")[0];
+        } else {
+          apiBaseUrl = isLocal
+            ? "http://localhost:3001"
+            : "https://trekdesk-backend-1525120942.us-central1.run.app";
+        }
+      }
+
+      // Ensure no trailing slash
+      apiBaseUrl = apiBaseUrl.replace(/\/$/, "");
+
+      const embedUrl = `${apiBaseUrl}/api/v1/widget/embed/chat?agentId=${agentId}&apiUrl=${encodeURIComponent(apiBaseUrl)}&color=${encodeURIComponent(primaryColor)}&msg=${encodeURIComponent(initialMessage)}&name=${encodeURIComponent(assistantName)}`;
+
       // 2. Create Styles
-  const style = document.createElement("style");
-  style.textContent = `
+      const style = document.createElement("style");
+      style.textContent = `
     #trekdesk-widget-launcher {
       position: fixed;
       bottom: 20px;
@@ -61,39 +87,39 @@
       }
     }
   `;
-  document.head.appendChild(style);
+      document.head.appendChild(style);
 
-  // 3. Create Elements
-  const launcher = document.createElement("div");
-  launcher.id = "trekdesk-widget-launcher";
-  const headsetIcon = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0h-3a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-5Z"/><path d="M21 16v2a2 2 0 0 1-2 2h-1"/></svg>`;
-  launcher.innerHTML = headsetIcon;
-  
-  const container = document.createElement("div");
-  container.id = "trekdesk-widget-container";
-  
-  const iframe = document.createElement("iframe");
-  const embedUrl = `http://localhost:5173/embed/chat?agentId=${agentId}&color=${encodeURIComponent(primaryColor)}&msg=${encodeURIComponent(initialMessage)}&name=${encodeURIComponent(assistantName)}`;
-  iframe.src = embedUrl;
-  iframe.style.width = "100%";
-  iframe.style.height = "100%";
-  iframe.style.border = "none";
-  
-  container.appendChild(iframe);
-  document.body.appendChild(launcher);
-  document.body.appendChild(container);
-
-  // 4. Toggle Interaction
-  let isOpen = false;
-  launcher.onclick = () => {
-    isOpen = !isOpen;
-    container.classList.toggle("open", isOpen);
-    if (isOpen) {
-      launcher.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
-    } else {
+      // 3. Create Elements
+      const launcher = document.createElement("div");
+      launcher.id = "trekdesk-widget-launcher";
+      const headsetIcon = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0h-3a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-5Z"/><path d="M21 16v2a2 2 0 0 1-2 2h-1"/></svg>`;
       launcher.innerHTML = headsetIcon;
-    }
-  };
-    }
+
+      const container = document.createElement("div");
+      container.id = "trekdesk-widget-container";
+
+      const iframe = document.createElement("iframe");
+      iframe.src = embedUrl;
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.allow = "microphone; clipboard-write; autoplay";
+
+      container.appendChild(iframe);
+      document.body.appendChild(launcher);
+      document.body.appendChild(container);
+
+      // 4. Toggle Interaction
+      let isOpen = false;
+      launcher.onclick = () => {
+        isOpen = !isOpen;
+        container.classList.toggle("open", isOpen);
+        if (isOpen) {
+          launcher.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        } else {
+          launcher.innerHTML = headsetIcon;
+        }
+      };
+    },
   };
 })();

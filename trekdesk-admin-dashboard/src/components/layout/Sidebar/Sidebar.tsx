@@ -32,12 +32,16 @@ const Sidebar: React.FC = () => {
     { icon: <UserCircle size={20} />, label: "AI Persona", path: "/persona" },
     { icon: <MapIcon size={20} />, label: "Tours & Treks", path: "/tours" },
     { icon: <Code2 size={20} />, label: "Widget Config", path: "/widget" },
-    {
+  ];
+
+  // Only show Diagnostic Tools if dev features are enabled
+  if (import.meta.env.VITE_ENABLE_DEV_LOGIN === "true") {
+    navItems.push({
       icon: <Wrench size={20} />,
       label: "Diagnostic Tools",
       path: "/debugger",
-    },
-  ];
+    });
+  }
 
   return (
     <aside

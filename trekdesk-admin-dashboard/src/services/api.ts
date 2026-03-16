@@ -91,11 +91,14 @@ api.interceptors.response.use(
       };
 
       // Extract and clean the human-readable message
-      const message = formatErrorMessage(
-        data?.message ||
-          error.message ||
-          "An unexpected error occurred. Please try again.",
-      );
+      const rawMsg =
+        typeof data === "string"
+          ? data
+          : data?.message ||
+            error.message ||
+            "An unexpected error occurred. Please try again.";
+
+      const message = formatErrorMessage(rawMsg);
 
       // Handle 401 globally: clear token and redirect to login
       if (statusCode === 401) {

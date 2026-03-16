@@ -34,6 +34,7 @@ RUN npm ci --omit=dev --legacy-peer-deps --no-audit --no-fund && \
 
 # Copy the compiled output from the builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/static ./static
 
 # Change ownership of the app directory to the node user
 RUN chown -R node:node /app

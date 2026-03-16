@@ -77,7 +77,9 @@ function App() {
                         <Route path="/persona" element={<Persona />} />
                         <Route path="/tours" element={<Tours />} />
                         <Route path="/widget" element={<WidgetConfig />} />
-                        <Route path="/debugger" element={<AIDebugger />} />
+                        {import.meta.env.VITE_ENABLE_DEV_LOGIN === "true" && (
+                          <Route path="/debugger" element={<AIDebugger />} />
+                        )}
 
                         {/* Fallback redirect */}
                         <Route path="*" element={<Navigate to="/" replace />} />

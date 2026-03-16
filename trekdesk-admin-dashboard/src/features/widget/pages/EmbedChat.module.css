@@ -234,3 +234,27 @@
 .fadeIn {
   animation: fadeIn 0.4s ease-out;
 }
+
+.thinkingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  animation: pulseOpacity 1.5s ease-in-out infinite;
+}
+
+.thinkingDot {
+  width: 4px;
+  height: 4px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

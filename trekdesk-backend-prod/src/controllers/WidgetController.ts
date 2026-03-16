@@ -9,6 +9,7 @@ import { ApiResponse } from "../utils/response/ApiResponse";
 import { HttpStatus } from "../utils/httpStatusCodes";
 import { MVP_TENANT_ID } from "../config/constants";
 import { IWidgetSettingsService } from "../interfaces/services/IWidgetSettingsService";
+import { env } from "../config/env";
 
 /**
  * Controller for handling HTTP requests related to widget configuration.
@@ -88,6 +89,73 @@ export class WidgetController {
         "Widget settings updated successfully",
         settings,
       );
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Endpoint: GET /v1/widget/embed/chat
+   * Renders a simple HTML wrapper for the widget iframe.
+   * This allows the backend to set CSP headers before the browser loads the frontend.
+   *
+   * @param req Express request.
+   * @param res Express response.
+   * @param next Express next function.
+   * @returns {Promise<void>}
+   */
+  public async renderEmbed(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const agentId = (req.query.agentId as string) || MVP_TENANT_ID;
+      const apiUrl = req.query.apiUrl as string;
+      const color = req.query.color as string;
+      const msg = req.query.msg as string;
+      const name = req.query.name as string;
+
+      // Construct the URL for the actual widget hosted on Frontend
+      // Note: We use the same parameters passed to us
+      const frontendBaseUrl =
+        process.env.NODE_ENV === "production"
+          ? env.FRONTEND_URL
+          : "http://localhost:5173";
+
+      const targetUrl = `${frontendBaseUrl}/embed/chat?agentId=${agentId}&apiUrl=${encodeURIComponent(apiUrl || "")}&color=${encodeURIComponent(color || "")}&msg=${encodeURIComponent(msg || "")}&name=${encodeURIComponent(name || "")}`;
+
+      // Return a simple HTML wrapper that loads the real widget in an iframe
+      const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>TrekDesk AI Chat</title>
+          <style>
+            body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+            iframe { border: none; width: 100%; height: 100%; background: transparent; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${targetUrl}" allow="microphone; clipboard-write; autoplay"></iframe>
+        </body>
+        </html>
+      `;
+
+      res.setHeader("Content-Type", "text/html");
+
+      // Construct Permissions-Policy
+      // In development, we use '*' for less friction. In production, we restrict to self and frontend.
+      const allowedOrigin =
+        process.env.NODE_ENV === "production" ? `"${frontendBaseUrl}"` : "*";
+
+      res.setHeader(
+        "Permissions-Policy",
+        `microphone=(self ${allowedOrigin}), clipboard-write=(self ${allowedOrigin}), autoplay=(self ${allowedOrigin})`,
+      );
+      res.status(200).send(html);
     } catch (err) {
       next(err);
     }

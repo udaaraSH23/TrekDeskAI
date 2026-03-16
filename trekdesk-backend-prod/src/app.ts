@@ -37,6 +37,7 @@ import chatRoutes from "./routes/chatRoutes";
  */
 import { errorHandler } from "./middleware/errorHandler";
 import { authMiddleware } from "./middleware/authMiddleware";
+import { dynamicCspMiddleware } from "./middleware/cspMiddleware";
 
 // Initialize the Express application instance
 const app = express();
@@ -56,8 +57,25 @@ app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        // We'll handle 'frame-ancestors' dynamically in the next middleware
+      },
+    },
   }),
 );
+
+// Apply dynamic CSP for widget iframing protection
+app.use(dynamicCspMiddleware);
+
+// Root route to prevent 404s on the base URL
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "TrekDesk AI Backend is running",
+    health: "/health",
+  });
+});
 
 // Morgan provides automated HTTP request logging for development/monitoring
 // Stream morgan logs to winston
@@ -101,16 +119,25 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  */
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Relaxed for MVP/Dev testing. Limit each IP to 1000 requests per 15 minutes.
-  message: "Too many requests from this IP, please try again after 15 minutes",
+  max: 100, // Production Grade: 100 requests per 15 mins
+  message: {
+    status: "error",
+    statusCode: 429,
+    message:
+      "Too many requests from this IP, please try again after 15 minutes",
+  },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 100, // Relaxed for Dev testing. Limit each IP to 100 login requests per hour
-  message: "Too many login attempts, please try again after an hour",
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Production Grade: 100 login attempts per 15 mins
+  message: {
+    status: "error",
+    statusCode: 429,
+    message: "Too many login attempts, please try again after 15 minutes",
+  },
   standardHeaders: true,
   legacyHeaders: false,
 });

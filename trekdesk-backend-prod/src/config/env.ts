@@ -19,6 +19,7 @@ const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   PORT: z.string().default("3001"),
+  FRONTEND_URL: z.string().url().default("https://trekdesk.web.app"),
 
   // Database
   DATABASE_URL: z

@@ -56,6 +56,27 @@ const router = Router();
 
 /**
  * @swagger
+ * /api/v1/widget/embed/chat:
+ *   get:
+ *     summary: Render widget embed wrapper
+ *     description: |
+ *       Serves an HTML wrapper for the widget chat.
+ *       Includes Content-Security-Policy headers for iframe protection.
+ *     tags: [Widget]
+ *     parameters:
+ *       - in: query
+ *         name: agentId
+ *         schema:
+ *           type: string
+ *         description: The tenant ID
+ *     responses:
+ *       200:
+ *         description: HTML wrapper rendered successfully
+ */
+router.get("/embed/chat", widgetController.renderEmbed.bind(widgetController));
+
+/**
+ * @swagger
  * /api/v1/widget/settings:
  *   get:
  *     summary: Get widget settings for the tenant

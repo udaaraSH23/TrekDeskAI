@@ -291,6 +291,19 @@
   color: var(--muted-foreground);
 }
 
+.syncingText {
+  color: var(--primary);
+  animation: pulseOpacity 1.5s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.8; }
   100% { transform: scale(1.5); opacity: 0; }
@@ -299,4 +312,15 @@
 @keyframes wave {
   0%, 100% { transform: scaleY(0.3); }
   50% { transform: scaleY(1); }
+}
+
+.thinkingBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  color: var(--muted-foreground);
+  font-style: italic;
+  animation: pulseOpacity 1.5s ease-in-out infinite;
 }

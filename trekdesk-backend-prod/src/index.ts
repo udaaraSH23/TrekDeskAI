@@ -54,8 +54,21 @@ wss.on("connection", (ws, req) => {
   handleVoiceConnection(ws);
 
   ws.on("close", (code, reason) => {
+    const statusMap: Record<number, string> = {
+      1000: "Normal Closure",
+      1001: "Going Away (Client navigated away or server down)",
+      1002: "Protocol Error",
+      1003: "Unsupported Data",
+      1005: "No Status Received",
+      1006: "Abnormal Closure (Connection lost without close frame)",
+      1011: "Internal Server Error",
+    };
+
+    const reasonStr = reason?.toString() || "None";
+    const statusInfo = statusMap[code] || "Unknown Code";
+
     logger.info(
-      `[WebSocket] Client ${ip} disconnected (Code: ${code}, Reason: ${reason || "none"})`,
+      `[WebSocket] Client ${ip} disconnected | Code: ${code} (${statusInfo}) | Reason: ${reasonStr}`,
     );
   });
 

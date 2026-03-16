@@ -217,4 +217,29 @@ export class GeminiService implements IGeminiService {
       geminiWs.send(JSON.stringify(message));
     }
   }
+
+  /**
+   * Sends a cancellation signal to the Gemini model to stop current speech/generation.
+   * This is used for "barge-in" support to stop the model's output immediately.
+   *
+   * @param geminiWs - The active WebSocket connection.
+   */
+  public cancelAiSpeech(geminiWs: WebSocket) {
+    if (geminiWs.readyState === WebSocket.OPEN) {
+      const message = {
+        clientContent: {
+          turns: [
+            {
+              role: "user",
+              parts: [
+                { text: "(SYSTEM: Stop talking now. User has interrupted.)" },
+              ],
+            },
+          ],
+          turnComplete: true,
+        },
+      };
+      geminiWs.send(JSON.stringify(message));
+    }
+  }
 }

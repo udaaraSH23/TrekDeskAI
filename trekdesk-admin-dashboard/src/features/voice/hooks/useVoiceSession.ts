@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useVAD } from "./useVAD";
+import { useAudioPlayback } from "./useAudioPlayback";
+import { AudioStreamService } from "../services/AudioStreamService";
+import { float32ToBase64 } from "../utils/audioUtils";
 
-/**
- * VoiceSessionOptions
- * Callbacks for handling various session events.
- */
 export interface VoiceSessionOptions {
   onAiSpeakingStart?: () => void;
   onAiSpeakingEnd?: () => void;
@@ -11,265 +11,159 @@ export interface VoiceSessionOptions {
   onGreetingReceived?: () => void;
   onMessageReceived?: (data: Record<string, unknown>) => void;
   onError?: (error: string) => void;
+  apiUrl?: string;
 }
 
-const SAMPLE_RATE = 24000;
+export type SessionStatus = "idle" | "connecting" | "active" | "error";
 
 /**
  * useVoiceSession
- * Encapsulates the core logic for real-time multimodal voice sessions.
- * Manages WebSocket, AudioContext, and microphone stream.
+ *
+ * The Top-Level Orchestrator.
+ * Coordinates VAD, Audio Playback, and Streaming Services.
  */
 export const useVoiceSession = (options: VoiceSessionOptions = {}) => {
-  // Use a ref to store the latest options to avoid re-triggering effects/callbacks
+  const [status, setStatus] = useState<SessionStatus>("idle");
+  const [isThinking, setIsThinking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const optionsRef = useRef(options);
   useEffect(() => {
     optionsRef.current = options;
   }, [options]);
 
-  const [isActive, setIsActive] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isAiSpeaking, setIsAiSpeaking] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const streamServiceRef = useRef<AudioStreamService | null>(null);
+  const aiStartedAtRef = useRef<number>(0);
 
-  const socketRef = useRef<WebSocket | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
-  const nextStartTimeRef = useRef<number>(0);
+  // 1. Setup Audio Playback Layer
+  const { isAiSpeaking, playAudio, stopAudio, resumeAudio } = useAudioPlayback({
+    onAiSpeakingStart: () => {
+      aiStartedAtRef.current = Date.now();
+      setIsThinking(false);
+      optionsRef.current.onAiSpeakingStart?.();
+    },
+    onAiSpeakingEnd: () => optionsRef.current.onAiSpeakingEnd?.(),
+  });
 
-  const cleanup = useCallback(() => {
-    if (socketRef.current) {
-      // Small delay to allow any pending messages to be sent/buffered
-      const socket = socketRef.current;
-      socketRef.current = null;
-      socket.close();
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
-    }
-    setIsActive(false);
-    setIsRecording(false);
-    setIsConnecting(false);
-    setIsAiSpeaking(false);
-    optionsRef.current.onAiSpeakingEnd?.();
-  }, []);
-
-  useEffect(() => {
-    return () => cleanup();
-  }, [cleanup]);
-
-  const initAudioContext = useCallback(async () => {
-    if (
-      !audioContextRef.current ||
-      audioContextRef.current.state === "closed"
-    ) {
-      const AudioContextClass =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext;
-      if (!AudioContextClass) {
-        throw new Error("Web Audio API not supported");
-      }
-      audioContextRef.current = new AudioContextClass({
-        sampleRate: SAMPLE_RATE,
-      });
-    }
-    if (audioContextRef.current.state === "suspended") {
-      await audioContextRef.current.resume();
-    }
-    return audioContextRef.current;
-  }, []);
-
-  const playBinaryAudio = useCallback((base64Data: string) => {
-    const ctx = audioContextRef.current;
-    if (!ctx) return;
-
-    try {
-      const binaryString = atob(base64Data);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-
-      const int16Data = new Int16Array(bytes.buffer);
-      const float32Data = new Float32Array(int16Data.length);
-      for (let i = 0; i < int16Data.length; i++) {
-        float32Data[i] = int16Data[i] / 32768.0;
-      }
-
-      const audioBuffer = ctx.createBuffer(1, float32Data.length, SAMPLE_RATE);
-      audioBuffer.getChannelData(0).set(float32Data);
-
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ctx.destination);
-
-      const startTime = Math.max(ctx.currentTime, nextStartTimeRef.current);
-      source.start(startTime);
-      nextStartTimeRef.current = startTime + audioBuffer.duration;
-
-      // Use functional state update to check current isAiSpeaking
-      setIsAiSpeaking((prev) => {
-        if (!prev) {
-          optionsRef.current.onAiSpeakingStart?.();
-          return true;
+  // 2. Setup VAD Layer
+  const { isVADLoading, isRecording, startVAD, pauseVAD, destroyVAD } = useVAD({
+    onSpeechStart: () => {
+      // Interruption Logic
+      if (aiStartedAtRef.current > 0) {
+        const timeSinceAiStarted = Date.now() - aiStartedAtRef.current;
+        if (timeSinceAiStarted > 400) {
+          stopAudio();
+          streamServiceRef.current?.sendStop();
+          aiStartedAtRef.current = 0;
         }
-        return prev;
-      });
+      }
+    },
+    onSpeechEnd: () => {
+      setIsThinking(true);
+    },
+    onMisfire: () => {
+      setIsThinking(false);
+    },
+    onFrameProcessed: (_probs, frame) => {
+      if (streamServiceRef.current?.isConnected) {
+        const base64Audio = float32ToBase64(frame);
+        streamServiceRef.current.sendAudio(base64Audio);
+      }
+    },
+  });
 
-      source.onended = () => {
-        if (ctx.currentTime >= nextStartTimeRef.current - 0.1) {
-          setIsAiSpeaking(false);
-          optionsRef.current.onAiSpeakingEnd?.();
-        }
-      };
-    } catch (err) {
-      console.error("Audio playback error", err);
-    }
-  }, []);
+  const cleanup = useCallback(async () => {
+    stopAudio();
+    streamServiceRef.current?.disconnect();
+    await destroyVAD();
+    setStatus("idle");
+    setIsThinking(false);
+    setError(null);
+  }, [destroyVAD, stopAudio]);
 
   const startSession = useCallback(async () => {
-    setIsConnecting(true);
+    setStatus("connecting");
     setError(null);
     optionsRef.current.onStatusChange?.("Connecting...");
 
     try {
-      const audioCtx = await initAudioContext();
-      nextStartTimeRef.current = audioCtx.currentTime;
+      if (!window.isSecureContext) {
+        throw new Error(
+          "Microphone requires a secure context (HTTPS or localhost).",
+        );
+      }
+      // 1. Initialize Audio contexts in user-gesture
+      await resumeAudio();
 
-      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      // 2. Start VAD (Microphone) in user-gesture
+      // Waiting for WS open causes browsers to block mic access because it's no longer in the click stack.
+      await startVAD();
+
+      const baseUrl =
+        optionsRef.current.apiUrl ||
+        import.meta.env.VITE_API_URL ||
+        "http://localhost:3001";
       const wsUrl = baseUrl.replace("http", "ws").replace("/api/v1", "");
 
-      const socket = new WebSocket(wsUrl);
-      socketRef.current = socket;
+      const stream = new AudioStreamService(wsUrl);
+      streamServiceRef.current = stream;
 
-      socket.onopen = () => {
-        setIsConnecting(false);
-        setIsActive(true);
+      stream.onOpen = () => {
+        setStatus("active");
         optionsRef.current.onStatusChange?.("Connected");
       };
 
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          optionsRef.current.onMessageReceived?.(data);
-
-          if (data.parts) {
-            for (const part of data.parts) {
-              if (part.inlineData?.mimeType?.includes("audio")) {
-                optionsRef.current.onGreetingReceived?.();
-                playBinaryAudio(part.inlineData.data);
-              }
+      stream.onMessage = (data) => {
+        optionsRef.current.onMessageReceived?.(data);
+        const parts = data.parts;
+        if (Array.isArray(parts)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          parts.forEach((part: any) => {
+            // we use any here because part is a complex nested object from Gemini
+            if (part.inlineData?.mimeType?.includes("audio")) {
+              optionsRef.current.onGreetingReceived?.();
+              playAudio(part.inlineData.data);
             }
-          }
-        } catch (e) {
-          console.error("Socket message error", e);
+          });
         }
       };
 
-      socket.onerror = () => {
-        const msg = "WebSocket connection error";
+      stream.onError = (msg) => {
         setError(msg);
         optionsRef.current.onError?.(msg);
         cleanup();
       };
 
-      socket.onclose = () => {
-        cleanup();
-      };
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to start session";
+      stream.onClose = () => cleanup();
+
+      stream.connect();
+    } catch (err: unknown) {
+      console.error("Session Start Error:", err);
+      const msg = err instanceof Error ? err.message : "Failed to connect";
       setError(msg);
       optionsRef.current.onError?.(msg);
-      setIsConnecting(false);
+      setStatus("error");
       cleanup();
     }
-  }, [cleanup, initAudioContext, playBinaryAudio]);
-
-  const startRecording = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      const ctx = await initAudioContext();
-
-      const source = ctx.createMediaStreamSource(stream);
-      const processor = ctx.createScriptProcessor(2048, 1, 1);
-      processorRef.current = processor;
-
-      processor.onaudioprocess = (e) => {
-        const inputData = e.inputBuffer.getChannelData(0);
-
-        let l = inputData.length;
-        const buf = new Int16Array(l);
-        while (l--) {
-          const s = Math.max(-1, Math.min(1, inputData[l]));
-          buf[l] = s < 0 ? s * 0x8000 : s * 0x7fff;
-        }
-
-        const bytes = new Uint8Array(buf.buffer);
-        let binary = "";
-        for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        const base64Audio = btoa(binary);
-
-        if (socketRef.current?.readyState === WebSocket.OPEN) {
-          socketRef.current.send(JSON.stringify({ audio: base64Audio }));
-        }
-      };
-
-      source.connect(processor);
-      processor.connect(ctx.destination);
-      setIsRecording(true);
-      optionsRef.current.onStatusChange?.("Listening");
-    } catch (err) {
-      console.error(err);
-      const msg = "Microphone access denied";
-      setError(msg);
-      optionsRef.current.onError?.(msg);
-    }
-  }, [initAudioContext]);
-
-  const stopRecording = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
-    }
-    setIsRecording(false);
-    optionsRef.current.onStatusChange?.("Active");
-  }, []);
-
-  const toggleRecording = useCallback(async () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      await startRecording();
-    }
-  }, [isRecording, stopRecording, startRecording]);
+  }, [cleanup, playAudio, resumeAudio, startVAD]);
 
   return {
-    isActive,
-    isConnecting,
+    status,
+    isActive: status === "active",
+    isConnecting: status === "connecting",
     isRecording,
     isAiSpeaking,
+    isVADLoading,
+    isThinking,
     error,
-    setError,
     startSession,
     endSession: cleanup,
-    toggleRecording,
-    stopRecording,
+    toggleRecording: async () => {
+      if (isRecording) {
+        await pauseVAD();
+      } else {
+        await startVAD();
+      }
+    },
   };
 };

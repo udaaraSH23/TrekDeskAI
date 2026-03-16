@@ -37,7 +37,10 @@ import styles from "./EmbedChat.module.css";
 const EmbedChat: React.FC = () => {
   // --- 1. CONFIGURATION & CUSTOMIZATION ---
   // The layout and initial behavior are driven by URL parameters provided by the host script.
-  const params = new URLSearchParams(window.location.search);
+  const params = React.useMemo(
+    () => new URLSearchParams(window.location.search),
+    [],
+  );
 
   /**
    * The primary brand color (HEX) for buttons, waves, and shadows.
@@ -57,10 +60,9 @@ const EmbedChat: React.FC = () => {
   const assistantName: string = params.get("name") || "TrekDesk AI";
 
   // --- 2. UI STATE ---
-  /**
-   * Tracks if the AI has finished its initial greeting; enables user interaction.
-   */
   const [hasGreetingStarted, setHasGreetingStarted] = useState<boolean>(false);
+  const [isInitialGreetingFinished, setIsInitialGreetingFinished] =
+    useState<boolean>(false);
 
   /**
    * Human-readable status text displayed below the central sphere.
@@ -91,8 +93,11 @@ const EmbedChat: React.FC = () => {
       },
       /** Triggers the wave animation. */
       onAiSpeakingStart: () => setStatus("Trek AI Speaking..."),
-      /** Stops the wave animation. */
-      onAiSpeakingEnd: () => setStatus("Online"),
+      /** Stops the wave animation and finalizes greeting state. */
+      onAiSpeakingEnd: () => {
+        setStatus("Online");
+        setIsInitialGreetingFinished(true);
+      },
       /** Displays fatal errors to the user. */
       onError: (msg: string) => setStatus(msg),
     }),
@@ -108,6 +113,7 @@ const EmbedChat: React.FC = () => {
     isConnecting, // Whether we are in the handshake phase
     isRecording, // Whether the user's mic is currently active
     isAiSpeaking, // Whether the AI is currently streaming audio output
+    isThinking, // Whether the AI is processing input
     error, // Any fatal connection or permission errors
     startSession, // Initializes the voice stream
     endSession, // Gracefully closes the connection
@@ -156,11 +162,13 @@ const EmbedChat: React.FC = () => {
               - Becomes translucent when inactive.
           */}
           <div
-            className={`${styles.sphereContainer} ${isAiSpeaking ? styles.sphereActive : styles.sphereInactive}`}
+            className={`${styles.sphereContainer} ${isAiSpeaking ? styles.sphereActive : styles.sphereInactive} ${isThinking ? styles.sphereThinking : ""}`}
             style={{
               boxShadow: isAiSpeaking
                 ? `0 0 50px ${primaryColor}`
-                : "0 10px 30px rgba(0,0,0,0.2)",
+                : isThinking
+                  ? `0 0 30px ${primaryColor}80`
+                  : "0 10px 30px rgba(0,0,0,0.2)",
             }}
           >
             {isAiSpeaking ? (
@@ -185,7 +193,23 @@ const EmbedChat: React.FC = () => {
             )}
           </div>
 
-          <p className={styles.statusText}>{status}</p>
+          <p className={styles.statusText}>
+            {isThinking ? "Assistant is thinking..." : status}
+          </p>
+
+          {isThinking && (
+            <div className={styles.thinkingIndicator}>
+              <div className={styles.thinkingDot} />
+              <div
+                className={styles.thinkingDot}
+                style={{ animationDelay: "0.2s" }}
+              />
+              <div
+                className={styles.thinkingDot}
+                style={{ animationDelay: "0.4s" }}
+              />
+            </div>
+          )}
         </div>
 
         {/* 
@@ -216,15 +240,19 @@ const EmbedChat: React.FC = () => {
             {/* Mic Toggle Button */}
             <button
               onClick={toggleRecording}
-              disabled={!hasGreetingStarted}
+              disabled={!hasGreetingStarted || !isInitialGreetingFinished}
               className={`${styles.micButton} ${isRecording ? styles.micButtonActive : styles.micButtonInactive}`}
               style={{
                 backgroundColor: isRecording
                   ? primaryColor
                   : "rgba(255,255,255,0.1)",
                 boxShadow: isRecording ? `0 0 20px ${primaryColor}` : "none",
-                opacity: hasGreetingStarted ? 1 : 0.5,
-                cursor: hasGreetingStarted ? "pointer" : "not-allowed",
+                opacity:
+                  hasGreetingStarted && isInitialGreetingFinished ? 1 : 0.5,
+                cursor:
+                  hasGreetingStarted && isInitialGreetingFinished
+                    ? "pointer"
+                    : "not-allowed",
               }}
             >
               {isRecording ? (

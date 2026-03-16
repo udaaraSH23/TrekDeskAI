@@ -392,9 +392,10 @@ const WidgetConfig: React.FC = () => {
                 as query parameters. This ensures the preview is always in sync with unsaved edits.
             */}
             <iframe
-              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}&position=${formData.position}&name=${encodeURIComponent(assistantName)}`}
+              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}&position=${formData.position}&name=${encodeURIComponent(assistantName)}&apiUrl=${encodeURIComponent(import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1")}`}
               className={styles.previewIframe}
               title="Widget Preview"
+              allow="microphone; autoplay"
             />
           </div>
           <p className={styles.previewNote}>

@@ -142,6 +142,11 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
         if (parsed.audio) {
           geminiService.sendAudio(geminiWs, parsed.audio);
         }
+
+        // Support explicit stop command for barge-in
+        if (parsed.command === "stop") {
+          geminiService.cancelAiSpeech(geminiWs);
+        }
       } catch {
         logger.error("[Server] Client message parsing error");
       }
@@ -152,8 +157,9 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
      * Ensures all external connections (like the Gemini stream) are
      * properly disposed of when the client disconnects.
      */
-    ws.on("close", async () => {
+    ws.on("close", async (code, reason) => {
       geminiWs.close();
+      const reasonStr = reason?.toString() || "None";
       const durationSecs = Math.floor((Date.now() - startTime) / 1000);
       try {
         await callLogService.endCallSession({
@@ -166,7 +172,7 @@ export const handleVoiceConnection = async (ws: WebSocket) => {
         logger.error(err as Error);
       }
       logger.info(
-        "[Server] Voice session closed. Duration: " + durationSecs + "s",
+        `[Server] Voice session closed | Duration: ${durationSecs}s | Code: ${code} | Reason: ${reasonStr}`,
       );
     });
   } catch (err: unknown) {

@@ -49,4 +49,11 @@ export interface IGeminiService {
    * @param text - The text message to send.
    */
   sendText(geminiWs: WebSocket, text: string): void;
+
+  /**
+   * Sends a cancellation signal to the Gemini model to stop current speech/generation.
+   *
+   * @param geminiWs - The active WebSocket connection.
+   */
+  cancelAiSpeech(geminiWs: WebSocket): void;
 }
