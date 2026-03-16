@@ -18,8 +18,10 @@ export const WidgetSettingsRowSchema = z.object({
   primary_color: z.string().length(7),
   /** Visual position of the widget on the host website */
   position: z.enum(["left", "right"]),
-  /** The first message the AI assistant displays to the user */
+  /** The greeting message displayed before the user starts the session. */
   initial_message: z.string(),
+  /** The name of the AI agent displayed in the widget UI */
+  agent_name: z.string().min(1).max(100).default("TrekDesk AI"),
   /** List of authorized domains allowed to embed this widget */
   allowed_origins: z.array(z.string()),
   /** Timestamp of the last configuration update */
@@ -45,6 +47,8 @@ export const UpdateWidgetSettingsPayloadSchema = z.object({
   position: z.enum(["left", "right"]).optional(),
   /** Optional new greeting message */
   initial_message: z.string().optional(),
+  /** Optional new agent name */
+  agent_name: z.string().min(1).max(100).optional(),
   /** Optional new list of authorized origins */
   allowed_origins: z.array(z.string()).optional(),
 });

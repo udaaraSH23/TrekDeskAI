@@ -71,8 +71,13 @@ export class WidgetController {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
-    const { primary_color, position, initial_message, allowed_origins } =
-      req.body;
+    const {
+      primary_color,
+      position,
+      initial_message,
+      agent_name,
+      allowed_origins,
+    } = req.body;
 
     try {
       const settings = await this.widgetService.updateSettings({
@@ -80,6 +85,7 @@ export class WidgetController {
         primary_color,
         position,
         initial_message,
+        agent_name,
         allowed_origins,
       });
 
@@ -117,13 +123,20 @@ export class WidgetController {
       const name = req.query.name as string;
 
       // Construct the URL for the actual widget hosted on Frontend
-      // Note: We use the same parameters passed to us
       const frontendBaseUrl =
         process.env.NODE_ENV === "production"
           ? env.FRONTEND_URL
           : "http://localhost:5173";
 
-      const targetUrl = `${frontendBaseUrl}/embed/chat?agentId=${agentId}&apiUrl=${encodeURIComponent(apiUrl || "")}&color=${encodeURIComponent(color || "")}&msg=${encodeURIComponent(msg || "")}&name=${encodeURIComponent(name || "")}`;
+      // Fetch current settings from DB to ensure name/color are accurate
+      const settings = await this.widgetService.getSettingsByTenant(agentId);
+
+      const resolvedColor = color || settings?.primary_color || "#10b981";
+      const resolvedMsg =
+        msg || settings?.initial_message || "Hi! Ready for a adventure?";
+      const resolvedName = name || settings?.agent_name || "TrekDesk AI";
+
+      const targetUrl = `${frontendBaseUrl}/embed/chat?agentId=${agentId}&apiUrl=${encodeURIComponent(apiUrl || "")}&color=${encodeURIComponent(resolvedColor)}&msg=${encodeURIComponent(resolvedMsg)}&name=${encodeURIComponent(resolvedName)}`;
 
       // Return a simple HTML wrapper that loads the real widget in an iframe
       const html = `

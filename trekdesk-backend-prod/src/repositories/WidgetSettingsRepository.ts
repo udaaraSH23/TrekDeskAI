@@ -47,12 +47,13 @@ export class WidgetSettingsRepository implements IWidgetSettingsRepository {
     data: UpdateWidgetSettingsPayload,
   ): Promise<WidgetSettingsRow> {
     const result = await query(
-      `INSERT INTO widget_settings (tenant_id, primary_color, position, initial_message, allowed_origins, updated_at)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+      `INSERT INTO widget_settings (tenant_id, primary_color, position, initial_message, agent_name, allowed_origins, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
        ON CONFLICT (tenant_id) DO UPDATE 
        SET primary_color = COALESCE(EXCLUDED.primary_color, widget_settings.primary_color),
            position = COALESCE(EXCLUDED.position, widget_settings.position),
            initial_message = COALESCE(EXCLUDED.initial_message, widget_settings.initial_message),
+           agent_name = COALESCE(EXCLUDED.agent_name, widget_settings.agent_name),
            allowed_origins = COALESCE(EXCLUDED.allowed_origins, widget_settings.allowed_origins),
            updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
@@ -61,6 +62,7 @@ export class WidgetSettingsRepository implements IWidgetSettingsRepository {
         data.primary_color || null,
         data.position || null,
         data.initial_message || null,
+        data.agent_name || null,
         data.allowed_origins || null,
       ],
     );

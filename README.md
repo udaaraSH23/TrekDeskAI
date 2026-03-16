@@ -67,7 +67,9 @@ npm run dev
 
 ## Major Functionality
 
-- **Admin authentication:** Google OAuth on frontend; backend verifies Google ID token and issues JWT (MVP can restrict by whitelist).
+- **Admin authentication:** Google OAuth on frontend; backend verifies Google ID token and issues JWT.
+  > [!IMPORTANT]
+  > **MVP Phase Security**: Access is restricted by an email whitelist. Admins must have their Google email address added to `GOOGLE_AUTH_WHITELIST` in `trekdesk-backend-prod/src/config/constants.ts` to log in.
 - **Tours:** CRUD trekking itineraries and tiered pricing.
 - **Knowledge Base (RAG):** ingest content → embeddings → pgvector search used during tool calls.
 - **Real-time voice:** full-duplex streaming via backend WebSocket proxy to Gemini Live API.

@@ -4,7 +4,9 @@
  * Defines the high-level routing architecture, implements code-splitting (Lazy Loading),
  * handles global error boundaries, and enforces protected route access.
  */
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
+import { lazyRetry } from "./lib/lazyRetry";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -24,19 +26,23 @@ import { Loader2 } from "lucide-react";
  * Route Splitting (Lazy Loading)
  * Components are only loaded when the user navigates to the respective route.
  */
-const Overview = lazy(() => import("./features/overview/pages/Overview"));
-const Conversations = lazy(
+const Overview = lazyRetry(() => import("./features/overview/pages/Overview"));
+const Conversations = lazyRetry(
   () => import("./features/conversations/pages/Conversations"),
 );
-const Persona = lazy(() => import("./features/persona/pages/Persona"));
-const KnowledgeBase = lazy(
+const Persona = lazyRetry(() => import("./features/persona/pages/Persona"));
+const KnowledgeBase = lazyRetry(
   () => import("./features/knowledge/pages/KnowledgeBase"),
 );
-const WidgetConfig = lazy(() => import("./features/widget/pages/WidgetConfig"));
-const Tours = lazy(() => import("./features/tours/pages/Tours"));
-const Login = lazy(() => import("./features/auth/pages/Login"));
-const AIDebugger = lazy(() => import("./features/devtools/pages/AIDebugger"));
-const EmbedChat = lazy(() => import("./features/widget/pages/EmbedChat"));
+const WidgetConfig = lazyRetry(
+  () => import("./features/widget/pages/WidgetConfig"),
+);
+const Tours = lazyRetry(() => import("./features/tours/pages/Tours"));
+const Login = lazyRetry(() => import("./features/auth/pages/Login"));
+const AIDebugger = lazyRetry(
+  () => import("./features/devtools/pages/AIDebugger"),
+);
+const EmbedChat = lazyRetry(() => import("./features/widget/pages/EmbedChat"));
 
 /**
  * Global Intermediate Loader

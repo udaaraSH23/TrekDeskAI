@@ -31,10 +31,15 @@ export interface WidgetSettings {
   position: "left" | "right";
 
   /**
-   * The greeting text displayed in the intro screen before the voice session starts.
    * @defaultValue "Hi! How can I help you today?"
    */
   initial_message: string;
+
+  /**
+   * The name of the AI assistant shown in the widget header.
+   * @defaultValue "TrekDesk AI"
+   */
+  agent_name: string;
 
   /**
    * Security: A list of authorized origins that are permitted to embed this widget.
@@ -62,6 +67,9 @@ export interface UpdateWidgetSettingsPayload {
 
   /** New introductory message for the chat interface. */
   initial_message?: string;
+
+  /** New AI assistant name. */
+  agent_name?: string;
 
   /** Updated list of allowed origins for security enforcement. */
   allowed_origins?: string[];

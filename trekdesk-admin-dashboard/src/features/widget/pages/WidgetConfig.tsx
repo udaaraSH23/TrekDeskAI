@@ -29,7 +29,6 @@ import {
   useWidgetSettings,
   useUpdateWidgetSettings,
 } from "../hooks/useWidgetSettings";
-import { usePersonaSettings } from "../../persona/hooks/usePersona";
 
 import styles from "./WidgetConfig.module.css";
 
@@ -53,8 +52,6 @@ const WidgetConfig: React.FC = () => {
   // --- 1. DATA FETCHING ---
   /** Fetch the current widget settings (color, greeting, etc.) */
   const { data: settings, isLoading } = useWidgetSettings();
-  /** Fetch the Persona settings to get the Assistant Name */
-  const { data: personaSettings } = usePersonaSettings();
   /** Mutation hook for updating widget settings */
   const updateMutation = useUpdateWidgetSettings();
 
@@ -68,6 +65,7 @@ const WidgetConfig: React.FC = () => {
    */
   const [formData, setFormData] = useState({
     primaryColor: "#10b981",
+    agentName: "TrekDesk AI",
     welcomeMessage: "Hi! How can I help you today?",
     theme: "dark",
     position: "right",
@@ -90,6 +88,7 @@ const WidgetConfig: React.FC = () => {
       const timer = setTimeout(() => {
         setFormData({
           primaryColor: settings.primary_color || "#10b981",
+          agentName: settings.agent_name || "TrekDesk AI",
           welcomeMessage:
             settings.initial_message || "Hi! How can I help you today?",
           theme: "dark",
@@ -113,6 +112,7 @@ const WidgetConfig: React.FC = () => {
   const handleSave = (): void => {
     updateMutation.mutate({
       primary_color: formData.primaryColor,
+      agent_name: formData.agentName,
       initial_message: formData.welcomeMessage,
       position: formData.position as "left" | "right",
       allowed_origins: formData.allowedOrigins
@@ -122,12 +122,9 @@ const WidgetConfig: React.FC = () => {
     });
   };
 
-  /** Helper to get Persona name for the script preview, fallback to TrekDesk AI */
-  const assistantName: string =
-    personaSettings?.assistant_name || "TrekDesk AI";
-
   /**
    * The actual <script> snippet the user needs to paste on their site.
+
    * Dynamically generated based on current (unsaved) form selections for instant preview.
    *
    * @internal
@@ -140,7 +137,7 @@ const WidgetConfig: React.FC = () => {
     color: "${formData.primaryColor}",
     msg: "${formData.welcomeMessage}",
     position: "${formData.position}",
-    name: "${assistantName}"
+    name: "${formData.agentName}"
   });
 </script>
   `.trim();
@@ -208,6 +205,20 @@ const WidgetConfig: React.FC = () => {
                     className={`${styles.input} ${styles.hexInput}`}
                   />
                 </div>
+              </div>
+
+              {/* Assistant Name Input */}
+              <div className={styles.inputField}>
+                <label className={styles.label}>Assistant Name</label>
+                <input
+                  type="text"
+                  value={formData.agentName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, agentName: e.target.value })
+                  }
+                  className={styles.input}
+                  placeholder="e.g. Trek Assistant"
+                />
               </div>
 
               {/* Theme Selector (Currently restricted to Dark / Glassmorphism) */}
@@ -392,7 +403,7 @@ const WidgetConfig: React.FC = () => {
                 as query parameters. This ensures the preview is always in sync with unsaved edits.
             */}
             <iframe
-              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}&position=${formData.position}&name=${encodeURIComponent(assistantName)}&apiUrl=${encodeURIComponent(import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1")}`}
+              src={`/embed/chat?color=${encodeURIComponent(formData.primaryColor)}&msg=${encodeURIComponent(formData.welcomeMessage)}&position=${formData.position}&name=${encodeURIComponent(formData.agentName)}&apiUrl=${encodeURIComponent(import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1")}`}
               className={styles.previewIframe}
               title="Widget Preview"
               allow="microphone; autoplay"
