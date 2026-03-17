@@ -1,7 +1,7 @@
 # TrekDesk AI — Full Stack Tour Intelligence
 
 <div align="center">
-  <video src="Video/TrekdeskAI.mp4" width="100%" controls autoplay muted loop>
+  <video src="https://github.com/udaaraSH23/TrekDeskAI/raw/main/Video/TrekdeskAI.mp4" width="100%" controls autoplay muted loop>
   </video>
 </div>
 
