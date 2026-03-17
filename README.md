@@ -1,8 +1,7 @@
-# TrekDesk AI — Full Stack Tour Intelligence
+# TrekDesk AI - Full Stack Tour Intelligence
 
 <div align="center">
-  <video src="https://github.com/udaaraSH23/TrekDeskAI/raw/main/Video/TrekdeskAI.mp4" width="100%" controls autoplay muted loop>
-  </video>
+  ![TrekDesk AI Demo](https://github.com/udaaraSH23/TrekDeskAI/raw/main/Video/TrekdeskAI.mp4)
 </div>
 
 TrekDesk AI is a full-stack platform for trekking tour operators: an admin dashboard for configuration and analytics, plus a real-time voice AI system (Gemini Multimodal Live over WebSockets) with RAG (pgvector) and Google Calendar availability checks.
