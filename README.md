@@ -1,4 +1,4 @@
-# TrekDesk AI - Full Stack Tour Intelligence
+<img width="2528" height="963" alt="image" src="https://github.com/user-attachments/assets/9c63723f-cae5-4e09-96d6-5238389a35fd" /># TrekDesk AI - Full Stack Tour Intelligence
 
 TrekDesk AI is a full-stack platform for trekking tour operators: an admin dashboard for configuration and analytics, plus a real-time voice AI system (Gemini Multimodal Live over WebSockets) with RAG (pgvector) and Google Calendar availability checks.
 
@@ -147,6 +147,7 @@ Frontend is configured for Firebase Hosting:
 
 - Frontend (Firebase Hosting): `https://trekdesk.web.app/`
 - Backend (Cloud Run): `https://trekdesk-backend-1525120942.us-central1.run.app`
+- Live Test (Integrated Widget):`https://www.kandytreks.com/?test_ai=true`
 
 ## Docker (Backend)
 
